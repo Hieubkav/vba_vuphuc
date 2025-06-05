@@ -15,12 +15,19 @@ return new class extends Migration
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('menu_items')->nullOnDelete();
             $table->string('label');
-            $table->enum('type', ['link', 'cat_post', 'post', 'cat_product', 'product'])->default('link');
+            $table->enum('type', [
+                'link',
+                'cat_post',
+                'all_posts',
+                'post',
+                'course',
+                'all_courses',
+                'display_only'
+            ])->default('link');
             $table->string('link')->nullable();
             $table->foreignId('cat_post_id')->nullable()->constrained('cat_posts')->nullOnDelete();
             $table->foreignId('post_id')->nullable()->constrained('posts')->nullOnDelete();
-            $table->foreignId('cat_product_id')->nullable()->constrained('cat_products')->nullOnDelete();
-            $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
+            $table->unsignedBigInteger('course_id')->nullable();
             $table->integer('order')->default(0);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

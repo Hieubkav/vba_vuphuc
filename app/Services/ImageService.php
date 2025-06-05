@@ -17,11 +17,11 @@ class ImageService
      * @param string $directory Thư mục lưu trong storage
      * @param int $width Chiều rộng (0 để giữ nguyên)
      * @param int $height Chiều cao (0 để giữ nguyên)
-     * @param int $quality Chất lượng ảnh (1-100)
+     * @param int $quality Chất lượng ảnh (1-100) - mặc định 95%
      * @param string|null $customName Tên file tùy chỉnh cho SEO
      * @return string|null Đường dẫn đến ảnh đã lưu
      */
-    public function saveImage($image, string $directory, int $width = 0, int $height = 0, int $quality = 80, ?string $customName = null): ?string
+    public function saveImage($image, string $directory, int $width = 0, int $height = 0, int $quality = 95, ?string $customName = null): ?string
     {
         // Nếu không có ảnh, trả về null
         if (!$image) {
@@ -122,11 +122,11 @@ class ImageService
      * @param string $directory Thư mục lưu trong storage
      * @param int $maxWidth Chiều rộng tối đa
      * @param int $maxHeight Chiều cao tối đa
-     * @param int $quality Chất lượng ảnh (1-100)
+     * @param int $quality Chất lượng ảnh (1-100) - mặc định 95%
      * @param string|null $customName Tên file tùy chỉnh cho SEO
      * @return string|null Đường dẫn đến ảnh đã lưu
      */
-    public function saveImageWithAspectRatio($image, string $directory, int $maxWidth = 400, int $maxHeight = 200, int $quality = 80, ?string $customName = null): ?string
+    public function saveImageWithAspectRatio($image, string $directory, int $maxWidth = 400, int $maxHeight = 200, int $quality = 95, ?string $customName = null): ?string
     {
         // Nếu không có ảnh, trả về null
         if (!$image) {
@@ -212,6 +212,77 @@ class ImageService
         }
 
         return null;
+    }
+
+    /**
+     * Kiểm tra xem ảnh có tồn tại trong storage không
+     *
+     * @param string|null $imagePath
+     * @return bool
+     */
+    public static function imageExists(?string $imagePath): bool
+    {
+        if (empty($imagePath)) {
+            return false;
+        }
+
+        return Storage::exists('public/' . $imagePath);
+    }
+
+    /**
+     * Lấy URL ảnh với fallback thông minh
+     *
+     * @param object|null $model
+     * @param string $imageField
+     * @return array [hasImage, imageUrl, altText, iconClass]
+     */
+    public static function getImageData($model, string $imageField = 'thumbnail'): array
+    {
+        $hasImage = false;
+        $imageUrl = null;
+        $altText = '';
+        $iconClass = 'fas fa-image';
+
+        if ($model) {
+            $altText = $model->title ?? $model->name ?? 'Hình ảnh';
+
+            // Kiểm tra có ảnh trong database và file tồn tại
+            if (isset($model->$imageField) && !empty($model->$imageField)) {
+                if (self::imageExists($model->$imageField)) {
+                    $hasImage = true;
+                    $imageUrl = asset('storage/' . $model->$imageField);
+                }
+            }
+
+            // Xác định icon phù hợp theo type
+            if (isset($model->type)) {
+                $iconClass = self::getIconByType($model->type);
+            }
+        }
+
+        return [
+            'hasImage' => $hasImage,
+            'imageUrl' => $imageUrl,
+            'altText' => $altText,
+            'iconClass' => $iconClass
+        ];
+    }
+
+    /**
+     * Lấy icon Font Awesome theo type
+     *
+     * @param string $type
+     * @return string
+     */
+    public static function getIconByType(string $type): string
+    {
+        return match($type) {
+            'news' => 'fas fa-newspaper',
+            'service' => 'fas fa-concierge-bell',
+            'course' => 'fas fa-graduation-cap',
+            'normal' => 'fas fa-file-alt',
+            default => 'fas fa-image'
+        };
     }
 
     /**

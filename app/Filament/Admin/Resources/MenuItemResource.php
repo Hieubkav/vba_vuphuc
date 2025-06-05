@@ -20,9 +20,12 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use App\Traits\OptimizedFilamentResource;
 
 class MenuItemResource extends Resource
 {
+    use OptimizedFilamentResource;
+
     protected static ?string $model = MenuItem::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';

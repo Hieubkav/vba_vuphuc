@@ -1,6 +1,6 @@
-# Vũ Phúc - Website Doanh Nghiệp
+# VBA Vũ Phúc - Nền tảng Khóa học Trực tuyến
 
-Dự án website doanh nghiệp được xây dựng bằng Laravel 10 với Filament Admin Panel, tích hợp Livewire và Tailwind CSS.
+Dự án nền tảng khóa học trực tuyến được xây dựng bằng Laravel 10 với Filament Admin Panel, tích hợp Livewire và Tailwind CSS.
 
 ## 🚀 Tính năng chính
 

@@ -1,8 +1,4 @@
-<div class="relative" x-data="{
-    showResults: @entangle('showResults'),
-    query: @entangle('query'),
-    results: @entangle('results')
-}">
+<div class="relative">
     @if(!$isMobile)
         <!-- Desktop Search -->
         <div class="relative w-full">
@@ -22,10 +18,10 @@
                     wire:model.live.debounce.150ms="query"
                     wire:focus="$set('showResults', true)"
                     wire:blur="hideResults"
-                    placeholder="Tìm kiếm sản phẩm, bài viết..."
+                    placeholder="Tìm kiếm bài viết, khóa học..."
                     class="w-full py-3 pl-12 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 shadow-sm hover:shadow-md transition-all duration-200 text-sm"
                     autocomplete="off"
-                    @keydown.enter="$wire.performSearch()">
+                    onkeydown="if(event.key==='Enter') @this.call('performSearch')">
 
                 <button
                     wire:click="performSearch"
@@ -44,15 +40,10 @@
                 </button>
 
                 <!-- Search Results Dropdown -->
-                <div x-show="showResults && query && query.length >= 1"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 z-50 max-h-96 overflow-y-auto"
-                     @click.away="showResults = false">
+                @if($showResults && !empty($query) && strlen($query) >= 1)
+                <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-600 z-50 max-h-96 overflow-y-auto"
+                     onclick="event.stopPropagation()"
+                     style="display: block !important;">
 
                     <!-- Loading state -->
                     <div wire:loading wire:target="search" class="px-4 py-3 text-center">
@@ -76,11 +67,20 @@
                                     @if(isset($result['image']) && $result['image'])
                                         <img src="{{ asset('storage/' . $result['image']) }}"
                                              alt="{{ $result['title'] }}"
-                                             class="w-12 h-12 object-cover rounded-lg mr-3 flex-shrink-0 shadow-sm">
+                                             class="w-12 h-12 object-cover rounded-lg mr-3 flex-shrink-0 shadow-sm"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <!-- Fallback UI khi ảnh lỗi -->
+                                        <div class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 dark:from-gray-600 dark:to-gray-700 rounded-lg mr-3 flex-shrink-0 items-center justify-center" style="display: none;">
+                                            @if(isset($result['type']) && $result['type'] === 'course')
+                                                <i class="fas fa-graduation-cap text-red-500 dark:text-red-400 text-lg"></i>
+                                            @else
+                                                <i class="fas fa-newspaper text-red-500 dark:text-red-400 text-lg"></i>
+                                            @endif
+                                        </div>
                                     @else
                                         <div class="w-12 h-12 bg-gradient-to-br from-red-100 to-red-200 dark:from-gray-600 dark:to-gray-700 rounded-lg mr-3 flex-shrink-0 flex items-center justify-center">
-                                            @if(isset($result['type']) && $result['type'] === 'product')
-                                                <i class="fas fa-birthday-cake text-red-500 dark:text-red-400 text-lg"></i>
+                                            @if(isset($result['type']) && $result['type'] === 'course')
+                                                <i class="fas fa-graduation-cap text-red-500 dark:text-red-400 text-lg"></i>
                                             @else
                                                 <i class="fas fa-newspaper text-red-500 dark:text-red-400 text-lg"></i>
                                             @endif
@@ -92,9 +92,17 @@
                                             {{ $result['title'] }}
                                         </div>
 
-                                        @if(isset($result['type']) && $result['type'] === 'product' && isset($result['price']))
-                                            <div class="text-sm text-red-600 dark:text-red-400 font-semibold">
-                                                {{ $result['price'] }}
+                                        @if(isset($result['type']) && $result['type'] === 'course')
+                                            <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                @if(isset($result['price']))
+                                                    <span class="text-red-600 dark:text-red-400 font-semibold">{{ $result['price'] }}</span>
+                                                @endif
+                                                @if(isset($result['level']))
+                                                    <span class="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{{ ucfirst($result['level']) }}</span>
+                                                @endif
+                                                @if(isset($result['duration']))
+                                                    <span>{{ $result['duration'] }}</span>
+                                                @endif
                                             </div>
                                         @elseif(isset($result['type']) && $result['type'] === 'post' && isset($result['excerpt']))
                                             <div class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
@@ -103,10 +111,10 @@
                                         @endif
 
                                         <div class="flex items-center mt-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ isset($result['type']) && $result['type'] === 'product' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
-                                                @if(isset($result['type']) && $result['type'] === 'product')
-                                                    <i class="fas fa-birthday-cake mr-1"></i>
-                                                    Sản phẩm
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ isset($result['type']) && $result['type'] === 'course' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
+                                                @if(isset($result['type']) && $result['type'] === 'course')
+                                                    <i class="fas fa-graduation-cap mr-1"></i>
+                                                    Khóa học
                                                 @else
                                                     <i class="fas fa-newspaper mr-1"></i>
                                                     Bài viết
@@ -147,6 +155,7 @@
                         </div>
                     @endif
                 </div>
+                @endif
             </div>
         </div>
     @else
@@ -158,10 +167,10 @@
                     wire:model.live.debounce.150ms="query"
                     wire:focus="$set('showResults', true)"
                     wire:blur="hideResults"
-                    placeholder="Tìm kiếm sản phẩm, bài viết..."
+                    placeholder="Tìm kiếm bài viết, khóa học..."
                     class="w-full py-2 px-4 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     autocomplete="off"
-                    @keydown.enter="$wire.performSearch()">
+                    onkeydown="if(event.key==='Enter') @this.call('performSearch')">
 
                 <button
                     wire:click="performSearch"
@@ -173,10 +182,10 @@
                 </button>
 
                 <!-- Mobile Search Results -->
-                <div x-show="showResults && results && results.length > 0"
-                     x-transition
-                     class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50 max-h-64 overflow-y-auto"
-                     @click.away="showResults = false">
+                @if($showResults && !empty($results))
+                <div class="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-50 max-h-64 overflow-y-auto"
+                     onclick="event.stopPropagation()"
+                     style="display: block !important;">
 
                     @if(!empty($results))
                         <div class="py-1">
@@ -189,11 +198,20 @@
                                     @if(isset($result['image']) && $result['image'])
                                         <img src="{{ asset('storage/' . $result['image']) }}"
                                              alt="{{ $result['title'] }}"
-                                             class="w-10 h-10 object-cover rounded-lg mr-3 flex-shrink-0 shadow-sm">
+                                             class="w-10 h-10 object-cover rounded-lg mr-3 flex-shrink-0 shadow-sm"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                        <!-- Fallback UI khi ảnh lỗi -->
+                                        <div class="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 dark:from-gray-600 dark:to-gray-700 rounded-lg mr-3 flex-shrink-0 items-center justify-center" style="display: none;">
+                                            @if(isset($result['type']) && $result['type'] === 'course')
+                                                <i class="fas fa-graduation-cap text-red-500 dark:text-red-400"></i>
+                                            @else
+                                                <i class="fas fa-newspaper text-red-500 dark:text-red-400"></i>
+                                            @endif
+                                        </div>
                                     @else
                                         <div class="w-10 h-10 bg-gradient-to-br from-red-100 to-red-200 dark:from-gray-600 dark:to-gray-700 rounded-lg mr-3 flex-shrink-0 flex items-center justify-center">
-                                            @if(isset($result['type']) && $result['type'] === 'product')
-                                                <i class="fas fa-birthday-cake text-red-500 dark:text-red-400"></i>
+                                            @if(isset($result['type']) && $result['type'] === 'course')
+                                                <i class="fas fa-graduation-cap text-red-500 dark:text-red-400"></i>
                                             @else
                                                 <i class="fas fa-newspaper text-red-500 dark:text-red-400"></i>
                                             @endif
@@ -205,9 +223,14 @@
                                             {{ $result['title'] }}
                                         </div>
 
-                                        @if(isset($result['type']) && $result['type'] === 'product' && isset($result['price']))
-                                            <div class="text-xs text-red-600 dark:text-red-400 font-semibold">
-                                                {{ $result['price'] }}
+                                        @if(isset($result['type']) && $result['type'] === 'course')
+                                            <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                                @if(isset($result['price']))
+                                                    <span class="text-red-600 dark:text-red-400 font-semibold">{{ $result['price'] }}</span>
+                                                @endif
+                                                @if(isset($result['duration']))
+                                                    <span>{{ $result['duration'] }}</span>
+                                                @endif
                                             </div>
                                         @elseif(isset($result['type']) && $result['type'] === 'post' && isset($result['excerpt']))
                                             <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -216,8 +239,8 @@
                                         @endif
 
                                         <div class="flex items-center mt-1">
-                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium {{ isset($result['type']) && $result['type'] === 'product' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' }}">
-                                                {{ isset($result['type']) && $result['type'] === 'product' ? 'Sản phẩm' : 'Bài viết' }}
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium {{ isset($result['type']) && $result['type'] === 'course' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' }}">
+                                                {{ isset($result['type']) && $result['type'] === 'course' ? 'Khóa học' : 'Bài viết' }}
                                             </span>
                                         </div>
                                     </div>
@@ -227,6 +250,7 @@
                         </div>
                     @endif
                 </div>
+                @endif
             </div>
         </div>
     @endif

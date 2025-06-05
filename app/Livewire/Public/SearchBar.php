@@ -3,13 +3,14 @@
 namespace App\Livewire\Public;
 
 use Livewire\Component;
-use App\Models\Product;
+use App\Models\Course;
 use App\Models\Post;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class SearchBar extends Component
 {
+
     public $query = '';
     public $results = [];
     public $showResults = false;
@@ -29,6 +30,9 @@ class SearchBar extends Component
             $this->results = [];
             $this->showResults = false;
         }
+
+        // Force re-render
+        $this->dispatch('search-updated');
     }
 
     public function search()
@@ -36,27 +40,7 @@ class SearchBar extends Component
         $cacheKey = 'search_' . md5($this->query);
 
         $this->results = Cache::remember($cacheKey, 300, function () {
-            $products = Product::where('status', 'active')
-                ->where('name', 'like', '%' . $this->query . '%')
-                ->with(['images' => function($query) {
-                    $query->where('status', 'active')->orderBy('order');
-                }])
-                ->take(5)
-                ->get()
-                ->map(function ($product) {
-                    // Lấy ảnh đầu tiên của sản phẩm
-                    $image = $product->images->first()?->image_link ?? null;
-
-                    return [
-                        'type' => 'product',
-                        'id' => $product->id,
-                        'title' => $product->name,
-                        'url' => route('products.show', $product->slug),
-                        'image' => $image,
-                        'price' => $product->price ? number_format($product->price, 0, ',', '.') . 'đ' : null
-                    ];
-                });
-
+            // Tìm kiếm bài viết
             $posts = Post::where('status', 'active')
                 ->where('title', 'like', '%' . $this->query . '%')
                 ->with(['images' => function($query) {
@@ -78,7 +62,31 @@ class SearchBar extends Component
                     ];
                 });
 
-            return $products->concat($posts)->take(8)->toArray();
+            // Tìm kiếm khóa học
+            $courses = Course::where('status', 'active')
+                ->where('title', 'like', '%' . $this->query . '%')
+                ->with(['images' => function($query) {
+                    $query->where('status', 'active')->orderBy('order');
+                }])
+                ->take(5)
+                ->get()
+                ->map(function ($course) {
+                    // Ưu tiên thumbnail, nếu không có thì lấy ảnh đầu tiên
+                    $image = $course->thumbnail ?? $course->images->first()?->image_link ?? null;
+
+                    return [
+                        'type' => 'course',
+                        'id' => $course->id,
+                        'title' => $course->title,
+                        'url' => route('courses.show', $course->slug),
+                        'image' => $image,
+                        'price' => $course->price ? number_format($course->price, 0, ',', '.') . 'đ' : null,
+                        'level' => $course->level,
+                        'duration' => $course->duration_hours ? $course->duration_hours . ' giờ' : null
+                    ];
+                });
+
+            return $posts->concat($courses)->take(8)->toArray();
         });
     }
 
@@ -91,7 +99,7 @@ class SearchBar extends Component
     public function performSearch()
     {
         if (!empty($this->query)) {
-            return redirect()->route('products.search', ['q' => $this->query]);
+            return redirect()->route('search.posts', ['q' => $this->query]);
         }
     }
 

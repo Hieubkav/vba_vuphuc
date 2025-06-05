@@ -1,112 +1,73 @@
 @extends('layouts.shop')
 
 @section('content')
-    {{--
-        Hero Banner Slider - Component chính hiển thị ở đầu trang chủ
-        - Sử dụng dữ liệu từ model Sliders thông qua ViewServiceProvider
-        - Responsive design với ảnh WebP tối ưu cho cả mobile và desktop
-        - Tự động ẩn nếu không có dữ liệu slider
-        - Hỗ trợ auto-play, navigation controls và indicators
-        - Tích hợp SEO-friendly alt text và lazy loading
-    --}}
+    <!-- Hero Banner -->
     @include('components.storefront.hero-banner')
 
-    <!-- Giới thiệu tổng quan về Vũ Phúc Baking -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-white">
-        @include('components.storefront.about-us')
+    <!-- Giới thiệu khóa học - Tối ưu hóa với tone đỏ-trắng minimalist -->
+    <section class="storefront-section bg-white bg-pattern-subtle animate-fade-in-optimized">
+        @livewire('courses-overview')
     </section>
 
-    <!-- Thống kê số liệu -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-gray-50">
-        @include('components.storefront.stats-counter')
+    <!-- Album timeline khóa học -->
+    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+        @include('components.storefront.album-timeline')
     </section>
 
-    <!-- Giới thiệu sản phẩm tiêu biểu -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-gray-50">
-        @include('components.storefront.featured-products')
+    <!-- Nhóm khóa học -->
+    <section class="storefront-section bg-white animate-fade-in-optimized">
+        @include('components.storefront.course-groups')
     </section>
 
-    <!-- Services Section -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-gray-50">
-        @include('components.storefront.services')
+    <!-- Khóa học theo từng danh mục -->
+    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+        @include('components.storefront.course-categories-sections')
     </section>
-
-    <!-- Slogan Section -->
-    <section class="animate-on-scroll py-6 md:py-8">
-        @include('components.storefront.slogan')
-    </section>
-
-    <!-- Giới thiệu khóa học - Chỉ hiển thị tổng quan và liên kết đến trang khóa học -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-white">
-        @include('components.storefront.courses-overview')
-    </section>
-
-    <!-- Trusted Partners Gallery -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-white">
-        @include('components.storefront.partners')
-    </section>
-
-    <!-- Curated Articles & Insights -->
-    <section class="animate-on-scroll py-12 md:py-16 bg-gray-50">
-        @include('components.storefront.blog-posts')
-    </section>
-
-    <section class="py-12 md:py-16 bg-gradient-to-r from-red-800 via-red-700 to-red-600 text-white relative overflow-hidden">
-        @include('components.storefront.homepage-cta')
-    </section>
-
-    {{-- <!-- Elegant Category Showcase - Giới thiệu ngắn gọn các danh mục -->
-    <section class="animate-on-scroll py-16 md:py-24">
-        @include('components.storefront.categories')
-    </section>
-
-    <!-- Brand Story & Heritage -->
-    <section class="animate-on-scroll py-16 md:py-24 bg-gray-50">
-        @include('components.storefront.about-section')
-    </section>
-
-    
-
-
 
     <!-- Đánh giá của khách hàng -->
-    <section class="animate-on-scroll py-16 md:py-24 bg-white">
+    <section class="storefront-section bg-white animate-fade-in-optimized">
         @include('components.storefront.testimonials')
     </section>
 
     <!-- FAQ - Câu hỏi thường gặp -->
-    <section class="animate-on-scroll py-16 md:py-24 bg-gray-50">
+    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
         @include('components.storefront.faq-section')
     </section>
 
-    
-    
+    <!-- Trusted Partners Gallery -->
+    <section class="storefront-section bg-white animate-fade-in-optimized">
+        @include('components.storefront.partners')
+    </section>
 
-    <!-- Premium Call To Action -->
-    <section class="py-14 md:py-20 bg-gradient-to-r from-red-800 via-red-700 to-red-600 text-white relative overflow-hidden">
+    <!-- Curated Articles & Insights -->
+    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+        @include('components.storefront.course-posts')
+    </section>
+
+    <!-- Blog Posts -->
+    <section class="storefront-section bg-white animate-fade-in-optimized">
+        @include('components.storefront.blog-posts')
+    </section>
+
+    <!-- Call to Action -->
+    <section class="storefront-section bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white relative overflow-hidden">
         @include('components.storefront.homepage-cta')
     </section>
-
-    <!-- Premium Services Showcase -->
-    <section class="animate-on-scroll py-16 md:py-24 bg-white">
-        @include('components.storefront.services')
-    </section>
-    --}}
 @endsection
 
 @push('styles')
     <style>
-        /* Premium styling and animations */
+        /* Tối ưu hóa styling minimalist với tone đỏ-trắng */
         section {
             position: relative;
-            transition: all 0.5s ease;
+            transition: all 0.3s ease;
         }
 
-        /* Enhanced scroll animations */
+        /* Smooth scroll animations - tối ưu performance */
         .animate-on-scroll {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 1.2s ease, transform 1.2s ease;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
 
         .animate-on-scroll.animate-visible {
@@ -114,44 +75,64 @@
             transform: translateY(0);
         }
 
-        /* Section dividers for elegant separation */
+        /* Minimalist section separators */
         section::after {
             content: '';
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 150px;
+            width: 60px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
         }
 
         section:last-of-type::after {
             display: none;
         }
 
-        /* Luxury scrollbar */
+        /* Optimized scrollbar với tone đỏ */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #f8f8f8;
+            background: #fafafa;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #c53030, #9b2c2c);
-            border-radius: 10px;
+            background: linear-gradient(to bottom, #dc2626, #b91c1c);
+            border-radius: 6px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #b91c1c, #7f1d1d);
+            background: linear-gradient(to bottom, #b91c1c, #991b1b);
         }
 
-        /* Subtle background pattern */
-        .bg-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.5;
+        /* Custom background colors */
+        .bg-gray-25 {
+            background-color: #fafafa;
+        }
+
+        .bg-red-25 {
+            background-color: #fef7f7;
+        }
+
+        /* Responsive spacing optimization */
+        @media (max-width: 768px) {
+            section {
+                padding-top: 1.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
+        }
+
+        /* Performance optimizations */
+        .animate-on-scroll {
+            will-change: opacity, transform;
+        }
+
+        .animate-on-scroll.animate-visible {
+            will-change: auto;
         }
     </style>
 @endpush
@@ -159,11 +140,11 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Enhanced scroll animations
+            // Tối ưu scroll animations với performance cao
             const observerOptions = {
                 root: null,
-                rootMargin: '0px',
-                threshold: 0.15
+                rootMargin: '50px',
+                threshold: 0.1
             };
 
             const observer = new IntersectionObserver((entries) => {
@@ -171,15 +152,18 @@
                     if (entry.isIntersecting) {
                         entry.target.classList.add('animate-visible');
 
-                        // Add staggered animation to children if they exist
+                        // Staggered animation cho children elements
                         const animatedChildren = entry.target.querySelectorAll('.stagger-item');
                         if (animatedChildren.length) {
                             animatedChildren.forEach((child, index) => {
                                 setTimeout(() => {
                                     child.classList.add('animate-visible');
-                                }, 150 * index);
+                                }, 100 * index);
                             });
                         }
+
+                        // Unobserve để tối ưu performance
+                        observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
@@ -189,16 +173,27 @@
                 observer.observe(section);
             });
 
-            // Subtle parallax effect for premium feel
-            window.addEventListener('scroll', function() {
-                const scrollTop = window.pageYOffset;
-                const parallaxElements = document.querySelectorAll('.parallax-bg');
-
-                parallaxElements.forEach(element => {
-                    const speed = element.dataset.speed || 0.5;
-                    element.style.transform = `translateY(${scrollTop * speed}px)`;
+            // Smooth scroll behavior cho internal links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
                 });
             });
         });
+
+        // Initialize storefront lazy loading
+        if (window.storefrontLazyLoader) {
+            // Refresh lazy loading sau khi tất cả animations đã setup
+            setTimeout(() => {
+                window.storefrontLazyLoader.refresh();
+            }, 100);
+        }
     </script>
 @endpush

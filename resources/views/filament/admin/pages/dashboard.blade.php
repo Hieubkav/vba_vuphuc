@@ -1,342 +1,310 @@
 <x-filament-panels::page class="fi-dashboard-page">
-    <!-- Executive Header -->
-    <div class="executive-header">
-        <div class="flex items-center justify-between flex-wrap gap-4">
+    <!-- Dashboard Header với gradient đẹp mắt -->
+    <div class="dashboard-header">
+        <div class="flex items-center justify-between flex-wrap gap-6">
             <div class="flex-1 min-w-0">
-                <h1 class="text-2xl font-bold mb-2 text-white dark:text-gray-100">📊 Dashboard Điều Hành</h1>
-                <p class="text-blue-100 dark:text-blue-200">Tổng quan hoạt động kinh doanh realtime</p>
+                <div class="flex items-center gap-4 mb-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <span class="text-2xl">🎓</span>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-white dark:text-gray-100">VBA Vũ Phúc</h1>
+                        <p class="text-blue-100 dark:text-blue-200 text-sm">Hệ thống quản lý khóa học chuyên nghiệp</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-blue-100">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Chào mừng, {{ auth()->user()->name }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                        </svg>
+                        {{ now()->format('d/m/Y') }}
+                    </span>
+                </div>
             </div>
             <div class="text-right flex-shrink-0">
-                <div class="text-sm text-blue-100 dark:text-blue-200 mb-1">Cập nhật lần cuối</div>
-                <div class="text-lg font-semibold text-white dark:text-gray-100" id="last-update-time">{{ now()->format('H:i:s d/m/Y') }}</div>
+                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                    <div class="text-sm text-blue-100 mb-1">Thời gian hiện tại</div>
+                    <div class="text-2xl font-bold text-white" id="current-time">{{ now()->format('H:i:s') }}</div>
+                </div>
             </div>
         </div>
     </div>
 
-    @if (method_exists($this, 'filtersForm'))
-        <div class="mb-6">
-            {{ $this->filtersForm }}
-        </div>
-    @endif
+    <!-- Stats Cards -->
+    <div class="stats-grid mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Khóa học -->
+            <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Tổng khóa học</p>
+                        <p class="text-3xl font-bold text-white">{{ \App\Models\Course::count() }}</p>
+                        <p class="text-blue-200 text-xs mt-1">
+                            {{ \App\Models\Course::where('status', 'active')->count() }} đang hoạt động
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 
-    <x-filament-widgets::widgets
-        :columns="$this->getColumns()"
-        :data="
-            [
-                ...(property_exists($this, 'filters') ? ['filters' => $this->filters] : []),
-                ...$this->getWidgetData(),
-            ]
-        "
-        :widgets="$this->getVisibleWidgets()"
-    />
+            <!-- Học viên -->
+            <div class="stat-card bg-gradient-to-br from-green-500 to-green-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Tổng học viên</p>
+                        <p class="text-3xl font-bold text-white">{{ \App\Models\Student::count() }}</p>
+                        <p class="text-green-200 text-xs mt-1">
+                            {{ \App\Models\Student::where('status', 'active')->count() }} đang học
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bài viết -->
+            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Tổng bài viết</p>
+                        <p class="text-3xl font-bold text-white">{{ \App\Models\Post::count() }}</p>
+                        <p class="text-purple-200 text-xs mt-1">
+                            {{ \App\Models\Post::where('status', 'active')->count() }} đã xuất bản
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giảng viên -->
+            <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-orange-100 text-sm font-medium">Tổng giảng viên</p>
+                        <p class="text-3xl font-bold text-white">{{ \App\Models\Instructor::count() }}</p>
+                        <p class="text-orange-200 text-xs mt-1">
+                            {{ \App\Models\Instructor::where('status', 'active')->count() }} đang hoạt động
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Hiển thị thông báo khi dashboard được tải
-                if (typeof window.filamentData !== 'undefined') {
-                    console.log('Dashboard realtime đã được kích hoạt');
-                }
-
-                // Thêm hiệu ứng loading khi widget refresh
-                document.addEventListener('livewire:load', function () {
-                    Livewire.hook('message.sent', (message, component) => {
-                        if (component.fingerprint.name.includes('widget')) {
-                            // Thêm class loading
-                            const element = component.el;
-                            if (element) {
-                                element.style.opacity = '0.7';
-                                element.style.transition = 'opacity 0.3s ease';
-                            }
-                        }
-                    });
-
-                    Livewire.hook('message.processed', (message, component) => {
-                        if (component.fingerprint.name.includes('widget')) {
-                            // Xóa class loading
-                            const element = component.el;
-                            if (element) {
-                                element.style.opacity = '1';
-                            }
-                        }
-                    });
-                });
-
-                // Auto refresh toàn bộ dashboard mỗi 60 giây
-                setInterval(function() {
-                    if (typeof Livewire !== 'undefined') {
-                        console.log('Đang cập nhật dashboard...');
-                        // Refresh tất cả widgets
-                        Livewire.all().forEach(function(component) {
-                            if (component.fingerprint.name.includes('widget')) {
-                                component.call('$refresh');
-                            }
-                        });
-                    }
-                }, 60000); // 60 seconds
-
-                // Hiển thị thời gian cập nhật cuối
-                function updateLastRefreshTime() {
+                // Cập nhật thời gian hiện tại với hiệu ứng mượt mà
+                function updateCurrentTime() {
                     const now = new Date();
-                    const timeString = now.toLocaleTimeString('vi-VN');
-
-                    // Tìm hoặc tạo element hiển thị thời gian
-                    let timeElement = document.getElementById('last-refresh-time');
-                    if (!timeElement) {
-                        timeElement = document.createElement('div');
-                        timeElement.id = 'last-refresh-time';
-                        timeElement.className = 'text-sm text-gray-500 text-right mb-4';
-                        timeElement.innerHTML = `<i class="fas fa-clock"></i> Cập nhật lần cuối: ${timeString}`;
-
-                        const dashboardContent = document.querySelector('.fi-dashboard-page');
-                        if (dashboardContent) {
-                            dashboardContent.insertBefore(timeElement, dashboardContent.firstChild);
-                        }
-                    } else {
-                        timeElement.innerHTML = `<i class="fas fa-clock"></i> Cập nhật lần cuối: ${timeString}`;
-                    }
-                }
-
-                // Function cập nhật thời gian header
-                function updateHeaderTime() {
-                    const now = new Date();
-                    const timeString = now.toLocaleString('vi-VN');
-                    const headerTimeElement = document.getElementById('last-update-time');
-                    if (headerTimeElement) {
-                        headerTimeElement.textContent = timeString;
-                    }
-                }
-
-                // Cập nhật thời gian ngay khi load
-                updateLastRefreshTime();
-                updateHeaderTime();
-
-                // Cập nhật thời gian mỗi khi có refresh
-                document.addEventListener('livewire:load', function () {
-                    Livewire.hook('message.processed', function() {
-                        updateLastRefreshTime();
-                        updateHeaderTime();
+                    const timeString = now.toLocaleTimeString('vi-VN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
                     });
-                });
-
-                // Cập nhật thời gian header mỗi giây
-                setInterval(updateHeaderTime, 1000);
-
-                // Handle filter changes - force page reload for immediate update
-                document.addEventListener('livewire:init', () => {
-                    Livewire.on('filtersUpdated', () => {
-                        console.log('Filter updated, reloading page...');
-                        // Force page reload to ensure all widgets get new filter values
+                    const timeElement = document.getElementById('current-time');
+                    if (timeElement) {
+                        // Thêm hiệu ứng fade khi cập nhật
+                        timeElement.style.opacity = '0.7';
                         setTimeout(() => {
-                            window.location.reload();
+                            timeElement.textContent = timeString;
+                            timeElement.style.opacity = '1';
                         }, 100);
+                    }
+                }
+
+                // Thêm hiệu ứng hover cho stat cards
+                const statCards = document.querySelectorAll('.stat-card');
+                statCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-4px) scale(1.02)';
+                    });
+
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0) scale(1)';
                     });
                 });
 
-                // Listen for select changes in filter form
-                document.addEventListener('change', (event) => {
-                    if (event.target.name === 'data.period') {
-                        console.log('Filter select changed, reloading...');
+                // Thêm hiệu ứng loading cho quick actions
+                const quickActions = document.querySelectorAll('.quick-action-btn');
+                quickActions.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        // Thêm hiệu ứng ripple
+                        const ripple = document.createElement('div');
+                        ripple.style.cssText = `
+                            position: absolute;
+                            border-radius: 50%;
+                            background: rgba(255,255,255,0.6);
+                            transform: scale(0);
+                            animation: ripple 0.6s linear;
+                            pointer-events: none;
+                        `;
+
+                        const rect = this.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+
+                        this.style.position = 'relative';
+                        this.appendChild(ripple);
+
                         setTimeout(() => {
-                            window.location.reload();
-                        }, 200);
-                    }
+                            ripple.remove();
+                        }, 600);
+                    });
+                });
+
+                // Cập nhật thời gian ngay khi load và mỗi giây
+                updateCurrentTime();
+                setInterval(updateCurrentTime, 1000);
+
+                // Thêm animation cho các elements khi load
+                const animatedElements = document.querySelectorAll('.stat-card, .quick-action-btn');
+                animatedElements.forEach((el, index) => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        el.style.transition = 'all 0.5s ease';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 100);
                 });
             });
+
+            // Thêm CSS cho ripple effect
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
         </script>
     @endpush
 
     @push('styles')
         <style>
-            /* Executive Dashboard Styles - Dark/Light Mode Compatible */
+            /* Dashboard Styles - Dark/Light Mode Compatible */
             .fi-dashboard-page {
                 @apply bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800;
                 min-height: 100vh;
                 transition: background 0.3s ease;
             }
 
-            /* KPI Cards - Executive Level with Theme Support */
-            .executive-kpi-primary {
-                @apply bg-gradient-to-br from-emerald-600 to-emerald-500 dark:from-emerald-700 dark:to-emerald-600;
-                @apply text-white dark:text-gray-100;
-                @apply border-emerald-500 dark:border-emerald-600;
-                @apply shadow-lg shadow-emerald-500/25 dark:shadow-emerald-600/25;
-                border: 1px solid !important;
-                transition: all 0.3s ease;
-            }
-
-            .executive-kpi-primary:hover {
-                @apply shadow-xl shadow-emerald-500/30 dark:shadow-emerald-600/30;
-                transform: translateY(-2px);
-            }
-
-            .executive-kpi-primary .fi-wi-stats-overview-stat-value {
-                @apply text-white dark:text-gray-100 !important;
-                font-size: 2rem !important;
-                font-weight: 800 !important;
-            }
-
-            .executive-kpi-primary .fi-wi-stats-overview-stat-description {
-                @apply text-emerald-50 dark:text-emerald-100 !important;
-                opacity: 0.9;
-            }
-
-            /* Stats Overview - Theme Compatible */
-            .fi-wi-stats-overview-stat {
-                @apply bg-white dark:bg-gray-800;
-                @apply border border-gray-200 dark:border-gray-700;
-                @apply shadow-sm dark:shadow-gray-900/20;
-                @apply rounded-xl;
-                transition: all 0.3s ease;
-            }
-
-            .fi-wi-stats-overview-stat:hover {
-                @apply shadow-lg dark:shadow-gray-900/40;
-                @apply border-blue-300 dark:border-blue-600;
-                @apply bg-gray-50 dark:bg-gray-750;
-                transform: translateY(-4px);
-            }
-
-            /* Charts - Theme Compatible */
-            .fi-wi-chart {
-                @apply bg-white dark:bg-gray-800;
-                @apply border border-gray-200 dark:border-gray-700;
-                @apply shadow-sm dark:shadow-gray-900/20;
-                @apply rounded-xl;
-                transition: all 0.3s ease;
-            }
-
-            .fi-wi-chart:hover {
-                @apply shadow-md dark:shadow-gray-900/30;
-                @apply border-gray-300 dark:border-gray-600;
-                transform: translateY(-2px);
-            }
-
-            /* Tables - Theme Compatible */
-            .fi-wi-table {
-                @apply bg-white dark:bg-gray-800;
-                @apply border border-gray-200 dark:border-gray-700;
-                @apply shadow-sm dark:shadow-gray-900/20;
-                @apply rounded-xl overflow-hidden;
-                transition: all 0.3s ease;
-            }
-
-            .fi-wi-table:hover {
-                @apply shadow-md dark:shadow-gray-900/30;
-            }
-
-            /* Widgets - Theme Compatible */
-            .fi-wi {
-                @apply bg-white dark:bg-gray-800;
-                @apply border border-gray-200 dark:border-gray-700;
-                @apply shadow-sm dark:shadow-gray-900/20;
-                @apply rounded-xl;
-                transition: all 0.3s ease;
-            }
-
-            .fi-wi:hover {
-                @apply shadow-md dark:shadow-gray-900/30;
-                @apply border-gray-300 dark:border-gray-600;
-            }
-
-            /* Section Headers - Theme Compatible */
-            .fi-section-header-heading {
-                @apply text-lg font-semibold text-gray-900 dark:text-gray-100;
-            }
-
-            /* Loading Animation */
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.7; }
-            }
-
-            .loading {
-                animation: pulse 1.5s ease-in-out infinite;
-            }
-
-            /* Responsive Improvements */
-            @media (max-width: 768px) {
-                .fi-wi-stats-overview-stat {
-                    @apply mb-4;
-                }
-
-                .executive-kpi-primary .fi-wi-stats-overview-stat-value {
-                    font-size: 1.5rem !important;
-                }
-
-                .executive-header {
-                    @apply p-4;
-                }
-
-                .executive-header h1 {
-                    @apply text-xl;
-                }
-            }
-
-            /* Alert Animations */
-            @keyframes slideIn {
-                from {
-                    opacity: 0;
-                    transform: translateX(-20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-
-            .alert-item {
-                animation: slideIn 0.3s ease-out;
-            }
-
-            /* Executive Header - Theme Compatible */
-            .executive-header {
-                @apply bg-gradient-to-br from-blue-600 to-blue-500 dark:from-blue-700 dark:to-blue-600;
+            /* Dashboard Header - Theme Compatible */
+            .dashboard-header {
+                @apply bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-700 dark:via-blue-600 dark:to-indigo-700;
                 @apply text-white dark:text-gray-100;
                 @apply shadow-lg shadow-blue-500/25 dark:shadow-blue-600/25;
                 @apply rounded-xl p-6 mb-8;
                 transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
             }
 
-            .executive-header:hover {
+            .dashboard-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+                pointer-events: none;
+            }
+
+            .dashboard-header:hover {
                 @apply shadow-xl shadow-blue-500/30 dark:shadow-blue-600/30;
+                transform: translateY(-1px);
             }
 
-            /* Status Indicators - Theme Compatible */
-            .status-indicator {
-                @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium;
-                transition: all 0.2s ease;
+            /* Stats Cards */
+            .stats-grid {
+                @apply mb-8;
             }
 
-            .status-success {
-                @apply bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
-            }
-
-            .status-warning {
-                @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400;
-            }
-
-            .status-danger {
-                @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
-            }
-
-            .status-info {
-                @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
-            }
-
-            /* Additional Theme Enhancements */
-            .fi-section {
-                @apply bg-white dark:bg-gray-800;
-                @apply border border-gray-200 dark:border-gray-700;
+            .stat-card {
+                @apply rounded-xl p-6 shadow-lg border border-white/20;
                 transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
             }
 
-            /* Form Styling */
-            .fi-fo-field-wrp {
-                @apply bg-white dark:bg-gray-800;
+            .stat-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+                pointer-events: none;
             }
 
-            /* Ensure proper text contrast */
+            .stat-card:hover {
+                transform: translateY(-2px);
+                @apply shadow-xl;
+            }
+
+            /* Quick Action Buttons */
+            .quick-action-btn {
+                @apply flex flex-col items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700;
+                @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700;
+                @apply transition-all duration-200 ease-in-out;
+                text-decoration: none;
+            }
+
+            .quick-action-btn:hover {
+                @apply shadow-md border-gray-300 dark:border-gray-600;
+                transform: translateY(-1px);
+            }
+
+            /* Responsive Improvements */
+            @media (max-width: 768px) {
+                .dashboard-header {
+                    @apply p-4;
+                }
+
+                .dashboard-header h1 {
+                    @apply text-xl;
+                }
+
+                .welcome-content .grid {
+                    @apply grid-cols-1;
+                }
+            }
+
+            /* Smooth transitions */
             .fi-dashboard-page * {
                 transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
             }

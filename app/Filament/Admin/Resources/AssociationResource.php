@@ -4,7 +4,8 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AssociationResource\Pages;
 use App\Models\Association;
-use Filament\Forms\Components\FileUpload;
+use App\Traits\HasImageUpload;
+use App\Traits\OptimizedFilamentResource;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -21,11 +22,13 @@ use Filament\Tables\Actions\DeleteBulkAction;
 
 class AssociationResource extends Resource
 {
+    use HasImageUpload, OptimizedFilamentResource;
+
     protected static ?string $model = Association::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'Quản lý đối tác';
+    protected static ?string $navigationGroup = 'Quản lý nội dung';
 
     protected static ?string $navigationLabel = 'Hiệp hội';
 
@@ -47,29 +50,12 @@ class AssociationResource extends Resource
                             ->maxLength(255)
                             ->columnSpan(2),
 
-                        FileUpload::make('image_link')
-                            ->label('Logo/Hình ảnh')
-                            ->image()
-                            ->directory('associations/logos')
-                            ->visibility('public')
-                            ->imageResizeMode('cover')
-                            ->imageResizeTargetWidth(400)
-                            ->imageResizeTargetHeight(400)
-                            ->maxSize(2048)
-                            ->imageEditor()
-                            ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
-                                $associationName = $get('name') ?? 'hiep-hoi';
-                                return $imageService->saveImage(
-                                    $file,
-                                    'associations/logos',
-                                    400,   // width
-                                    400,   // height
-                                    95,    // quality
-                                    "logo-{$associationName}" // SEO-friendly name
-                                );
-                            })
-                            ->columnSpan(1),
+                        self::createLogoUpload(
+                            'image_link',
+                            'Logo/Hình ảnh',
+                            'associations/logos',
+                            400
+                        )->columnSpan(1),
 
                         TextInput::make('website_link')
                             ->label('Website')
@@ -193,5 +179,41 @@ class AssociationResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
+    }
+
+    /**
+     * Lấy danh sách cột cần thiết cho table
+     */
+    protected static function getTableColumns(): array
+    {
+        return [
+            'id',
+            'name',
+            'description',
+            'image_link',
+            'website_link',
+            'order',
+            'status',
+            'created_at',
+        ];
+    }
+
+    /**
+     * Lấy relationships cần thiết cho form
+     */
+    protected static function getFormRelationships(): array
+    {
+        return [];
+    }
+
+    /**
+     * Lấy các cột có thể search
+     */
+    protected static function getSearchableColumns(): array
+    {
+        return array (
+  0 => 'name',
+  1 => 'description',
+);
     }
 }

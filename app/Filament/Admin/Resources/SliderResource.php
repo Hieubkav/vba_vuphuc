@@ -4,8 +4,8 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\SliderResource\Pages;
 use App\Models\Slider;
-use App\Services\ImageService;
-use Filament\Forms\Components\FileUpload;
+use App\Traits\HasImageUpload;
+use App\Traits\OptimizedFilamentResource;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -22,6 +22,8 @@ use Filament\Tables\Actions\DeleteBulkAction;
 
 class SliderResource extends Resource
 {
+    use HasImageUpload, OptimizedFilamentResource;
+
     protected static ?string $model = Slider::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
@@ -42,33 +44,13 @@ class SliderResource extends Resource
             ->schema([
                 Section::make('Thông tin slider')
                     ->schema([
-                        FileUpload::make('image_link')
-                            ->label('Hình ảnh Hero Banner')
-                            ->helperText('Kích thước tối ưu: 1920x1080px (16:9) cho desktop, 800x450px cho mobile. Ảnh sẽ được tự động chuyển sang WebP.')
-                            ->required()
-                            ->image()
-                            ->directory('sliders/banners')
-                            ->visibility('public')
-                            ->imageResizeMode('cover')
-                            ->imageCropAspectRatio('16:9')
-                            ->imageResizeTargetWidth(1920)
-                            ->imageResizeTargetHeight(1080)
-                            ->maxSize(8192) // Tăng lên 8MB để cho phép ảnh chất lượng cao
-                            ->imageEditor()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
-                                $title = $get('title') ?? 'hero-banner';
-                                return $imageService->saveImage(
-                                    $file,
-                                    'sliders/banners',
-                                    1920,  // width - tối ưu cho desktop
-                                    1080,  // height - tỷ lệ 16:9
-                                    85,    // quality - cân bằng giữa chất lượng và dung lượng
-                                    "hero-banner-{$title}" // SEO-friendly name
-                                );
-                            })
-                            ->columnSpanFull(),
+                        self::createBannerUpload(
+                            'image_link',
+                            'Hình ảnh Hero Banner',
+                            'sliders/banners',
+                            1920,
+                            1080
+                        )->columnSpanFull(),
 
                         TextInput::make('title')
                             ->label('Tiêu đề')
@@ -202,5 +184,41 @@ class SliderResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
+    }
+
+    /**
+     * Lấy danh sách cột cần thiết cho table
+     */
+    protected static function getTableColumns(): array
+    {
+        return array (
+  0 => 'id',
+  1 => 'title',
+  2 => 'image_link',
+  3 => 'link',
+  4 => 'description',
+  5 => 'order',
+  6 => 'status',
+  7 => 'created_at',
+);
+    }
+
+    /**
+     * Lấy relationships cần thiết cho form
+     */
+    protected static function getFormRelationships(): array
+    {
+        return [];
+    }
+
+    /**
+     * Lấy các cột có thể search
+     */
+    protected static function getSearchableColumns(): array
+    {
+        return array (
+  0 => 'title',
+  1 => 'description',
+);
     }
 }

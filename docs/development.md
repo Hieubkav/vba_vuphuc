@@ -24,9 +24,10 @@ Tài liệu này cung cấp hướng dẫn chi tiết cho việc phát triển d
 ```
 app/Models/
 ├── User.php              # Người dùng
+├── Course.php            # Khóa học
+├── Student.php           # Học viên
 ├── Post.php              # Bài viết
 ├── Category.php          # Danh mục
-├── Employee.php          # Nhân viên
 ├── Setting.php           # Cài đặt
 └── Slider.php            # Banner slider
 ```
@@ -35,17 +36,18 @@ app/Models/
 ```
 app/Livewire/
 ├── HomePage.php          # Trang chủ
+├── CourseList.php        # Danh sách khóa học
 ├── PostList.php          # Danh sách bài viết
-├── SearchComponent.php   # Tìm kiếm
-└── EmployeeCard.php      # Card nhân viên
+└── SearchComponent.php   # Tìm kiếm
 ```
 
 ### Filament Resources
 ```
 app/Filament/Resources/
+├── CourseResource.php    # Quản lý khóa học
+├── StudentResource.php   # Quản lý học viên
 ├── PostResource.php      # Quản lý bài viết
 ├── CategoryResource.php  # Quản lý danh mục
-├── EmployeeResource.php  # Quản lý nhân viên
 └── SettingResource.php   # Quản lý cài đặt
 ```
 

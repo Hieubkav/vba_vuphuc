@@ -189,12 +189,9 @@
                                                          alt="{{ $product->name }}"
                                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                                 @else
-                                                    <!-- Custom placeholder -->
-                                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center relative overflow-hidden">
-                                                        <div class="text-center">
-                                                            <i class="fas fa-birthday-cake text-4xl text-red-300 mb-2"></i>
-                                                            <p class="text-xs text-red-400 font-medium">Vũ Phúc Baking</p>
-                                                        </div>
+                                                    <!-- Custom placeholder - chỉ icon -->
+                                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center relative overflow-hidden">
+                                                        <i class="fas fa-birthday-cake text-4xl text-red-300"></i>
                                                     </div>
                                                 @endif
 

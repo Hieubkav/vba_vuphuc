@@ -143,16 +143,17 @@ GET /api/categories
 }
 ```
 
-## 👥 Employees API
+## 🎓 Courses API
 
-### Lấy danh sách nhân viên
+### Lấy danh sách khóa học
 ```http
-GET /api/employees
+GET /api/courses
 ```
 
 **Parameters:**
-- `department` (string): Lọc theo phòng ban
+- `category` (string): Lọc theo danh mục
 - `status` (string): active|inactive
+- `featured` (boolean): Khóa học nổi bật
 
 **Response:**
 ```json
@@ -161,17 +162,19 @@ GET /api/employees
     "data": [
         {
             "id": 1,
-            "name": "Nguyễn Văn A",
-            "position": "Giám đốc",
-            "department": "Điều hành",
-            "phone": "0123456789",
-            "email": "nguyenvana@vuphuc.com",
-            "avatar": "https://vuphuc.com/storage/employees/avatar.webp",
-            "qr_code": "https://vuphuc.com/storage/qr-codes/employee-1.png",
-            "description": "Mô tả về nhân viên...",
+            "title": "Excel VBA Cơ Bản",
+            "slug": "excel-vba-co-ban",
+            "description": "Khóa học Excel VBA từ cơ bản đến nâng cao...",
+            "price": 2500000,
+            "duration": "40 giờ",
+            "level": "Cơ bản",
+            "image": "https://vuphuc.com/storage/courses/excel-vba.webp",
+            "instructor": "Thầy Vũ Phúc",
+            "requirements": ["Kiến thức Excel cơ bản"],
+            "learning_outcomes": ["Tự động hóa Excel", "Viết macro"],
             "gallery": [
-                "https://vuphuc.com/storage/employees/gallery/1.webp",
-                "https://vuphuc.com/storage/employees/gallery/2.webp"
+                "https://vuphuc.com/storage/courses/gallery/1.webp",
+                "https://vuphuc.com/storage/courses/gallery/2.webp"
             ],
             "status": "active",
             "created_at": "2024-01-01T00:00:00Z"

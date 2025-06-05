@@ -4,11 +4,12 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\PostResource\Pages;
 use App\Filament\Admin\Resources\PostResource\RelationManagers;
+use App\Filament\Admin\Resources\PostCategoryResource;
 use App\Models\Post;
-use App\Services\ImageService;
+use App\Traits\HasImageUpload;
+use App\Traits\OptimizedFilamentResource;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -29,6 +30,8 @@ use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
+    use HasImageUpload, OptimizedFilamentResource;
+
     protected static ?string $model = Post::class;
 
     protected static ?string $modelLabel = 'bài viết';
@@ -103,30 +106,13 @@ class PostResource extends Resource
                                     ->maxLength(255),
                             ]),
 
-                        FileUpload::make('thumbnail') // Giữ tên trường là 'thumbnail' để khớp với database
-                            ->label('Hình đại diện')
-                            ->helperText('💡 Kích thước khuyến nghị: 1200x630px (tỷ lệ 1.91:1) cho hiển thị tối ưu trên mạng xã hội')
-                            ->image()
-                            ->directory('posts/thumbnails')
-                            ->visibility('public')
-                            ->maxSize(5120) // Tăng lên 5MB để cho phép ảnh chất lượng cao
-                            ->imageEditor()
-                            ->imagePreviewHeight('200') // Hiển thị preview lớn hơn
-                            ->nullable()
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            // Sử dụng saveImageWithAspectRatio để không bị méo ảnh
-                            ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(ImageService::class);
-                                $title = $get('title') ?? 'bai-viet';
-                                return $imageService->saveImageWithAspectRatio(
-                                    $file,
-                                    'posts/thumbnails',
-                                    1200,  // max width
-                                    630,   // max height - giữ tỷ lệ gốc
-                                    90,    // quality cao hơn
-                                    "thumbnail-{$title}" // SEO-friendly name
-                                );
-                            }),
+                        self::createThumbnailUpload(
+                            'thumbnail',
+                            'Hình đại diện',
+                            'posts/thumbnails',
+                            1200,
+                            630
+                        )->imagePreviewHeight('200'),
                     ])->columns(2),
 
                 Section::make('Nội dung bài viết')
@@ -196,27 +182,18 @@ class PostResource extends Resource
                             ->rows(3)
                             ->maxLength(255),
 
-                        FileUpload::make('og_image_link')
-                            ->label('Hình ảnh OG (Social Media)')
-                            ->helperText('Kích thước tối ưu: 1200x630px')
-                            ->image()
-                            ->directory('posts/og-images')
-                            ->visibility('public')
-                            ->imageResizeMode('cover')
-                            ->imageResizeTargetWidth(1200)
-                            ->imageResizeTargetHeight(630)
-                            ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
-                                $title = $get('title') ?? 'bai-viet';
-                                return $imageService->saveImage(
-                                    $file,
-                                    'posts/og-images',
-                                    1200,  // width
-                                    630,   // height
-                                    85,    // quality
-                                    "og-image-{$title}" // SEO-friendly name
-                                );
-                            }),
+                        self::createImageUpload(
+                            'og_image_link',
+                            'Hình ảnh OG (Social Media)',
+                            'posts/og-images',
+                            1200,
+                            630,
+                            5120,
+                            'Kích thước tối ưu: 1200x630px cho mạng xã hội',
+                            ['16:9'],
+                            false,
+                            false
+                        ),
                     ])->columns(2),
 
                 Section::make('Cấu hình hiển thị')
@@ -248,18 +225,25 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('thumbnail') // Giữ tên trường là 'thumbnail' để khớp với database
-                    ->label('Hình đại diện')
-                    ->defaultImageUrl(fn() => asset('images/default-post.jpg'))
-                    ->size(80) // Kích thước cố định
-                    ->extraImgAttributes(['class' => 'object-cover rounded-lg']) // Không bị méo, bo góc
-                    ->tooltip(fn ($record) => $record->title), // Hiển thị tiêu đề khi hover
+                ImageColumn::make('thumbnail')
+                    ->label('Ảnh')
+                    ->circular()
+                    ->size(50),
 
                 TextColumn::make('title')
                     ->label('Tiêu đề')
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
+                    ->weight('bold')
+                    ->description(fn ($record): string =>
+                        ($record->category ? "Danh mục: {$record->category->name}" : '') .
+                        ($record->type !== 'normal' ? " • " . match($record->type) {
+                            'service' => 'Dịch vụ',
+                            'news' => 'Tin tức',
+                            'course' => 'Khóa học',
+                            default => 'Bài viết'
+                        } : '')
+                    ),
 
                 TextColumn::make('type')
                     ->label('Loại')
@@ -276,16 +260,17 @@ class PostResource extends Resource
                         'course' => 'Khóa học',
                         'normal' => 'Bài viết',
                     })
-                    ->sortable(),
-
-                TextColumn::make('category.name')
-                    ->label('Danh mục')
-                    ->searchable()
-                    ->sortable(),
+                    ->width(100),
 
                 ToggleColumn::make('is_featured')
                     ->label('Nổi bật')
-                    ->sortable(),
+                    ->width(80),
+
+                TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->sortable()
+                    ->alignCenter()
+                    ->width(80),
 
                 TextColumn::make('status')
                     ->label('Trạng thái')
@@ -298,16 +283,20 @@ class PostResource extends Resource
                         'active' => 'Hiển thị',
                         'inactive' => 'Ẩn',
                     })
-                    ->sortable(),
+                    ->width(100),
 
-                TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->sortable(),
+                // Cột ẩn mặc định
+                TextColumn::make('category.name')
+                    ->label('Danh mục')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->reorderable('order')
             ->filters([
@@ -335,6 +324,19 @@ class PostResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('view_frontend')
+                    ->label('Xem trên website')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(fn ($record) => route('posts.show', $record->slug))
+                    ->openUrlInNewTab(),
+                Tables\Actions\Action::make('view_category')
+                    ->label('Xem danh mục')
+                    ->icon('heroicon-o-folder')
+                    ->color('warning')
+                    ->url(fn ($record) => $record->category ?
+                        PostCategoryResource::getUrl('edit', ['record' => $record->category->id]) : null)
+                    ->visible(fn ($record) => $record->category !== null),
                 Tables\Actions\EditAction::make()
                     ->label('Sửa'),
                 Tables\Actions\DeleteAction::make()
@@ -367,12 +369,64 @@ class PostResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
+
+        return $optimizationService->cacheQuery(
+            'posts_count_badge',
+            function() {
+                return static::getModel()::where('status', 'active')->count();
+            },
+            300 // Cache 5 phút
+        );
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
         return 'success';
+    }
+
+    /**
+     * Lấy danh sách cột cần thiết cho table
+     */
+    protected static function getTableColumns(): array
+    {
+        return [
+            'id',
+            'title',
+            'slug',
+            'type',
+            'status',
+            'is_featured',
+            'order',
+            'thumbnail',
+            'category_id',
+            'created_at'
+        ];
+    }
+
+    /**
+     * Lấy relationships cần thiết cho form
+     */
+    protected static function getFormRelationships(): array
+    {
+        return [
+            'category' => function($query) {
+                $query->select(['id', 'name', 'slug']);
+            },
+            'images' => function($query) {
+                $query->where('status', 'active')
+                      ->orderBy('order')
+                      ->limit(10);
+            }
+        ];
+    }
+
+    /**
+     * Lấy các cột có thể search
+     */
+    protected static function getSearchableColumns(): array
+    {
+        return ['title', 'content'];
     }
 
     /**

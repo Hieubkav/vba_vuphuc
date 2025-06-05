@@ -14,12 +14,12 @@ class ListPostCategories extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Thêm danh mục mới'),
+                ->label('Tạo danh mục mới'),
         ];
     }
 
     public function getTitle(): string
     {
-        return 'Quản lý Danh mục Bài viết';
+        return 'Danh mục bài viết';
     }
 }

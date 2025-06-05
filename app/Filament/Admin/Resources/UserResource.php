@@ -4,77 +4,86 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Models\User;
-use Filament\Forms\Components\DateTimePicker;
+use App\Traits\OptimizedFilamentResource;
+use Filament\Forms;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
+    use OptimizedFilamentResource;
+
     protected static ?string $model = User::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static ?string $navigationLabel = 'Người dùng';
 
     protected static ?string $modelLabel = 'người dùng';
 
     protected static ?string $pluralModelLabel = 'người dùng';
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationGroup = 'Quản lý hệ thống';
 
-    protected static ?string $navigationGroup = 'Hệ Thống';
-
-    protected static ?string $navigationLabel = 'Quản lý người dùng';
-
-    protected static ?int $navigationSort = 50;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Thông tin người dùng')
+                Section::make('Thông tin tài khoản')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Tên người dùng')
+                            ->label('Họ và tên')
                             ->required()
                             ->maxLength(255),
 
                         TextInput::make('email')
                             ->label('Email')
                             ->email()
-                            ->unique(ignoreRecord: true)
                             ->required()
+                            ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
                         TextInput::make('password')
                             ->label('Mật khẩu')
                             ->password()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->required(fn (string $context): bool => $context === 'create')
                             ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $operation): bool => $operation === 'create'),
+                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                            ->maxLength(255)
+                            ->helperText('Để trống nếu không muốn thay đổi mật khẩu'),
+
+                        Forms\Components\DateTimePicker::make('email_verified_at')
+                            ->label('Email đã xác thực lúc')
+                            ->displayFormat('d/m/Y H:i'),
                     ])->columns(2),
 
-                Section::make('Cấu hình hiển thị')
+                Section::make('Cài đặt')
                     ->schema([
                         TextInput::make('order')
                             ->label('Thứ tự hiển thị')
-                            ->integer()
-                            ->default(0),
+                            ->numeric()
+                            ->default(0)
+                            ->required(),
 
-                        Toggle::make('status')
-                            ->label('Hoạt động')
-                            ->default(true)
-                            ->onColor('success')
-                            ->offColor('danger'),
-
-                        DateTimePicker::make('last_login_at')
-                            ->label('Lần đăng nhập cuối')
-                            ->disabled(),
-                    ])->columns(3),
+                        Select::make('status')
+                            ->label('Trạng thái')
+                            ->options([
+                                'active' => 'Hoạt động',
+                                'inactive' => 'Không hoạt động',
+                            ])
+                            ->default('active')
+                            ->required(),
+                    ])->columns(2),
             ]);
     }
 
@@ -82,35 +91,73 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->sortable(),
+                TextColumn::make('id')
+                    ->label('ID')
+                    ->sortable()
+                    ->searchable(),
 
                 TextColumn::make('name')
-                    ->label('Tên người dùng')
+                    ->label('Họ và tên')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold'),
 
                 TextColumn::make('email')
                     ->label('Email')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->copyMessage('Đã sao chép email!'),
 
-                ToggleColumn::make('status')
-                    ->label('Hoạt động')
-                    ->sortable(),
-
-                TextColumn::make('last_login_at')
-                    ->label('Lần đăng nhập cuối')
+                TextColumn::make('email_verified_at')
+                    ->label('Email đã xác thực')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->placeholder('Chưa xác thực')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'warning'),
+
+                TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->numeric()
+                    ->sortable()
+                    ->alignCenter(),
+
+                SelectColumn::make('status')
+                    ->label('Trạng thái')
+                    ->options([
+                        'active' => 'Hoạt động',
+                        'inactive' => 'Không hoạt động',
+                    ])
+                    ->selectablePlaceholder(false),
 
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('updated_at')
+                    ->label('Cập nhật lần cuối')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Trạng thái')
+                    ->options([
+                        'active' => 'Hoạt động',
+                        'inactive' => 'Không hoạt động',
+                    ]),
+
+                Tables\Filters\Filter::make('email_verified')
+                    ->label('Email đã xác thực')
+                    ->query(fn ($query) => $query->whereNotNull('email_verified_at')),
+
+                Tables\Filters\Filter::make('email_not_verified')
+                    ->label('Email chưa xác thực')
+                    ->query(fn ($query) => $query->whereNull('email_verified_at')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -141,5 +188,38 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Lấy danh sách cột cần thiết cho table
+     */
+    protected static function getTableColumns(): array
+    {
+        return [
+            'id',
+            'name',
+            'email',
+            'email_verified_at',
+            'order',
+            'status',
+            'created_at',
+            'updated_at'
+        ];
+    }
+
+    /**
+     * Lấy relationships cần thiết cho form
+     */
+    protected static function getFormRelationships(): array
+    {
+        return [];
+    }
+
+    /**
+     * Lấy các cột có thể search
+     */
+    protected static function getSearchableColumns(): array
+    {
+        return ['name', 'email'];
     }
 }

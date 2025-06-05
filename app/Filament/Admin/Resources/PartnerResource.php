@@ -3,93 +3,80 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\PartnerResource\Pages;
+use App\Filament\Admin\Resources\PartnerResource\RelationManagers;
 use App\Models\Partner;
-use App\Services\ImageService;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
+use App\Traits\HasImageUpload;
+use App\Traits\OptimizedFilamentResource;
+use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PartnerResource extends Resource
 {
+    use HasImageUpload, OptimizedFilamentResource;
+
     protected static ?string $model = Partner::class;
-
-    protected static ?string $modelLabel = 'đối tác';
-
-    protected static ?string $pluralModelLabel = 'đối tác';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
+    protected static ?string $modelLabel = 'Đối tác';
+
+    protected static ?string $pluralModelLabel = 'Đối tác';
+
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?string $navigationLabel = 'Quản lý đối tác';
-
-    protected static ?int $navigationSort = 25;
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Thông tin đối tác')
+                Forms\Components\Section::make('Thông tin đối tác')
                     ->schema([
-                        TextInput::make('name')
+                        Forms\Components\TextInput::make('name')
                             ->label('Tên đối tác')
                             ->required()
                             ->maxLength(255),
 
-                        FileUpload::make('logo_link')
-                            ->label('Logo')
-                            ->image()
-                            ->directory('partners/logos')
-                            ->visibility('public')
-                            ->imageResizeMode('contain')
-                            ->imageResizeTargetWidth(300)
-                            ->imageResizeTargetHeight(200)
-                            ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(ImageService::class);
-                                $partnerName = $get('name') ?? 'doi-tac';
-                                return $imageService->saveImage(
-                                    $file,
-                                    'partners/logos',
-                                    300,  // width
-                                    200,  // height
-                                    100,   // quality - cao hơn cho logo để giữ độ sắc nét
-                                    "logo-{$partnerName}" // SEO-friendly name
-                                );
-                            }),
+                        self::createLogoUpload(
+                            'logo_link',
+                            'Logo đối tác',
+                            'partners',
+                            400
+                        ),
 
-                        TextInput::make('website_link')
+                        Forms\Components\TextInput::make('website_link')
                             ->label('Website')
                             ->url()
-                            ->maxLength(255),
+                            ->placeholder('https://example.com')
+                            ->helperText('Đường dẫn website của đối tác'),
 
-                        Textarea::make('description')
+                        Forms\Components\Textarea::make('description')
                             ->label('Mô tả')
                             ->rows(3)
-                            ->maxLength(1000),
-                    ]),
+                            ->columnSpanFull()
+                            ->helperText('Mô tả ngắn về đối tác'),
 
-                Section::make('Cấu hình hiển thị')
-                    ->schema([
-                        TextInput::make('order')
+                        Forms\Components\TextInput::make('order')
                             ->label('Thứ tự hiển thị')
-                            ->integer()
-                            ->default(0),
+                            ->numeric()
+                            ->default(0)
+                            ->helperText('Số thứ tự hiển thị (càng nhỏ càng ưu tiên)'),
 
-                        Toggle::make('status')
-                            ->label('Hiển thị')
-                            ->default(true)
-                            ->onColor('success')
-                            ->offColor('danger'),
-                    ])->columns(2),
+                        Forms\Components\Select::make('status')
+                            ->label('Trạng thái')
+                            ->options([
+                                'active' => 'Hiển thị',
+                                'inactive' => 'Ẩn',
+                            ])
+                            ->default('active')
+                            ->required(),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -97,54 +84,71 @@ class PartnerResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->sortable(),
-
-                ImageColumn::make('logo_link')
+                Tables\Columns\ImageColumn::make('logo_link')
                     ->label('Logo')
-                    ->height(60),
+                    ->circular()
+                    ->size(60)
+                    ->defaultImageUrl(asset('images/placeholder.webp')),
 
-                TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')
                     ->label('Tên đối tác')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('website_link')
+                Tables\Columns\TextColumn::make('website_link')
                     ->label('Website')
-                    // ->url(fn (Partner $record): string => $record->website_link)
-                    ->searchable(),
+                    ->url(fn ($record) => $record->website_url)
+                    ->openUrlInNewTab()
+                    ->limit(30)
+                    ->tooltip(fn ($record) => $record->website_link),
 
-                TextColumn::make('description')
+                Tables\Columns\TextColumn::make('description')
                     ->label('Mô tả')
                     ->limit(50)
-                    ->searchable(),
+                    ->tooltip(fn ($record) => $record->description),
 
-                ToggleColumn::make('status')
-                    ->label('Hiển thị')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->sortable()
+                    ->alignCenter(),
 
-                TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Trạng thái')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'danger',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => 'Hiển thị',
+                        'inactive' => 'Ẩn',
+                    }),
+
+                Tables\Columns\TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Trạng thái')
+                    ->options([
+                        'active' => 'Hiển thị',
+                        'inactive' => 'Ẩn',
+                    ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->label('Sửa'),
-                Tables\Actions\DeleteAction::make()
-                    ->label('Xóa'),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->label('Xóa đã chọn'),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('order', 'asc');
+            ->defaultSort('order')
+            ->reorderable('order');
     }
 
     public static function getRelations(): array
@@ -165,11 +169,50 @@ class PartnerResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
+        
+        return $optimizationService->cacheQuery(
+            'PartnerResource_count_badge',
+            function() {
+                return static::getModel()::where('status', 'active')->count();
+            },
+            300 // Cache 5 phút
+        );
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    /**
+     * Lấy danh sách cột cần thiết cho table
+     */
+    protected static function getTableColumns(): array
     {
-        return 'success';
+        return array (
+  0 => 'id',
+  1 => 'name',
+  2 => 'logo_link',
+  3 => 'website_link',
+  4 => 'description',
+  5 => 'order',
+  6 => 'status',
+  7 => 'created_at',
+);
+    }
+
+    /**
+     * Lấy relationships cần thiết cho form
+     */
+    protected static function getFormRelationships(): array
+    {
+        return [];
+    }
+
+    /**
+     * Lấy các cột có thể search
+     */
+    protected static function getSearchableColumns(): array
+    {
+        return array (
+  0 => 'name',
+  1 => 'description',
+);
     }
 }

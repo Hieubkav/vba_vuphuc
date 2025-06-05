@@ -5,19 +5,19 @@
 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'old_image' in 'field list'
 ```
 
-**URL lỗi**: `http://127.0.0.1:8000/admin/employees/1/edit`
+**URL lỗi**: `http://127.0.0.1:8000/admin/courses/1/edit`
 
 **Nguyên nhân**: Tất cả Observer đang sử dụng cách lưu trữ tạm thời không đúng bằng cách gán thuộc tính động cho model (`$model->old_image`), Laravel cố gắng lưu vào database nhưng cột không tồn tại.
 
 ## **Observer đã được sửa:**
 
-### **1. ✅ EmployeeObserver**
-- **Trước**: `$employee->old_image = ...`
+### **1. ✅ CourseObserver**
+- **Trước**: `$course->old_image = ...`
 - **Sau**: `$this->storeOldFile($modelClass, $modelId, 'image_link', ...)`
-- **Xử lý**: `image_link` và `qr_code`
+- **Xử lý**: `image_link`
 
-### **2. ✅ ProductImageObserver**
-- **Trước**: `$productImage->old_image = ...`
+### **2. ✅ CourseImageObserver**
+- **Trước**: `$courseImage->old_image = ...`
 - **Sau**: `$this->storeOldFile($modelClass, $modelId, 'image_link', ...)`
 - **Xử lý**: `image_link`
 
@@ -26,10 +26,10 @@ SQLSTATE[42S22]: Column not found: 1054 Unknown column 'old_image' in 'field lis
 - **Sau**: `$this->storeOldFile($modelClass, $modelId, 'image_link', ...)`
 - **Xử lý**: `image_link`
 
-### **4. ✅ EmployeeImageObserver**
-- **Trước**: `$employeeImage->old_image = ...`
-- **Sau**: `$this->storeOldFile($modelClass, $modelId, 'image_link', ...)`
-- **Xử lý**: `image_link`
+### **4. ✅ PostObserver**
+- **Trước**: `$post->old_image = ...`
+- **Sau**: `$this->storeOldFile($modelClass, $modelId, 'thumbnail', ...)`
+- **Xử lý**: `thumbnail`
 
 ### **5. ✅ SliderObserver**
 - **Trước**: `$slider->old_image = ...`
@@ -114,10 +114,10 @@ public function updated(Model $model): void
 
 ## **Cache Key Format:**
 ```
-old_file_App\Models\Employee_1_image_link
-old_file_App\Models\Employee_1_qr_code
-old_file_App\Models\ProductImage_5_image_link
-old_file_App\Models\Partner_3_logo_link
+old_file_App\Models\Course_1_image_link
+old_file_App\Models\CourseImage_1_image_link
+old_file_App\Models\PostImage_5_image_link
+old_file_App\Models\Setting_1_logo_link
 ```
 
 ## **Lợi ích của giải pháp:**

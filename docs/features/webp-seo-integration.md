@@ -44,21 +44,17 @@
 - **Pattern**: `gallery-{postTitle}-{timestamp}.webp`
 - **Example**: `gallery-bai-viet-ve-laravel-1732896996.webp`
 
-#### **7. EmployeeImagesRelationManager** ✅ **[MỚI]**
+#### **7. CourseImagesRelationManager** ✅ **[MỚI]**
 - **Field**: `image_link`
-- **Directory**: `employees/gallery/`
-- **Pattern**: `gallery-{employeeName}-{timestamp}.webp`
-- **Example**: `gallery-nguyen-van-a-1732896996.webp`
+- **Directory**: `courses/gallery/`
+- **Pattern**: `gallery-{courseTitle}-{timestamp}.webp`
+- **Example**: `gallery-excel-vba-co-ban-1732896996.webp`
 
-#### **8. EmployeeResource** ✅ **[MỚI]**
-- **Fields**: `image_link`, `qr_code`
-- **Directories**: `employees/avatars/`, `employees/qr-codes/`
-- **Patterns**:
-  - `avatar-{employeeName}-{timestamp}.webp`
-  - `qr-{employeeName}-{timestamp}.webp`
-- **Examples**:
-  - `avatar-nguyen-van-a-1732896996.webp`
-  - `qr-nguyen-van-a-1732896996.webp`
+#### **8. CourseResource** ✅ **[MỚI]**
+- **Field**: `image_link`
+- **Directory**: `courses/thumbnails/`
+- **Pattern**: `thumbnail-{courseTitle}-{timestamp}.webp`
+- **Example**: `thumbnail-excel-vba-co-ban-1732896996.webp`
 
 #### **9. AssociationResource** ✅ **[MỚI]**
 - **Field**: `image_link`

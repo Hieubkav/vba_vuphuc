@@ -4,20 +4,49 @@
         <div class="flex justify-between items-center">
             <!-- Logo -->
             <a href="{{ route('storeFront') }}" class="flex-shrink-0 flex items-center group">
-                @if(isset($settings) && !empty($settings) && $settings->logo_link)
-                    <div class="h-14 md:h-18 flex items-center">
-                        <img src="{{ asset('storage/' . $settings->logo_link) }}"
-                            alt="{{ $settings->site_name ?? 'Vũ Phúc Baking' }}"
+                <div class="h-14 md:h-18 flex items-center">
+                    @php
+                        // Kiểm tra settings và logo
+                        $settingsData = $globalSettings ?? $settings ?? null;
+                        $hasValidLogo = $settingsData &&
+                                       !empty($settingsData->logo_link) &&
+                                       trim($settingsData->logo_link) !== '';
+                    @endphp
+
+                    @if($hasValidLogo)
+                        <!-- Logo chính -->
+                        <img src="{{ asset('storage/' . $settingsData->logo_link) }}"
+                            alt="{{ $settingsData->site_name ?? 'VBA Vũ Phúc' }}"
                             class="h-auto max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                            onerror="this.src='{{ asset('images/logo.png') }}'; this.onerror=null;">
-                    </div>
-                @else
-                    <div class="h-14 md:h-18 flex items-center">
-                        <img src="{{ asset('images/logo.png') }}"
-                            alt="Vũ Phúc Baking"
-                            class="h-auto max-h-full object-contain transition-transform duration-300 group-hover:scale-105">
-                    </div>
-                @endif
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                            id="main-logo">
+
+                        <!-- Fallback UI khi logo lỗi -->
+                        <div class="hidden items-center justify-center h-full px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105 logo-fallback"
+                             style="display: none;">
+                            <div class="text-center">
+                                <div class="text-lg md:text-xl font-bold tracking-tight whitespace-nowrap">
+                                    VBA VŨ PHÚC
+                                </div>
+                                <div class="text-xs opacity-90 -mt-1 whitespace-nowrap">
+                                    Khóa học Excel & VBA
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Fallback UI mặc định - luôn hiển thị khi không có logo -->
+                        <div class="flex items-center justify-center h-full px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg shadow-md transition-transform duration-300 group-hover:scale-105 logo-fallback">
+                            <div class="text-center">
+                                <div class="text-lg md:text-xl font-bold tracking-tight whitespace-nowrap">
+                                    VBA VŨ PHÚC
+                                </div>
+                                <div class="text-xs opacity-90 -mt-1 whitespace-nowrap">
+                                    Khóa học Excel & VBA
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </a>
 
             <!-- Thanh tìm kiếm - Desktop -->
@@ -27,23 +56,19 @@
 
             <!-- Icons - Desktop -->
             <div class="hidden lg:flex items-center space-x-3">
-                @livewire('public.cart-icon')
                 @livewire('public.user-account')
             </div>
 
             <!-- Menu mobile (hamburger) -->
             <div class="lg:hidden flex items-center gap-3">
-                <!-- Search icon for tablet -->
-                <button type="button" class="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors" aria-label="Tìm kiếm" id="mobile-search-button">
+                <!-- Search icon for mobile/tablet -->
+                <button type="button" class="p-2 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors" aria-label="Tìm kiếm" id="mobile-search-button">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </button>
 
-                <!-- Cart icon for mobile -->
-                <div class="md:hidden">
-                    @livewire('public.cart-icon')
-                </div>
+
 
                 @if(isset($settings) && !empty($settings) && $settings->hotline)
                     <a href="tel:{{ $settings->hotline }}" class="p-2 text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors shadow-sm" aria-label="Gọi điện">
@@ -146,6 +171,27 @@
             @livewire('public.dynamic-menu', ['isMobile' => false])
         </div>
     </div>
+
+    <!-- Mobile Search Modal -->
+    <div id="mobile-search-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden lg:hidden">
+        <div class="flex items-start justify-center min-h-screen pt-16 px-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300">
+                <div class="p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tìm kiếm</h3>
+                        <button type="button" id="close-search-modal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Search component for modal -->
+                    @livewire('public.search-bar', ['isMobile' => true])
+                </div>
+            </div>
+        </div>
+    </div>
 </header>
 
 <script>
@@ -195,20 +241,75 @@
             }
         });
 
-        // Mobile search button functionality
-        if (searchButton) {
+        // Mobile search modal functionality
+        const searchModal = document.getElementById('mobile-search-modal');
+        const closeSearchModal = document.getElementById('close-search-modal');
+
+        if (searchButton && searchModal) {
             searchButton.addEventListener('click', function() {
-                // Toggle mobile menu to show search
-                if (mobileMenu.classList.contains('hidden')) {
-                    menuButton.click();
-                }
-                // Focus on search input after menu opens
+                // Show search modal
+                searchModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+
+                // Focus on search input
                 setTimeout(() => {
-                    const searchInput = mobileMenu.querySelector('input[type="text"]');
+                    const searchInput = searchModal.querySelector('input[type="text"]');
                     if (searchInput) {
                         searchInput.focus();
                     }
-                }, 350);
+                }, 100);
+            });
+        }
+
+        // Close search modal
+        if (closeSearchModal && searchModal) {
+            closeSearchModal.addEventListener('click', function() {
+                searchModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            });
+
+            // Close modal when clicking outside
+            searchModal.addEventListener('click', function(event) {
+                if (event.target === searchModal) {
+                    searchModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && searchModal && !searchModal.classList.contains('hidden')) {
+                searchModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Đảm bảo logo fallback hoạt động
+        const mainLogo = document.getElementById('main-logo');
+        if (mainLogo) {
+            // Kiểm tra nếu ảnh không load được
+            mainLogo.addEventListener('error', function() {
+                console.log('Logo failed to load, showing fallback');
+                this.style.display = 'none';
+                const fallback = this.nextElementSibling;
+                if (fallback) {
+                    fallback.style.display = 'flex';
+                    fallback.classList.remove('hidden');
+                }
+            });
+
+            // Kiểm tra nếu ảnh đã load xong nhưng có kích thước 0
+            mainLogo.addEventListener('load', function() {
+                if (this.naturalWidth === 0 || this.naturalHeight === 0) {
+                    console.log('Logo has zero dimensions, showing fallback');
+                    this.style.display = 'none';
+                    const fallback = this.nextElementSibling;
+                    if (fallback) {
+                        fallback.style.display = 'flex';
+                        fallback.classList.remove('hidden');
+                    }
+                }
             });
         }
     });
@@ -264,5 +365,55 @@
 
     #mobile-menu::-webkit-scrollbar-thumb:hover {
         background: rgba(156, 163, 175, 0.7);
+    }
+
+    /* Logo fallback styling */
+    .logo-fallback {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(185, 28, 28, 0.2);
+        min-height: 3.5rem;
+        min-width: 8rem;
+    }
+
+    .logo-fallback:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        transform: scale(1.05);
+    }
+
+    /* Responsive logo text */
+    @media (max-width: 768px) {
+        .logo-fallback {
+            min-width: 6rem;
+            min-height: 3rem;
+        }
+
+        .logo-fallback .text-lg {
+            font-size: 1rem;
+        }
+
+        .logo-fallback .text-xs {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Search result image fallback */
+    .search-result-fallback {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border: 1px solid rgba(239, 68, 68, 0.1);
+    }
+
+    .search-result-fallback.course {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    }
+
+    .search-result-fallback.post {
+        background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 100%);
+    }
+
+    /* Dark mode adjustments */
+    .dark .search-result-fallback {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border: 1px solid rgba(75, 85, 99, 0.3);
     }
 </style>

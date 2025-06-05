@@ -7,7 +7,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\FileUpload;
+use App\Traits\HasImageUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\ImageColumn;
@@ -16,6 +16,8 @@ use Filament\Tables\Columns\ToggleColumn;
 
 class PostImagesRelationManager extends RelationManager
 {
+    use HasImageUpload;
+
     protected static string $relationship = 'images';
 
     protected static ?string $title = 'Hình ảnh bài viết';
@@ -24,30 +26,13 @@ class PostImagesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                FileUpload::make('image_link')
-                    ->label('Hình ảnh')
-                    ->required()
-                    ->image()
-                    ->directory('posts/gallery')
-                    ->visibility('public')
-                    ->imageResizeMode('cover')
-                    ->imageResizeTargetWidth(800)
-                    ->imageResizeTargetHeight(600)
-                    ->maxSize(3072)
-                    ->imageEditor()
-                    ->saveUploadedFileUsing(function ($file, $get, $livewire) {
-                        $imageService = app(\App\Services\ImageService::class);
-                        $postTitle = $livewire->ownerRecord->title ?? 'bai-viet';
-                        return $imageService->saveImage(
-                            $file,
-                            'posts/gallery',
-                            800,   // width
-                            600,   // height
-                            90,    // quality
-                            "gallery-{$postTitle}" // SEO-friendly name
-                        );
-                    })
-                    ->columnSpanFull(),
+                $this->createGalleryUpload(
+                    'image_link',
+                    'Hình ảnh',
+                    'posts/gallery',
+                    800,
+                    600
+                )->required()->columnSpanFull(),
 
                 TextInput::make('alt_text')
                     ->label('Alt text (SEO)')

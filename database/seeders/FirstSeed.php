@@ -4,17 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Setting;
-use App\Models\CatProduct;
 use App\Models\CatPost;
-use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Post;
 use App\Models\PostImage;
-use App\Models\Customer;
 use App\Models\Partner;
 use App\Models\Association;
-use App\Models\Employee;
-use App\Models\EmployeeImage;
 use App\Models\Slider;
 use App\Models\MenuItem;
 use Illuminate\Database\Seeder;
@@ -33,32 +27,22 @@ class FirstSeed extends Seeder
         $this->createSettings();
 
         // 3. Tạo Categories
-        $catProducts = $this->createCatProducts();
         $catPosts = $this->createCatPosts();
 
-        // 4. Tạo Products và ProductImages
-        $this->createProducts($catProducts);
-
-        // 5. Tạo Posts và PostImages
+        // 4. Tạo Posts và PostImages
         $this->createPosts($catPosts);
 
-        // 6. Tạo Customers
-        $this->createCustomers();
-
-        // 7. Tạo Partners
+        // 6. Tạo Partners
         $this->createPartners();
 
-        // 8. Tạo Associations
+        // 7. Tạo Associations
         $this->createAssociations();
 
-        // 9. Tạo Employees
-        $this->createEmployees();
-
-        // 10. Tạo Sliders
+        // 9. Tạo Sliders
         $this->createSliders();
 
         // 11. Tạo MenuItems
-        $this->createMenuItems($catProducts, $catPosts);
+        $this->createMenuItems($catPosts);
 
         // 12. Gọi các seeder khác
         $this->call([
@@ -105,65 +89,13 @@ class FirstSeed extends Seeder
             'youtube_link' => 'https://youtube.com/vuphucbaking',
             'tiktok_link' => 'https://tiktok.com/@vuphucbaking',
             'working_hours' => '6:00 - 22:00 (Thứ 2 - Chủ nhật)',
-            'dmca_link' => 'https://dmca.com/vuphucbaking',
             'footer_description' => '',
             'order' => 1,
             'status' => 'active',
         ]);
     }
 
-    private function createCatProducts()
-    {
-        $categories = [
-            [
-                'name' => 'Bánh Mì',
-                'slug' => 'banh-mi',
-                'seo_title' => 'Bánh Mì Tươi Ngon - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh mì tươi ngon được làm từ nguyên liệu tự nhiên, đảm bảo chất lượng và hương vị tuyệt vời.',
-                'image' => '/images/categories/banh-mi.jpg',
-                'description' => 'Các loại bánh mì tươi ngon, đa dạng hương vị',
-                'order' => 1,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Bánh Ngọt',
-                'slug' => 'banh-ngot',
-                'seo_title' => 'Bánh Ngọt Cao Cấp - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh ngọt cao cấp với nhiều hương vị độc đáo, phù hợp cho mọi dịp đặc biệt.',
-                'image' => '/images/categories/banh-ngot.jpg',
-                'description' => 'Bánh ngọt cao cấp, đa dạng mẫu mã',
-                'order' => 2,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Bánh Kem',
-                'slug' => 'banh-kem',
-                'seo_title' => 'Bánh Kem Sinh Nhật - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh kem sinh nhật đẹp mắt, ngon miệng với nhiều mẫu mã và kích thước khác nhau.',
-                'image' => '/images/categories/banh-kem.jpg',
-                'description' => 'Bánh kem sinh nhật, bánh kem trang trí',
-                'order' => 3,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Nguyên Liệu',
-                'slug' => 'nguyen-lieu',
-                'seo_title' => 'Nguyên Liệu Làm Bánh - Vũ Phúc Bakery',
-                'seo_description' => 'Nguyên liệu làm bánh chất lượng cao, đảm bảo an toàn thực phẩm.',
-                'image' => '/images/categories/nguyen-lieu.jpg',
-                'description' => 'Nguyên liệu làm bánh chất lượng cao',
-                'order' => 4,
-                'status' => 'active',
-            ],
-        ];
 
-        $createdCategories = [];
-        foreach ($categories as $category) {
-            $createdCategories[] = CatProduct::create($category);
-        }
-
-        return $createdCategories;
-    }
 
     private function createCatPosts()
     {
@@ -208,84 +140,7 @@ class FirstSeed extends Seeder
         return $createdCategories;
     }
 
-    private function createProducts($catProducts)
-    {
-        $products = [
-            [
-                'name' => 'Bánh Mì Việt Nam',
-                'description' => 'Bánh mì truyền thống Việt Nam với nhân thịt nguội, pate và rau sống tươi ngon.',
-                'seo_title' => 'Bánh Mì Việt Nam Truyền Thống - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh mì Việt Nam truyền thống với vỏ bánh giòn tan, nhân đầy đặn và hương vị đặc trưng.',
-                'slug' => 'banh-mi-viet-nam',
-                'price' => 25000,
-                'compare_price' => 30000,
-                'brand' => 'Vũ Phúc',
-                'sku' => 'BM001',
-                'stock' => 100,
-                'unit' => 'chiếc',
-                'is_hot' => true,
-                'order' => 1,
-                'status' => 'active',
-                'category_id' => $catProducts[0]->id,
-            ],
-            [
-                'name' => 'Bánh Croissant Bơ',
-                'description' => 'Bánh croissant bơ thơm ngon với lớp vỏ giòn tan và nhân bơ béo ngậy.',
-                'seo_title' => 'Bánh Croissant Bơ Pháp - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh croissant bơ kiểu Pháp với hương vị thơm ngon, lớp vỏ giòn tan đặc trưng.',
-                'slug' => 'banh-croissant-bo',
-                'price' => 35000,
-                'brand' => 'Vũ Phúc',
-                'sku' => 'BN001',
-                'stock' => 50,
-                'unit' => 'chiếc',
-                'is_hot' => false,
-                'order' => 2,
-                'status' => 'active',
-                'category_id' => $catProducts[1]->id,
-            ],
-            [
-                'name' => 'Bánh Kem Sinh Nhật',
-                'description' => 'Bánh kem sinh nhật với nhiều mẫu mã đẹp mắt, phù hợp cho mọi dịp đặc biệt.',
-                'seo_title' => 'Bánh Kem Sinh Nhật Đẹp - Vũ Phúc Bakery',
-                'seo_description' => 'Bánh kem sinh nhật đẹp mắt với nhiều kích thước và mẫu mã, đặt theo yêu cầu.',
-                'slug' => 'banh-kem-sinh-nhat',
-                'price' => 250000,
-                'compare_price' => 300000,
-                'brand' => 'Vũ Phúc',
-                'sku' => 'BK001',
-                'stock' => 20,
-                'unit' => 'chiếc',
-                'is_hot' => true,
-                'order' => 3,
-                'status' => 'active',
-                'category_id' => $catProducts[2]->id,
-            ],
-        ];
 
-        foreach ($products as $productData) {
-            $product = Product::create($productData);
-
-            // Tạo ảnh cho sản phẩm
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_link' => '/images/products/' . $product->slug . '-1.jpg',
-                'alt_text' => $product->name,
-                'is_main' => true,
-                'order' => 1,
-                'status' => 'active',
-            ]);
-
-            ProductImage::create([
-                'product_id' => $product->id,
-                'image_link' => '/images/products/' . $product->slug . '-2.jpg',
-                'alt_text' => $product->name . ' - Ảnh 2',
-                'is_main' => false,
-                'order' => 2,
-                'status' => 'active',
-            ]);
-        }
-    }
 
     private function createPosts($catPosts)
     {
@@ -332,92 +187,59 @@ class FirstSeed extends Seeder
         }
     }
 
-    private function createCustomers()
-    {
-        Customer::create([
-            'name' => 'Nguyễn Văn A',
-            'email' => 'nguyenvana@example.com',
-            'password' => 'password',
-            'phone' => '0901234567',
-            'address' => '123 Đường ABC, Quận 1, TP.HCM',
-            'status' => 'active',
-        ]);
 
-        Customer::create([
-            'name' => 'Trần Thị B',
-            'email' => 'tranthib@example.com',
-            'password' => 'password',
-            'phone' => '0907654321',
-            'address' => '456 Đường XYZ, Quận 3, TP.HCM',
-            'status' => 'active',
-        ]);
-    }
+
+
 
     private function createPartners()
     {
         $partners = [
             [
-                'name' => 'Rich Products Vietnam',
-                'logo_link' => '/images/partners/rich-products.jpg',
-                'website_link' => 'https://richproducts.com',
-                'description' => 'Nhà cung cấp nguyên liệu làm bánh hàng đầu thế giới',
+                'name' => 'Microsoft Vietnam',
+                'logo_link' => '/images/partners/microsoft.jpg',
+                'website_link' => 'https://microsoft.com/vi-vn',
+                'description' => 'Đối tác công nghệ hàng đầu cung cấp giải pháp Office và Azure',
                 'order' => 1,
                 'status' => 'active',
             ],
             [
-                'name' => 'KitchenAid',
-                'logo_link' => '/images/partners/kitchenaid.jpg',
-                'website_link' => 'https://kitchenaid.com',
-                'description' => 'Thương hiệu thiết bị nhà bếp chuyên nghiệp',
+                'name' => 'FPT Software',
+                'logo_link' => '/images/partners/fpt.jpg',
+                'website_link' => 'https://fpt-software.com',
+                'description' => 'Công ty phần mềm hàng đầu Việt Nam',
                 'order' => 2,
                 'status' => 'active',
             ],
             [
-                'name' => 'Anchor',
-                'logo_link' => '/images/partners/anchor.jpg',
-                'website_link' => 'https://anchor.com',
-                'description' => 'Sản phẩm sữa và kem tươi chất lượng cao',
+                'name' => 'Vietcombank',
+                'logo_link' => '/images/partners/vcb.jpg',
+                'website_link' => 'https://vietcombank.com.vn',
+                'description' => 'Ngân hàng thương mại cổ phần Ngoại thương Việt Nam',
                 'order' => 3,
                 'status' => 'active',
             ],
             [
-                'name' => 'Unox',
-                'logo_link' => '/images/partners/unox.jpg',
-                'website_link' => 'https://unox.com',
-                'description' => 'Lò nướng và thiết bị làm bánh chuyên nghiệp',
+                'name' => 'KPMG Vietnam',
+                'logo_link' => '/images/partners/kpmg.jpg',
+                'website_link' => 'https://kpmg.com.vn',
+                'description' => 'Công ty kiểm toán và tư vấn hàng đầu',
                 'order' => 4,
                 'status' => 'active',
             ],
             [
-                'name' => 'Callebaut',
-                'logo_link' => '/images/partners/callebaut.jpg',
-                'website_link' => 'https://callebaut.com',
-                'description' => 'Chocolate và cocoa cao cấp từ Bỉ',
+                'name' => 'Deloitte Vietnam',
+                'logo_link' => '/images/partners/deloitte.jpg',
+                'website_link' => 'https://deloitte.com/vn',
+                'description' => 'Dịch vụ tư vấn và kiểm toán chuyên nghiệp',
                 'order' => 5,
                 'status' => 'active',
             ],
             [
-                'name' => 'Valrhona',
-                'logo_link' => '/images/partners/valrhona.jpg',
-                'website_link' => 'https://valrhona.com',
-                'description' => 'Chocolate hảo hạng từ Pháp',
+                'name' => 'PwC Vietnam',
+                'logo_link' => '/images/partners/pwc.jpg',
+                'website_link' => 'https://pwc.com/vn',
+                'description' => 'Dịch vụ tư vấn thuế và kiểm toán',
                 'order' => 6,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Puratos',
-                'logo_link' => '/images/partners/puratos.jpg',
-                'website_link' => 'https://puratos.com',
-                'description' => 'Nguyên liệu và giải pháp làm bánh toàn diện',
-                'order' => 7,
-                'status' => 'active',
-            ],
-            [
-                'name' => 'Lesaffre',
-                'logo_link' => '/images/partners/lesaffre.jpg',
-                'website_link' => 'https://lesaffre.com',
-                'description' => 'Men nướng và nguyên liệu lên men chuyên nghiệp',
-                'order' => 8,
                 'status' => 'active',
             ],
         ];
@@ -426,7 +248,6 @@ class FirstSeed extends Seeder
             Partner::create($partnerData);
         }
     }
-
     private function createAssociations()
     {
         Association::create([
@@ -439,29 +260,7 @@ class FirstSeed extends Seeder
         ]);
     }
 
-    private function createEmployees()
-    {
-        $employee = Employee::create([
-            'name' => 'Nguyễn Văn Thợ',
-            'image_link' => '/images/employees/nguyen-van-tho.jpg',
-            'position' => 'Thợ làm bánh chính',
-            'description' => 'Thợ làm bánh chính với hơn 10 năm kinh nghiệm trong ngành bánh kẹo. Chuyên về các loại bánh truyền thống và hiện đại, có kỹ năng trang trí bánh xuất sắc và luôn đảm bảo chất lượng sản phẩm cao nhất.',
-            'phone' => '0912345678',
-            'email' => 'tho@vuphucbaking.com',
-            'qr_code' => 'EMP001',
-            'order' => 1,
-            'status' => 'active',
-        ]);
 
-        EmployeeImage::create([
-            'employee_id' => $employee->id,
-            'image_link' => '/images/employees/nguyen-van-tho-work.jpg',
-            'alt_text' => 'Nguyễn Văn Thợ đang làm việc',
-            'caption' => 'Thợ làm bánh chính đang chế biến sản phẩm',
-            'order' => 1,
-            'status' => 'active',
-        ]);
-    }
 
     private function createSliders()
     {
@@ -486,7 +285,7 @@ class FirstSeed extends Seeder
         ]);
     }
 
-    private function createMenuItems($catProducts, $catPosts)
+    private function createMenuItems($catPosts)
     {
         // Menu chính
         MenuItem::create([
@@ -498,9 +297,9 @@ class FirstSeed extends Seeder
         ]);
 
         MenuItem::create([
-            'label' => 'Sản phẩm',
-            'type' => 'cat_product',
-            'cat_product_id' => $catProducts[0]->id,
+            'label' => 'Khóa học',
+            'type' => 'link',
+            'link' => '/khoa-hoc',
             'order' => 2,
             'status' => 'active',
         ]);

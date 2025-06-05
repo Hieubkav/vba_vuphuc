@@ -10,26 +10,21 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public function getTitle(): string
-    {
-        return 'Chỉnh sửa Người dùng';
-    }
-
     protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make()
-                ->label('Xóa'),
+                ->label('Xóa người dùng'),
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Chỉnh sửa người dùng: ' . $this->record->name;
     }
 
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-
-    protected function getSavedNotificationTitle(): ?string
-    {
-        return 'Người dùng đã được cập nhật thành công';
     }
 }

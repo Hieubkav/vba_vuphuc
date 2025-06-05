@@ -4,12 +4,13 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Cache;
 use App\Models\Setting;
-use App\Models\CatProduct;
-use App\Models\Product;
+use App\Models\Course;
+use App\Models\CatPost;
 use App\Models\Post;
 use App\Models\Slider;
 use App\Models\Partner;
 use App\Models\MenuItem;
+use App\Models\Student;
 
 class ViewDataHelper
 {
@@ -24,7 +25,7 @@ class ViewDataHelper
     }
 
     /**
-     * Get cached storefront data
+     * Get cached storefront data - Cập nhật cho website khóa học VBA
      */
     public static function getStorefrontData()
     {
@@ -34,14 +35,14 @@ class ViewDataHelper
                     ->orderBy('order')
                     ->get(),
 
-                'categories' => CatProduct::where('status', 'active')
+                'courseCategories' => CatPost::where('status', 'active')
                     ->whereNull('parent_id')
                     ->orderBy('order')
                     ->take(12)
                     ->get(),
 
-                'featuredProducts' => Product::where('status', 'active')
-                    ->where('is_hot', true)
+                'featuredCourses' => Course::where('status', 'active')
+                    ->where('is_featured', true)
                     ->with(['category', 'images'])
                     ->orderBy('order')
                     ->take(8)
@@ -57,30 +58,33 @@ class ViewDataHelper
                     ->orderBy('order')
                     ->get(),
 
-                'popularProducts' => Product::where('status', 'active')
-                    ->where('is_hot', true)
+                'popularCourses' => Course::where('status', 'active')
+                    ->where('is_featured', true)
                     ->with(['category', 'images'])
                     ->orderBy('order')
                     ->take(8)
                     ->get(),
 
-                'newProducts' => Product::where('status', 'active')
+                'newCourses' => Course::where('status', 'active')
                     ->with(['category', 'images'])
                     ->orderBy('created_at', 'desc')
                     ->take(8)
                     ->get(),
+
+                'totalStudents' => Student::where('status', 'active')->count(),
+                'totalCourses' => Course::where('status', 'active')->count(),
             ];
         });
     }
 
     /**
-     * Get cached navigation data
+     * Get cached navigation data - Cập nhật cho website khóa học VBA
      */
     public static function getNavigationData()
     {
         return Cache::remember('navigation_data', 7200, function () {
             return [
-                'mainCategories' => CatProduct::where('status', 'active')
+                'mainCategories' => CatPost::where('status', 'active')
                     ->whereNull('parent_id')
                     ->with(['children' => function ($query) {
                         $query->where('status', 'active')->orderBy('order');
@@ -88,13 +92,18 @@ class ViewDataHelper
                     ->orderBy('order')
                     ->get(),
 
-                'footerCategories' => CatProduct::where('status', 'active')
+                'footerCategories' => CatPost::where('status', 'active')
                     ->whereNull('parent_id')
                     ->orderBy('order')
                     ->take(6)
                     ->get(),
 
                 'recentPosts' => Post::where('status', 'active')
+                    ->orderBy('created_at', 'desc')
+                    ->take(3)
+                    ->get(),
+
+                'recentCourses' => Course::where('status', 'active')
                     ->orderBy('created_at', 'desc')
                     ->take(3)
                     ->get(),

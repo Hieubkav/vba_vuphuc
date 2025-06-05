@@ -49,6 +49,9 @@ trait ClearsViewCache
             case 'App\Models\Post':
             case 'App\Models\Partner':
             case 'App\Models\Slider':
+            case 'App\Models\Course':
+            case 'App\Models\CatCourse':
+            case 'App\Models\CourseGroup':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('navigation');
                 break;

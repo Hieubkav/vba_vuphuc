@@ -11,16 +11,11 @@ class CreateUser extends CreateRecord
 
     public function getTitle(): string
     {
-        return 'Thêm Người dùng Mới';
+        return 'Tạo người dùng mới';
     }
 
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-
-    protected function getCreatedNotificationTitle(): ?string
-    {
-        return 'Người dùng đã được thêm thành công';
     }
 }

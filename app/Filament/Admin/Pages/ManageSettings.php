@@ -222,7 +222,9 @@ class ManageSettings extends Page implements HasForms
             Setting::create($data);
         }
 
-        Cache::forget('settings');
+        // Clear cache với key đúng từ ViewServiceProvider
+        Cache::forget('global_settings');
+        Cache::forget('settings'); // Giữ lại để tương thích
 
         Notification::make()
             ->title('Cài đặt đã được lưu')

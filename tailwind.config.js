@@ -23,9 +23,23 @@ export default {
                     dark: '#b91c1c',    // red-700
                 },
                 'gray': {
+                    25: '#fafafa',      // custom ultra light gray
                     light: '#9ca3af',   // gray-400
                     DEFAULT: '#6b7280', // gray-500
                     dark: '#4b5563',    // gray-600
+                },
+                'red': {
+                    25: '#fef7f7',      // custom ultra light red
+                    50: '#fef2f2',      // red-50
+                    100: '#fee2e2',     // red-100
+                    200: '#fecaca',     // red-200
+                    300: '#fca5a5',     // red-300
+                    400: '#f87171',     // red-400
+                    500: '#ef4444',     // red-500
+                    600: '#dc2626',     // red-600 (primary)
+                    700: '#b91c1c',     // red-700
+                    800: '#991b1b',     // red-800
+                    900: '#7f1d1d',     // red-900
                 }
             },
             fontFamily: {

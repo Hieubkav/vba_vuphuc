@@ -16,9 +16,9 @@
                     <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Tìm kiếm</h3>
                     <div class="relative">
                         <input type="text"
-                               wire:model.live.debounce.300ms="search"
-                               placeholder="Nhập từ khóa..."
-                               class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 font-open-sans text-sm">
+                               wire:model.live.debounce.200ms="search"
+                               placeholder="Tìm kiếm bài viết, tin tức..."
+                               class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 font-open-sans text-sm transition-all duration-200 hover:border-red-300">
                         <i class="fas fa-search absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
                 </div>
@@ -123,48 +123,34 @@
             <!-- Posts Grid -->
             <div wire:loading.remove>
                 @if($posts->count() > 0)
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                    <!-- Grid thông minh tự điều chỉnh theo số lượng bài viết -->
+                    @php
+                        $postCount = $posts->count();
+                        $gridClass = match(true) {
+                            $postCount === 1 => 'grid grid-cols-1 max-w-2xl mx-auto',
+                            $postCount === 2 => 'grid grid-cols-1 lg:grid-cols-2 max-w-5xl mx-auto',
+                            $postCount >= 3 => 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+                            default => 'grid grid-cols-1 lg:grid-cols-2'
+                        };
+                    @endphp
+                    <div class="{{ $gridClass }} gap-6 lg:gap-8 mb-16">
                         @foreach($posts as $post)
                             <article class="group">
                                 <a href="{{ route('posts.show', $post->slug) }}" class="block">
-                                    <div class="post-card bg-white rounded-3xl overflow-hidden shadow-xl">
-                                        <!-- Post Image - Responsive và thông minh -->
-                                        <div class="relative overflow-hidden rounded-t-3xl">
-                                            @if($post->thumbnail)
-                                                <div class="aspect-[16/9] w-full">
-                                                    <img src="{{ asset('storage/' . $post->thumbnail) }}"
-                                                         alt="{{ $post->title }}"
-                                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                         loading="lazy">
-                                                </div>
-                                            @else
-                                                <!-- Custom placeholder với aspect ratio cố định -->
-                                                <div class="aspect-[16/9] w-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center relative overflow-hidden">
-                                                    <!-- Background pattern -->
-                                                    <div class="absolute inset-0 opacity-10">
-                                                        <svg class="w-full h-full" viewBox="0 0 100 100" fill="none">
-                                                            <defs>
-                                                                <pattern id="cake-pattern-{{ $post->id }}" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                                                                    <circle cx="10" cy="10" r="2" fill="#dc2626"/>
-                                                                </pattern>
-                                                            </defs>
-                                                            <rect width="100" height="100" fill="url(#cake-pattern-{{ $post->id }})"/>
-                                                        </svg>
-                                                    </div>
-
-                                                    <!-- Cake icon -->
-                                                    <div class="relative z-10 text-red-300">
-                                                        <svg class="w-16 h-16 mx-auto mb-3" fill="currentColor" viewBox="0 0 24 24">
-                                                            <path d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.89 2 2 2zm4.5 3.5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5.67 1.5 1.5 1.5 1.5-.67 1.5-1.5zm-9 0C7.5 8.67 6.83 8 6 8s-1.5.67-1.5 1.5S5.17 11 6 11s1.5-.67 1.5-1.5zM12 15.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM3 13h18c1.1 0 2 .9 2 2v8H1v-8c0-1.1.9-2 2-2z"/>
-                                                        </svg>
-                                                        <p class="text-sm font-medium font-open-sans">{{ $typeNames[$post->type] ?? 'Bài viết' }}</p>
-                                                    </div>
-                                                </div>
-                                            @endif
+                                    <div class="post-card bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 hover:border-red-100 transition-all duration-300 h-full flex flex-col">
+                                        <!-- Post Image - Sử dụng component tái sử dụng -->
+                                        <div class="relative overflow-hidden rounded-t-2xl flex-shrink-0">
+                                            <x-image-fallback
+                                                :model="$post"
+                                                image-field="thumbnail"
+                                                aspect-ratio="aspect-[16/9]"
+                                                size="medium"
+                                                :show-hover="true"
+                                                :show-type="true" />
                                         </div>
 
                                         <!-- Post Content -->
-                                        <div class="p-8">
+                                        <div class="p-6 flex-grow flex flex-col">
                                             <!-- Type Badge -->
                                             <div class="flex items-center justify-between mb-4">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 font-open-sans">
@@ -180,19 +166,19 @@
                                             </div>
 
                                             <!-- Title -->
-                                            <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors font-montserrat line-clamp-2">
+                                            <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors font-montserrat line-clamp-2 flex-shrink-0">
                                                 {{ $post->title }}
                                             </h3>
 
                                             <!-- Excerpt -->
                                             @if($post->content)
-                                                <p class="text-gray-600 mb-4 font-open-sans line-clamp-3">
-                                                    {{ Str::limit(strip_tags($post->content), 150) }}
+                                                <p class="text-gray-600 mb-4 font-open-sans line-clamp-3 text-sm lg:text-base flex-grow">
+                                                    {{ Str::limit(strip_tags($post->content), 120) }}
                                                 </p>
                                             @endif
 
                                             <!-- Meta Info -->
-                                            <div class="flex items-center justify-between text-sm text-gray-500 font-open-sans">
+                                            <div class="flex items-center justify-between text-sm text-gray-500 font-open-sans mt-auto pt-2 border-t border-gray-100">
                                                 <div class="flex items-center">
                                                     <i class="far fa-calendar mr-2"></i>
                                                     {{ $post->created_at->format('d/m/Y') }}
@@ -237,19 +223,41 @@
                         </div>
                     @endif
                 @else
-                    <!-- Empty State -->
-                    <div class="text-center py-16">
-                        <div class="max-w-md mx-auto">
-                            <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-search text-4xl text-gray-400"></i>
+                    <!-- Empty State - Minimalist Design -->
+                    <div class="text-center py-20">
+                        <div class="max-w-lg mx-auto">
+                            <!-- Icon với gradient background -->
+                            <div class="w-32 h-32 mx-auto mb-8 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                                <div class="absolute inset-0 opacity-10">
+                                    <div class="w-full h-full" style="background-image: radial-gradient(circle at 25% 25%, rgba(220, 38, 38, 0.1) 2px, transparent 2px), radial-gradient(circle at 75% 75%, rgba(220, 38, 38, 0.1) 2px, transparent 2px); background-size: 20px 20px;"></div>
+                                </div>
+                                <i class="fas fa-search text-5xl text-red-300 relative z-10"></i>
                             </div>
-                            <h3 class="text-xl font-bold text-gray-900 mb-3 font-montserrat">Không tìm thấy bài viết</h3>
-                            <p class="text-gray-600 mb-6 font-open-sans">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm để xem thêm kết quả.</p>
-                            <button wire:click="clearFilters"
-                                   class="inline-flex items-center px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium font-open-sans">
-                                <i class="fas fa-redo mr-2"></i>
-                                Xem tất cả bài viết
-                            </button>
+
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4 font-montserrat">Không tìm thấy bài viết</h3>
+                            <p class="text-gray-600 mb-8 font-open-sans leading-relaxed">
+                                @if($search || $type)
+                                    Không có bài viết nào phù hợp với tiêu chí tìm kiếm của bạn.<br>
+                                    Thử thay đổi bộ lọc hoặc từ khóa để xem thêm kết quả.
+                                @else
+                                    Hiện tại chưa có bài viết nào được đăng tải.<br>
+                                    Vui lòng quay lại sau để xem nội dung mới.
+                                @endif
+                            </p>
+
+                            @if($search || $type || $sort !== 'newest')
+                                <button wire:click="clearFilters"
+                                       class="inline-flex items-center px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:shadow-lg transition-all duration-300 font-medium font-open-sans">
+                                    <i class="fas fa-redo mr-3"></i>
+                                    Xem tất cả bài viết
+                                </button>
+                            @else
+                                <a href="{{ route('storeFront') }}"
+                                   class="inline-flex items-center px-8 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 hover:shadow-lg transition-all duration-300 font-medium font-open-sans">
+                                    <i class="fas fa-home mr-3"></i>
+                                    Về trang chủ
+                                </a>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -276,11 +284,115 @@
     </div>
 </div>
 
+@push('styles')
+<style>
+    /* Tối ưu responsive grid */
+    @media (max-width: 640px) {
+        .post-card {
+            margin-bottom: 1rem;
+        }
+
+        .post-card .p-6 {
+            padding: 1rem;
+        }
+    }
+
+    /* Smooth transitions cho hover effects */
+    .post-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Loading animation */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Filter button styles */
+    .filter-btn {
+        transition: all 0.2s ease;
+    }
+
+    .filter-btn:hover {
+        background-color: rgba(220, 38, 38, 0.05);
+        color: #dc2626;
+    }
+
+    .filter-btn.active {
+        background-color: #dc2626;
+        color: white;
+    }
+
+    /* Mobile sidebar improvements */
+    .mobile-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-sidebar.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mobile-sidebar-content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 85%;
+        max-width: 400px;
+        background: white;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+    }
+
+    .mobile-sidebar.active .mobile-sidebar-content {
+        transform: translateX(0);
+    }
+
+    /* Responsive text sizing */
+    @media (max-width: 768px) {
+        .text-xl {
+            font-size: 1.125rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
 function toggleSidebar() {
     const mobileSidebar = document.querySelector('.mobile-sidebar');
     mobileSidebar.classList.toggle('active');
+
+    // Prevent body scroll when sidebar is open
+    if (mobileSidebar.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
 }
 
 // Copy filter content to mobile sidebar
@@ -291,6 +403,33 @@ document.addEventListener('DOMContentLoaded', function() {
     if (desktopContent && mobileContent) {
         mobileContent.innerHTML = desktopContent.innerHTML;
     }
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(e) {
+        const mobileSidebar = document.querySelector('.mobile-sidebar');
+        const sidebarContent = document.querySelector('.mobile-sidebar-content');
+
+        if (mobileSidebar && mobileSidebar.classList.contains('active')) {
+            if (!sidebarContent.contains(e.target) && !e.target.closest('[onclick*="toggleSidebar"]')) {
+                toggleSidebar();
+            }
+        }
+    });
+
+    // Close sidebar on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const mobileSidebar = document.querySelector('.mobile-sidebar');
+            if (mobileSidebar && mobileSidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        }
+    });
+});
+
+// Smooth scroll to top when filters change
+window.addEventListener('livewire:navigated', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 </script>
 @endpush

@@ -35,6 +35,12 @@ class CatPost extends Model
         return $this->hasMany(Post::class, 'category_id');
     }
 
+    // Quan hệ với Course (one-to-many)
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'category_id');
+    }
+
     // Quan hệ parent-child
     public function parent()
     {
@@ -50,5 +56,21 @@ class CatPost extends Model
     public function menuItems()
     {
         return $this->hasMany(MenuItem::class, 'cat_post_id');
+    }
+
+    // Helper methods
+    public function getPostsCount()
+    {
+        return $this->posts()->where('status', 'active')->count();
+    }
+
+    public function getCoursesCount()
+    {
+        return $this->courses()->where('status', 'active')->count();
+    }
+
+    public function getTotalItemsCount()
+    {
+        return $this->getPostsCount() + $this->getCoursesCount();
     }
 }

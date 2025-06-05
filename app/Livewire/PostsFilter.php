@@ -87,21 +87,25 @@ class PostsFilter extends Component
     private function getQuery()
     {
         $query = Post::where('status', 'active')
-            ->with(['category', 'images' => function($query) {
-                $query->where('status', 'active')->orderBy('order');
-            }]);
+            ->with(['category:id,name,slug', 'images' => function($query) {
+                $query->where('status', 'active')->orderBy('order')->limit(1);
+            }])
+            ->select(['id', 'title', 'content', 'slug', 'thumbnail', 'type', 'is_featured', 'category_id', 'created_at', 'order']);
 
         // Lọc theo type
         if ($this->type && in_array($this->type, ['normal', 'news', 'service', 'course'])) {
             $query->where('type', $this->type);
         }
 
-        // Tìm kiếm theo từ khóa
+        // Tìm kiếm theo từ khóa với tối ưu performance
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('title', 'like', "%{$this->search}%")
-                  ->orWhere('content', 'like', "%{$this->search}%");
-            });
+            $searchTerm = trim($this->search);
+            if (strlen($searchTerm) >= 2) { // Chỉ tìm kiếm khi có ít nhất 2 ký tự
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('title', 'like', "%{$searchTerm}%")
+                      ->orWhere('content', 'like', "%{$searchTerm}%");
+                });
+            }
         }
 
         // Sắp xếp

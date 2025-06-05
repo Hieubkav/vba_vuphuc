@@ -36,11 +36,10 @@ storage/app/public/
 - **PostImagesRelationManager**: `posts/gallery/`
 - **Mục đích**: Ảnh đại diện và ảnh bổ sung bài viết
 
-### **3. EmployeeResource**
-- **EmployeeResource (image_link)**: `employees/avatars/`
-- **EmployeeResource (qr_code)**: `employees/qr-codes/`
-- **EmployeeImagesRelationManager**: `employees/gallery/`
-- **Mục đích**: Ảnh đại diện, QR code và ảnh bổ sung nhân viên
+### **3. CourseResource**
+- **CourseResource (image_link)**: `courses/thumbnails/`
+- **CourseImagesRelationManager**: `courses/gallery/`
+- **Mục đích**: Ảnh đại diện và ảnh bổ sung khóa học
 
 ### **4. PartnerResource**
 - **PartnerResource**: `partners/logos/`
@@ -62,9 +61,9 @@ storage/app/public/
 
 ## **Observer đã cập nhật:**
 
-### **1. EmployeeObserver** ✅
-- **Xử lý**: `image_link` và `qr_code`
-- **Khi xóa Employee**: Xóa avatar, QR code và tất cả ảnh gallery
+### **1. CourseObserver** ✅
+- **Xử lý**: `image_link`
+- **Khi xóa Course**: Xóa ảnh đại diện và tất cả ảnh gallery
 
 ### **2. SettingObserver** ✅
 - **Xử lý**: `logo_link`, `favicon_link` và `og_image_link`

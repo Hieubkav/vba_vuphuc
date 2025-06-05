@@ -17,8 +17,7 @@ class MenuItem extends Model
         'link',
         'cat_post_id',
         'post_id',
-        'cat_product_id',
-        'product_id',
+        'course_id',
         'order',
         'status',
     ];
@@ -41,7 +40,7 @@ class MenuItem extends Model
     }
 
     // Quan hệ với các model khác
-    public function catPost()
+    public function category()
     {
         return $this->belongsTo(CatPost::class, 'cat_post_id');
     }
@@ -51,38 +50,45 @@ class MenuItem extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function catProduct()
+    public function course()
     {
-        return $this->belongsTo(CatProduct::class, 'cat_product_id');
+        return $this->belongsTo(Course::class);
     }
 
-    public function product()
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    // Helper method để lấy URL
+    // Helper method để lấy URL - Cập nhật cho website khóa học
     public function getUrl()
     {
         switch ($this->type) {
             case 'link':
                 return $this->link;
             case 'cat_post':
-                return $this->catPost ? route('posts.category', $this->catPost->slug) : '#';
+                return $this->category ? route('posts.category', $this->category->slug) : '#';
             case 'all_posts':
                 return route('posts.index');
             case 'post':
                 return $this->post ? route('posts.show', $this->post->slug) : '#';
-            case 'cat_product':
-                return $this->catProduct ? route('products.category', $this->catProduct->slug) : '#';
-            case 'all_products':
-                return route('products.categories');
-            case 'product':
-                return $this->product ? route('products.show', $this->product->slug) : '#';
+            case 'course':
+                return $this->course ? route('courses.show', $this->course->slug) : '#';
+            case 'all_courses':
+                return route('courses.index');
             case 'display_only':
                 return 'javascript:void(0)'; // Không dẫn đến đâu cả
             default:
                 return '#';
         }
+    }
+
+    // Helper method để lấy icon cho menu
+    public function getIcon()
+    {
+        return match($this->type) {
+            'course' => 'fas fa-graduation-cap',
+            'all_courses' => 'fas fa-book-open',
+            'cat_post' => 'fas fa-folder',
+            'all_posts' => 'fas fa-newspaper',
+            'post' => 'fas fa-file-alt',
+            'link' => 'fas fa-external-link-alt',
+            default => 'fas fa-link'
+        };
     }
 }

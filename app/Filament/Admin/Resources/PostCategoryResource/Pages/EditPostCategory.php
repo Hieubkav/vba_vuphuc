@@ -13,6 +13,12 @@ class EditPostCategory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('view_frontend')
+                ->label('Xem trên website')
+                ->icon('heroicon-o-eye')
+                ->color('info')
+                ->url(fn () => route('posts.category', $this->record->slug))
+                ->openUrlInNewTab(),
             Actions\DeleteAction::make()
                 ->label('Xóa'),
         ];
@@ -20,16 +26,11 @@ class EditPostCategory extends EditRecord
 
     public function getTitle(): string
     {
-        return 'Chỉnh sửa Danh mục Bài viết';
+        return 'Chỉnh sửa danh mục: ' . $this->record->name;
     }
 
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-
-    protected function getSavedNotificationTitle(): ?string
-    {
-        return 'Danh mục bài viết đã được cập nhật thành công';
     }
 }

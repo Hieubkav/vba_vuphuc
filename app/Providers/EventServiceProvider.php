@@ -4,22 +4,18 @@ namespace App\Providers;
 
 use App\Models\Post;
 use App\Models\PostImage;
-use App\Models\Product;
-use App\Models\ProductImage;
-use App\Models\Employee;
-use App\Models\EmployeeImage;
+use App\Models\Course;
+use App\Models\CourseImage;
+use App\Models\CourseMaterial;
 use App\Models\Slider;
-use App\Models\Partner;
 use App\Models\Association;
 use App\Models\Setting;
 use App\Observers\PostObserver;
 use App\Observers\PostImageObserver;
-use App\Observers\ProductImageObserver;
-use App\Observers\ProductObserver;
-use App\Observers\EmployeeObserver;
-use App\Observers\EmployeeImageObserver;
+use App\Observers\CourseObserver;
+use App\Observers\CourseImageObserver;
+use App\Observers\CourseMaterialObserver;
 use App\Observers\SliderObserver;
-use App\Observers\PartnerObserver;
 use App\Observers\AssociationObserver;
 use App\Observers\SettingObserver;
 use Illuminate\Auth\Events\Registered;
@@ -45,19 +41,14 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Đăng ký observer cho các model có file upload
-        Product::observe(ProductObserver::class);
-        ProductImage::observe(ProductImageObserver::class);
         Post::observe(PostObserver::class);
         PostImage::observe(PostImageObserver::class);
-        Employee::observe(EmployeeObserver::class);
-        EmployeeImage::observe(EmployeeImageObserver::class);
+        Course::observe(CourseObserver::class);
+        CourseImage::observe(CourseImageObserver::class);
+        CourseMaterial::observe(CourseMaterialObserver::class);
         Slider::observe(SliderObserver::class);
-        Partner::observe(PartnerObserver::class);
         Association::observe(AssociationObserver::class);
         Setting::observe(SettingObserver::class);
-
-        // Đăng ký observer cho Order
-        \App\Models\Order::observe(\App\Observers\OrderObserver::class);
     }
 
     /**

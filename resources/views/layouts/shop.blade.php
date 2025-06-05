@@ -13,10 +13,10 @@
     <meta name="keywords"
         content="Vũ Phúc Baking, nguyên liệu ngành bánh, pha chế, nhà hàng, ĐBSCL, Rich Products Vietnam, dụng cụ làm bánh, thiết bị pha chế">
     <meta name="robots" content="all">
-    <meta property="og:title" content="@yield('title', isset($seoData) ? $seoData['title'] : ($settings->site_name ?? 'Vũ Phúc Baking - Nhà phân phối nguyên liệu ngành bánh và pha chế'))">
-    <meta property="og:description" content="@yield('description', isset($seoData) ? $seoData['description'] : ($settings->seo_description ?? 'Vũ Phúc Baking - Nhà phân phối nguyên phụ liệu, dụng cụ, thiết bị ngành bánh, pha chế, nhà hàng tại khu vực ĐBSCL. Nhà phân phối độc quyền các sản phẩm Rich Products Vietnam khu vực Tây Nam.'))">
+    <meta property="og:title" content="@yield('title', isset($seoData) ? $seoData['title'] : (isset($settings) && $settings ? $settings->site_name : 'Vũ Phúc Baking - Nhà phân phối nguyên liệu ngành bánh và pha chế'))">
+    <meta property="og:description" content="@yield('description', isset($seoData) ? $seoData['description'] : (isset($settings) && $settings ? $settings->seo_description : 'Vũ Phúc Baking - Nhà phân phối nguyên phụ liệu, dụng cụ, thiết bị ngành bánh, pha chế, nhà hàng tại khu vực ĐBSCL. Nhà phân phối độc quyền các sản phẩm Rich Products Vietnam khu vực Tây Nam.'))">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ isset($seoData) ? $seoData['ogImage'] : ($settings->og_image_link ? asset('storage/' . $settings->og_image_link) : ($settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo())) }}">
+    <meta property="og:image" content="{{ isset($seoData) ? $seoData['ogImage'] : (isset($settings) && $settings && $settings->og_image_link ? asset('storage/' . $settings->og_image_link) : (isset($settings) && $settings && $settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo())) }}">
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -32,22 +32,91 @@
     <meta name="author" content="Manh Hieu">
     <meta name="theme-color" content="#b91c1c">
 
-    <!-- Preconnects & Preloads -->
+    <!-- Performance optimizations -->
+    @if(function_exists('preloadCriticalResources'))
+        {!! preloadCriticalResources() !!}
+    @else
+        <!-- Fallback preload -->
+        <link rel="preload" href="{{ asset('build/assets/app.css') }}" as="style">
+        <link rel="preload" href="{{ asset('build/assets/app.js') }}" as="script">
+    @endif
+
+    <!-- Preconnects & DNS prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
-    <!-- Google Fonts - Montserrat & Open Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Critical CSS inline -->
+    @if(function_exists('criticalCss'))
+        {!! criticalCss() !!}
+    @else
+        <!-- Fallback critical CSS -->
+        <style>
+            body{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+            .container{max-width:1200px;margin:0 auto;padding:0 1rem}
+            .btn{display:inline-flex;align-items:center;padding:0.5rem 1rem;border-radius:0.375rem;font-weight:500;transition:all 0.2s}
+            .btn-primary{background-color:#3b82f6;color:white}
+            .btn-primary:hover{background-color:#2563eb}
+        </style>
+    @endif
 
-    <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- Font Awesome CDN - Production ready -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+          integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Font Awesome Fallback CSS -->
+    <style>
+        /* Ensure Font Awesome icons display correctly */
+        .fa, .fas, .far, .fab, .fal, .fad {
+            font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", "FontAwesome" !important;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            line-height: 1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: inline-block;
+        }
+
+        .fas { font-weight: 900; }
+        .far { font-weight: 400; }
+        .fab {
+            font-family: "Font Awesome 6 Brands" !important;
+            font-weight: 400;
+        }
+
+        /* Fallback for missing icons */
+        .fa:before, .fas:before, .far:before, .fab:before {
+            content: "\f03e"; /* fa-image as fallback */
+        }
+
+        /* Specific icons used in fallbacks */
+        .fa-graduation-cap:before { content: "\f19d"; }
+        .fa-newspaper:before { content: "\f1ea"; }
+        .fa-handshake:before { content: "\f2b5"; }
+        .fa-images:before { content: "\f302"; }
+        .fa-user:before { content: "\f007"; }
+        .fa-folder:before { content: "\f07b"; }
+        .fa-chalkboard-teacher:before { content: "\f51c"; }
+        .fa-image:before { content: "\f03e"; }
+    </style>
+
+    <!-- Defer non-critical CSS -->
+    @if(function_exists('deferNonCriticalCss'))
+        {!! deferNonCriticalCss('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap') !!}
+        {!! deferNonCriticalCss('https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css') !!}
+    @else
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" rel="stylesheet">
+    @endif
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : ($settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{ $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : ($settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}" type="image/x-icon">
-    <link rel="apple-touch-icon" href="{{ $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : ($settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}">
+    <link rel="icon" href="{{ isset($settings) && $settings && $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : (isset($settings) && $settings && $settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ isset($settings) && $settings && $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : (isset($settings) && $settings && $settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}" type="image/x-icon">
+    <link rel="apple-touch-icon" href="{{ isset($settings) && $settings && $settings->favicon_link ? asset('storage/' . $settings->favicon_link) : (isset($settings) && $settings && $settings->logo_link ? asset('storage/' . $settings->logo_link) : \App\Helpers\PlaceholderHelper::getLogo()) }}">
 
-    <title>@yield('title', isset($seoData) ? $seoData['title'] : ($settings->seo_title ?? $settings->site_name ?? config('app.name')))</title>
+    <title>@yield('title', isset($seoData) ? $seoData['title'] : (isset($settings) && $settings ? ($settings->seo_title ?? $settings->site_name) : config('app.name')))</title>
 
     <!-- Structured Data -->
     @if(isset($seoData) && isset($seoData['structuredData']))
@@ -64,14 +133,25 @@
 
     <style>
         :root {
-            --primary: #b91c1c;
-            --primary-dark: #991b1b;
+            /* Tối ưu color palette với tone đỏ-trắng minimalist */
+            --primary: #dc2626;
+            --primary-light: #ef4444;
+            --primary-dark: #b91c1c;
+            --primary-darker: #991b1b;
             --secondary: #1f2937;
-            --light: #f9fafb;
+            --light: #fafafa;
+            --gray-25: #fafafa;
+            --gray-light: #f3f4f6;
+            --red-25: #fef7f7;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --gray-light: #f3f4f6;
+
+            /* Spacing scale tối ưu */
+            --section-padding-sm: 1.5rem;
+            --section-padding-md: 2rem;
+            --section-padding-lg: 3rem;
+            --container-padding: 1rem;
         }
 
         [x-cloak] {
@@ -118,18 +198,36 @@
         }
 
         .page-container {
-            max-width: 1440px;
+            max-width: 1400px;
             margin-left: auto;
             margin-right: auto;
+            padding-left: var(--container-padding);
+            padding-right: var(--container-padding);
         }
 
+        /* Tối ưu animations với performance cao */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.7s ease-out forwards;
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* Responsive container padding */
+        @media (min-width: 640px) {
+            .page-container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .page-container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
         }
 
         /* Enhanced Product Card Animations */
@@ -345,12 +443,20 @@
     </style>
 
     @filamentStyles
+    @livewireStyles
     @vite('resources/css/app.css')
 
     <!-- Custom CSS cho responsive images -->
     <link rel="stylesheet" href="{{ asset('css/image-responsive.css') }}">
 
+    <!-- Storefront Optimized CSS -->
+    <link rel="stylesheet" href="{{ asset('css/storefront-optimized.css') }}">
+
     @stack('styles')
+
+    <!-- Lazy Loading Configuration -->
+    @lazyLoadConfig
+    @adaptiveLoadingConfig
 
 </head>
 
@@ -358,10 +464,10 @@
     <!-- Preloader - Optimized -->
     <div id="page-preloader" class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
         <div class="loader-content flex flex-col items-center">
-            @if($settings->logo_link)
-                <img src="{{ asset('storage/' . $settings->logo_link) }}" alt="{{ $settings->site_name ?? config('app.name') }}" class="h-16 w-auto mb-4 animate-pulse" loading="eager">
-            @elseif($settings->placeholder_image)
-                <img src="{{ asset('storage/' . $settings->placeholder_image) }}" alt="{{ $settings->site_name ?? config('app.name') }}" class="h-16 w-auto mb-4 animate-pulse" loading="eager">
+            @if(isset($settings) && $settings && $settings->logo_link)
+                <img src="{{ asset('storage/' . $settings->logo_link) }}" alt="{{ isset($settings) && $settings ? $settings->site_name : config('app.name') }}" class="h-16 w-auto mb-4 animate-pulse" loading="eager">
+            @elseif(isset($settings) && $settings && $settings->placeholder_image)
+                <img src="{{ asset('storage/' . $settings->placeholder_image) }}" alt="{{ isset($settings) && $settings ? $settings->site_name : config('app.name') }}" class="h-16 w-auto mb-4 animate-pulse" loading="eager">
             @else
                 <div class="h-16 w-16 mb-4 bg-red-600 rounded-lg flex items-center justify-center animate-pulse">
                     <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -370,7 +476,7 @@
                 </div>
             @endif
             <div class="w-32 h-1 bg-gradient-to-r from-red-700 to-red-500 rounded-full animate-pulse"></div>
-            <p class="text-sm text-gray-600 mt-2 animate-pulse">{{ $settings->site_name ?? 'Đang tải...' }}</p>
+            <p class="text-sm text-gray-600 mt-2 animate-pulse">{{ isset($settings) && $settings ? $settings->site_name : 'Đang tải...' }}</p>
         </div>
     </div>
 
@@ -381,7 +487,7 @@
     @include('components.public.navbar')
 
     <!-- Main Content -->
-    <main class="flex-grow bg-gray-50 overflow-hidden">
+    <main class="flex-grow bg-white overflow-hidden">
         @yield('content')
     </main>
 
@@ -394,45 +500,75 @@
     <!-- Notifications -->
     @livewire('notifications')
 
-    <!-- Scripts -->
+    <!-- Critical Scripts -->
     @filamentScripts
+    @livewireScripts
+
     @vite('resources/js/app.js')
 
-    <!-- Swiper JS -->
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Performance CSS -->
+    <link rel="stylesheet" href="{{ asset('css/performance.css') }}">
 
-    <!-- Custom JS cho smart images -->
-    <script src="{{ asset('js/image-smart.js') }}"></script>
+    <!-- Smart Lazy Loading -->
+    <script defer src="{{ asset('js/smart-lazy-loading.js') }}"></script>
+
+    <!-- Enhanced Lazy Loading for Storefront -->
+    <script defer src="{{ asset('js/storefront-lazy-loading.js') }}"></script>
+
+    <!-- Defer non-critical scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+    @if(file_exists(public_path('js/image-smart.js')))
+        <script defer src="{{ asset('js/image-smart.js') }}"></script>
+    @endif
+
+    <!-- Storefront Optimized JavaScript -->
+    <script defer src="{{ asset('js/storefront-optimized.js') }}"></script>
 
     @stack('scripts')
 
     <script>
-        // Preloader
+        // Optimized preloader - hide faster
         document.addEventListener('DOMContentLoaded', function() {
             const preloader = document.getElementById('page-preloader');
             if (preloader) {
+                // Hide preloader immediately when DOM is ready
+                preloader.style.opacity = 0;
                 setTimeout(() => {
-                    preloader.style.opacity = 0;
-                    setTimeout(() => {
-                        preloader.style.display = 'none';
-                    }, 500);
-                }, 500);
+                    preloader.style.display = 'none';
+                }, 300);
             }
 
-            // Animate sections on scroll
-            const animateSections = document.querySelectorAll('.animate-on-scroll');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-fade-in');
-                        observer.unobserve(entry.target);
-                    }
+            // Optimized scroll animations with better performance
+            if ('IntersectionObserver' in window) {
+                const animateSections = document.querySelectorAll('.animate-on-scroll');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('animate-fade-in');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '50px 0px'
                 });
-            }, { threshold: 0.1 });
 
-            animateSections.forEach(section => {
-                observer.observe(section);
-            });
+                animateSections.forEach(section => {
+                    observer.observe(section);
+                });
+            }
+        });
+
+        // Hide preloader on window load as fallback
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('page-preloader');
+            if (preloader && preloader.style.display !== 'none') {
+                preloader.style.opacity = 0;
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 200);
+            }
         });
     </script>
 </body>
