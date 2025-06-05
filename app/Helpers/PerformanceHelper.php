@@ -60,17 +60,15 @@ if (!function_exists('lazyImageAttributes')) {
      */
     function lazyImageAttributes($imagePath, $altText = '', $class = '', $sizes = [480, 768, 1024], $options = [])
     {
-        $lazyLoadService = app(\App\Services\LazyLoadService::class);
+        $priority = $options['priority'] ?? false;
 
-        $lazyOptions = [
+        return [
+            'src' => asset('storage/' . $imagePath),
             'alt' => $altText,
             'class' => $class,
-            'sizes' => $sizes,
-            'blur' => $options['blur'] ?? true,
-            'priority' => $options['priority'] ?? false
+            'loading' => $priority ? 'eager' : 'lazy',
+            'decoding' => 'async'
         ];
-
-        return $lazyLoadService->generateLazyAttributes($imagePath, $lazyOptions);
     }
 }
 
@@ -80,27 +78,21 @@ if (!function_exists('smartImageAttributes')) {
      */
     function smartImageAttributes($imagePath, $options = [])
     {
-        $imageOptimizationService = app(\App\Services\ImageOptimizationService::class);
-        $lazyLoadService = app(\App\Services\LazyLoadService::class);
-
         $defaultOptions = [
             'alt' => '',
             'class' => '',
-            'lazy' => true,
             'priority' => false,
-            'responsive' => true,
-            'blur' => true,
-            'sizes' => [320, 480, 768, 1024, 1200]
         ];
 
         $options = array_merge($defaultOptions, $options);
 
-        if ($options['responsive']) {
-            $options['srcset'] = $imageOptimizationService->generateSrcSet($imagePath, $options['sizes']);
-            $options['sizes_attr'] = $imageOptimizationService->generateSizes();
-        }
-
-        return $lazyLoadService->generateLazyAttributes($imagePath, $options);
+        return [
+            'src' => asset('storage/' . $imagePath),
+            'alt' => $options['alt'],
+            'class' => $options['class'],
+            'loading' => $options['priority'] ? 'eager' : 'lazy',
+            'decoding' => 'async'
+        ];
     }
 }
 
@@ -272,5 +264,68 @@ if (!function_exists('structuredData')) {
         $structuredData = array_merge($structuredData, $data);
 
         return '<script type="application/ld+json">' . json_encode($structuredData, JSON_UNESCAPED_UNICODE) . '</script>';
+    }
+}
+
+if (!function_exists('simpleLazyImage')) {
+    /**
+     * Tạo ảnh lazy loading đơn giản với native loading="lazy"
+     */
+    function simpleLazyImage($src, $alt = '', $class = '', $options = [])
+    {
+        $priority = $options['priority'] ?? false;
+        $fallbackType = $options['type'] ?? 'default';
+        $width = $options['width'] ?? null;
+        $height = $options['height'] ?? null;
+
+        // Fallback icons theo type
+        $fallbackIcons = [
+            'course' => 'fas fa-graduation-cap',
+            'news' => 'fas fa-newspaper',
+            'partner' => 'fas fa-handshake',
+            'album' => 'fas fa-images',
+            'testimonial' => 'fas fa-quote-left',
+            'default' => 'fas fa-image'
+        ];
+
+        $fallbackIcon = $fallbackIcons[$fallbackType] ?? $fallbackIcons['default'];
+
+        // Xử lý đường dẫn ảnh
+        $imagePath = $src;
+        if (str_starts_with($src, asset('storage/'))) {
+            $imagePath = str_replace(asset('storage/'), '', $src);
+        } elseif (str_starts_with($src, 'storage/')) {
+            $imagePath = str_replace('storage/', '', $src);
+        }
+
+        // Kiểm tra ảnh tồn tại
+        $imageExists = !empty($imagePath) && \Illuminate\Support\Facades\Storage::exists('public/' . $imagePath);
+
+        if (!$imageExists) {
+            return '<div class="fallback-placeholder w-full h-full bg-gray-50 flex items-center justify-center">
+                        <i class="' . $fallbackIcon . ' text-2xl text-gray-400"></i>
+                    </div>';
+        }
+
+        $imageUrl = asset('storage/' . $imagePath);
+        $loading = $priority ? 'eager' : 'lazy';
+
+        $widthAttr = $width ? 'width="' . $width . '"' : '';
+        $heightAttr = $height ? 'height="' . $height . '"' : '';
+
+        return '<div class="simple-lazy-image-container relative overflow-hidden">
+                    <img src="' . $imageUrl . '"
+                         alt="' . e($alt) . '"
+                         class="' . $class . '"
+                         ' . $widthAttr . '
+                         ' . $heightAttr . '
+                         loading="' . $loading . '"
+                         decoding="async"
+                         onerror="handleSimpleImageError(this)"
+                         style="transition: opacity 0.3s ease;">
+                    <div class="fallback-placeholder w-full h-full bg-gray-50 flex items-center justify-center absolute inset-0" style="display: none;">
+                        <i class="' . $fallbackIcon . ' text-2xl text-gray-400"></i>
+                    </div>
+                </div>';
     }
 }

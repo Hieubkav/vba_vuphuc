@@ -6,7 +6,7 @@ use App\Filament\Admin\Resources\PartnerResource\Pages;
 use App\Filament\Admin\Resources\PartnerResource\RelationManagers;
 use App\Models\Partner;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PartnerResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Partner::class;
 
@@ -169,15 +169,7 @@ class PartnerResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-        
-        return $optimizationService->cacheQuery(
-            'PartnerResource_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     /**

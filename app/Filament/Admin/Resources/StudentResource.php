@@ -6,7 +6,7 @@ use App\Filament\Admin\Resources\StudentResource\Pages;
 use App\Filament\Admin\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,7 +20,7 @@ use Filament\Support\Enums\FontWeight;
 
 class StudentResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Student::class;
 
@@ -322,7 +322,7 @@ class StudentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): string|array|null

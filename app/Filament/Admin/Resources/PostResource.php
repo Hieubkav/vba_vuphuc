@@ -7,7 +7,7 @@ use App\Filament\Admin\Resources\PostResource\RelationManagers;
 use App\Filament\Admin\Resources\PostCategoryResource;
 use App\Models\Post;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\RichEditor;
@@ -30,7 +30,7 @@ use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Post::class;
 
@@ -369,15 +369,7 @@ class PostResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-
-        return $optimizationService->cacheQuery(
-            'posts_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): ?string

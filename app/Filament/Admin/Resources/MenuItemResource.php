@@ -20,11 +20,11 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 
 class MenuItemResource extends Resource
 {
-    use OptimizedFilamentResource;
+    use SimpleFilamentOptimization;
 
     protected static ?string $model = MenuItem::class;
 
@@ -261,7 +261,7 @@ class MenuItemResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): ?string

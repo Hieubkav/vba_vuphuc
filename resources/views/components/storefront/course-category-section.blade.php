@@ -39,16 +39,15 @@
         <div class="flex items-center space-x-3">
             <!-- Category Icon -->
             <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                @if($category->image)
-                    @storefrontImage([
-                        'src' => $category->image,
-                        'type' => 'category',
-                        'options' => [
-                            'alt' => $category->name,
-                            'class' => 'w-6 h-6 object-cover rounded',
-                            'priority' => false
-                        ]
-                    ])
+                @if(isset($category->image) && !empty($category->image))
+                    <img
+                        src="{{ asset('storage/' . $category->image) }}"
+                        alt="{{ $category->name ?? 'Danh mục khóa học' }}"
+                        class="w-6 h-6 object-cover rounded"
+                        loading="lazy"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+                    >
+                    <i class="fas fa-{{ $category->icon ?? 'graduation-cap' }} text-white text-sm" style="display: none;"></i>
                 @else
                     <i class="fas fa-{{ $category->icon ?? 'graduation-cap' }} text-white text-sm"></i>
                 @endif
@@ -106,7 +105,76 @@
                 >
                     @foreach($courses as $course)
                         <div class="flex-none w-1/2 md:w-1/3 lg:w-1/4 group">
-                            @include('components.storefront.course-card', ['course' => $course, 'category' => $category])
+                            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-50 group h-full">
+                                @if(isset($course->slug))
+                                <a href="{{ route('courses.show', $course->slug) }}" class="block">
+                                @else
+                                <div class="block">
+                                @endif
+                                    <div class="h-40 md:h-48 overflow-hidden relative">
+                                        @if(isset($course->thumbnail) && !empty($course->thumbnail))
+                                            <img
+                                                data-src="{{ asset('storage/' . $course->thumbnail) }}"
+                                                alt="{{ $course->title ?? 'Khóa học VBA Vũ Phúc' }}"
+                                                class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                                loading="lazy"
+                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                                style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
+                                            >
+                                            <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex-col items-center justify-center course-placeholder" style="display: none;">
+                                                <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                            </div>
+                                        @else
+                                            <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center">
+                                                <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @if(isset($course->slug))
+                                </a>
+                                @else
+                                </div>
+                                @endif
+                                <div class="p-4 md:p-5">
+                                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                                        @if($course->relationLoaded('category') && $course->category)
+                                        <span class="bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs font-medium">{{ $course->category->name }}</span>
+                                        @elseif($course->relationLoaded('courseCategory') && $course->courseCategory)
+                                        <span class="bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs font-medium">{{ $course->courseCategory->name }}</span>
+                                        @endif
+                                        @if(isset($course->level) && !empty($course->level))
+                                        <span class="text-gray-400 text-xs">{{ ucfirst($course->level) }}</span>
+                                        @endif
+                                    </div>
+                                    @if(isset($course->slug))
+                                    <a href="{{ route('courses.show', $course->slug) }}">
+                                        <h3 class="text-sm md:text-base font-light text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2 leading-snug">{{ $course->title ?? 'Khóa học mới' }}</h3>
+                                    </a>
+                                    @else
+                                    <h3 class="text-sm md:text-base font-light text-gray-900 mb-2 line-clamp-2 leading-snug">{{ $course->title ?? 'Khóa học mới' }}</h3>
+                                    @endif
+                                    @if(isset($course->seo_description) && !empty($course->seo_description))
+                                    <p class="text-gray-500 mb-3 line-clamp-2 text-xs md:text-sm leading-relaxed">
+                                        {{ Str::limit(strip_tags($course->seo_description), 80) }}
+                                    </p>
+                                    @elseif(isset($course->description) && !empty($course->description))
+                                    <p class="text-gray-500 mb-3 line-clamp-2 text-xs md:text-sm leading-relaxed">
+                                        {{ Str::limit(strip_tags($course->description), 80) }}
+                                    </p>
+                                    @endif
+                                    <div class="flex items-center justify-between pt-2 border-t border-gray-50">
+                                        @if(isset($course->slug))
+                                        <a href="{{ route('courses.show', $course->slug) }}" class="inline-flex items-center text-gray-900 hover:text-gray-700 font-medium text-xs group">
+                                            <span>Xem khóa học</span>
+                                            <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                                        </a>
+                                        @endif
+                                        @if(isset($course->price) && $course->price > 0)
+                                        <span class="text-xs font-light text-gray-900">{{ number_format($course->price) }}đ</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endforeach
                 </div>
@@ -173,6 +241,30 @@
                 });
 
                 updateCarousel();
+
+                // Lazy loading cho ảnh khóa học
+                const lazyImages = document.querySelectorAll('.course-thumbnail.lazy-loading');
+
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.getAttribute('data-src');
+
+                            if (src) {
+                                img.src = src;
+                                img.onload = () => {
+                                    img.style.opacity = '1';
+                                    img.classList.add('loaded');
+                                };
+                            }
+
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+
+                lazyImages.forEach(img => imageObserver.observe(img));
             });
         </script>
     @else
@@ -180,10 +272,107 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             @foreach($courses as $course)
                 <div class="group">
-                    @include('components.storefront.course-card', ['course' => $course, 'category' => $category])
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-50 group h-full">
+                        @if(isset($course->slug))
+                        <a href="{{ route('courses.show', $course->slug) }}" class="block">
+                        @else
+                        <div class="block">
+                        @endif
+                            <div class="h-40 md:h-48 overflow-hidden relative">
+                                @if(isset($course->thumbnail) && !empty($course->thumbnail))
+                                    <img
+                                        data-src="{{ asset('storage/' . $course->thumbnail) }}"
+                                        alt="{{ $course->title ?? 'Khóa học VBA Vũ Phúc' }}"
+                                        class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                        loading="lazy"
+                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                        style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
+                                    >
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex-col items-center justify-center course-placeholder" style="display: none;">
+                                        <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                    </div>
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center">
+                                        <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        @if(isset($course->slug))
+                        </a>
+                        @else
+                        </div>
+                        @endif
+                        <div class="p-4 md:p-5">
+                            <div class="flex flex-wrap items-center gap-2 mb-3">
+                                @if($course->relationLoaded('category') && $course->category)
+                                <span class="bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs font-medium">{{ $course->category->name }}</span>
+                                @elseif($course->relationLoaded('courseCategory') && $course->courseCategory)
+                                <span class="bg-gray-50 text-gray-600 px-2 py-1 rounded-full text-xs font-medium">{{ $course->courseCategory->name }}</span>
+                                @endif
+                                @if(isset($course->level) && !empty($course->level))
+                                <span class="text-gray-400 text-xs">{{ ucfirst($course->level) }}</span>
+                                @endif
+                            </div>
+                            @if(isset($course->slug))
+                            <a href="{{ route('courses.show', $course->slug) }}">
+                                <h3 class="text-sm md:text-base font-light text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2 leading-snug">{{ $course->title ?? 'Khóa học mới' }}</h3>
+                            </a>
+                            @else
+                            <h3 class="text-sm md:text-base font-light text-gray-900 mb-2 line-clamp-2 leading-snug">{{ $course->title ?? 'Khóa học mới' }}</h3>
+                            @endif
+                            @if(isset($course->seo_description) && !empty($course->seo_description))
+                            <p class="text-gray-500 mb-3 line-clamp-2 text-xs md:text-sm leading-relaxed">
+                                {{ Str::limit(strip_tags($course->seo_description), 80) }}
+                            </p>
+                            @elseif(isset($course->description) && !empty($course->description))
+                            <p class="text-gray-500 mb-3 line-clamp-2 text-xs md:text-sm leading-relaxed">
+                                {{ Str::limit(strip_tags($course->description), 80) }}
+                            </p>
+                            @endif
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-50">
+                                @if(isset($course->slug))
+                                <a href="{{ route('courses.show', $course->slug) }}" class="inline-flex items-center text-gray-900 hover:text-gray-700 font-medium text-xs group">
+                                    <span>Xem khóa học</span>
+                                    <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
+                                </a>
+                                @endif
+                                @if(isset($course->price) && $course->price > 0)
+                                <span class="text-xs font-light text-gray-900">{{ number_format($course->price) }}đ</span>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Lazy loading cho ảnh khóa học trong static grid
+                const lazyImages = document.querySelectorAll('.course-thumbnail.lazy-loading');
+
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.getAttribute('data-src');
+
+                            if (src) {
+                                img.src = src;
+                                img.onload = () => {
+                                    img.style.opacity = '1';
+                                    img.classList.add('loaded');
+                                };
+                            }
+
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+
+                lazyImages.forEach(img => imageObserver.observe(img));
+            });
+        </script>
     @endif
 </div>
 @endif
@@ -250,5 +439,57 @@
     .group:hover .bg-white\/90 {
         background-color: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(8px);
+    }
+
+    /* Course card styles - Tone đỏ-trắng */
+    .course-placeholder {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 50%, #fecaca 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-placeholder::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 100%;
+        }
+    }
+
+    /* Line clamp utilities */
+    .line-clamp-2 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .line-clamp-3 {
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+
+    /* Lazy loading styles */
+    .lazy-loading {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .lazy-loading.loaded {
+        opacity: 1;
     }
 </style>

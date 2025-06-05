@@ -4,7 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
-    use OptimizedFilamentResource;
+    use SimpleFilamentOptimization;
 
     protected static ?string $model = User::class;
 

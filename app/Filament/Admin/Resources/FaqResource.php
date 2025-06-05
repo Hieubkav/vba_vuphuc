@@ -9,11 +9,11 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 
 class FaqResource extends Resource
 {
-    use OptimizedFilamentResource;
+    use SimpleFilamentOptimization;
 
     protected static ?string $model = Faq::class;
 
@@ -169,15 +169,7 @@ class FaqResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-        
-        return $optimizationService->cacheQuery(
-            'FaqResource_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     /**

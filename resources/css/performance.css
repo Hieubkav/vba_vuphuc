@@ -1,82 +1,28 @@
-/* Performance Optimization CSS */
+/* Simple Performance CSS - Native Lazy Loading */
 
-/* ===== LAZY LOADING STYLES ===== */
-.lazy-image, .lazy-loading {
-    transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
-    will-change: opacity, filter, transform;
+/* ===== SIMPLE LAZY LOADING ===== */
+img[loading="lazy"] {
+    transition: opacity 0.3s ease;
 }
 
-.lazy-image.loading, .lazy-loading {
-    opacity: 0;
-    filter: blur(5px);
+/* Fallback UI cho ảnh lỗi */
+.fallback-placeholder {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    color: #9ca3af;
+    transition: opacity 0.3s ease;
+}
+
+.fallback-placeholder i {
+    opacity: 0.7;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fallback-placeholder:hover i {
+    opacity: 0.9;
     transform: scale(1.05);
 }
 
-.lazy-image.loaded, .lazy-loaded {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: scale(1) !important;
-}
-
-.lazy-image.error, .lazy-error {
-    opacity: 0.5;
-    filter: grayscale(100%);
-}
-
-/* Storefront specific lazy loading */
-.hero-image-main.lazy-loading {
-    filter: blur(3px);
-    transform: scale(1.02);
-}
-
-.course-image.lazy-loading,
-.course-thumbnail.lazy-loading {
-    filter: blur(4px);
-    transform: scale(1.03);
-}
-
-.news-image.lazy-loading,
-.post-thumbnail.lazy-loading {
-    filter: blur(4px);
-    transform: scale(1.03);
-}
-
-.partner-image.lazy-loading {
-    filter: blur(2px) grayscale(100%);
-    transform: scale(1.02);
-}
-
-.album-image.lazy-loading {
-    filter: blur(3px);
-    transform: scale(1.02);
-}
-
-.testimonial-image.lazy-loading {
-    filter: blur(2px);
-    transform: scale(1.02);
-}
-
-.category-image.lazy-loading {
-    filter: blur(3px);
-    transform: scale(1.02);
-}
-
-/* Loading indicators */
-.loading-indicator {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(4px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    border-radius: 8px;
-    margin: 4px;
-}
-
-.loading-indicator.fade-out {
-    opacity: 0;
-    transform: scale(0.9);
-    pointer-events: none;
-}
-
-/* Loading spinner animation */
+/* ===== LOADING SPINNER ===== */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -86,131 +32,6 @@
     animation: spin 1s linear infinite;
 }
 
-/* Timeout states */
-.lazy-timeout {
-    opacity: 0.6;
-    filter: grayscale(50%);
-}
-
-.lazy-stuck {
-    opacity: 0.4;
-    filter: grayscale(80%);
-}
-
-/* Blur placeholder effect */
-.blur-placeholder {
-    filter: blur(5px);
-    transform: scale(1.05);
-    transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-.blur-placeholder-bg {
-    filter: blur(5px);
-    transform: scale(1.05);
-    transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-/* Fallback icons - chỉ hiển thị icon, gọn gàng */
-.fallback-icon {
-    position: relative;
-    overflow: hidden;
-    border-radius: inherit;
-}
-
-.fallback-icon i {
-    opacity: 0.7;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.fallback-icon:hover i {
-    opacity: 0.9;
-    transform: scale(1.1);
-}
-
-/* Subtle shimmer effect cho fallback */
-.fallback-icon::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: shimmer 3s infinite;
-    pointer-events: none;
-}
-
-@keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-/* ===== SKELETON LOADING ===== */
-.skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-}
-
-.skeleton-image {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    position: relative;
-    overflow: hidden;
-}
-
-.skeleton-text {
-    height: 1rem;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-}
-
-.skeleton-text:last-child {
-    margin-bottom: 0;
-    width: 60%;
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-/* ===== PROGRESSIVE LOADING ===== */
-.progressive-image-container {
-    position: relative;
-    overflow: hidden;
-    background-color: #f3f4f6;
-}
-
-.progressive-image-container::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    opacity: 0.7;
-}
-
-.progressive-image-container.loaded::before {
-    display: none;
-}
-
-@keyframes spin {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
 /* ===== ASPECT RATIO UTILITIES ===== */
 .aspect-ratio-16-9 { aspect-ratio: 16/9; }
 .aspect-ratio-4-3 { aspect-ratio: 4/3; }
@@ -218,35 +39,7 @@
 .aspect-ratio-3-2 { aspect-ratio: 3/2; }
 .aspect-ratio-21-9 { aspect-ratio: 21/9; }
 
-/* Fallback for browsers without aspect-ratio support */
-@supports not (aspect-ratio: 1) {
-    .aspect-ratio-16-9 { padding-bottom: 56.25%; }
-    .aspect-ratio-4-3 { padding-bottom: 75%; }
-    .aspect-ratio-1-1 { padding-bottom: 100%; }
-    .aspect-ratio-3-2 { padding-bottom: 66.67%; }
-    .aspect-ratio-21-9 { padding-bottom: 42.86%; }
-    
-    .aspect-ratio-16-9 > *,
-    .aspect-ratio-4-3 > *,
-    .aspect-ratio-1-1 > *,
-    .aspect-ratio-3-2 > *,
-    .aspect-ratio-21-9 > * {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-}
-
-/* ===== PERFORMANCE OPTIMIZATIONS ===== */
-.img-optimized {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
+/* ===== BASIC IMAGE OPTIMIZATIONS ===== */
 .img-responsive {
     width: 100%;
     height: auto;
@@ -261,66 +54,17 @@
     object-fit: cover;
 }
 
-/* ===== SMOOTH TRANSITIONS ===== */
-.transition-smooth {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-fast {
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.transition-slow {
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ===== LOADING STATES ===== */
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    transition: opacity 0.3s ease;
-}
-
-.loading-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.loading-spinner {
-    width: 2rem;
-    height: 2rem;
-    border: 2px solid #e5e7eb;
-    border-top: 2px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
 /* ===== GALLERY OPTIMIZATIONS ===== */
-.gallery-grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-}
-
 .gallery-item {
     position: relative;
     overflow: hidden;
     border-radius: 8px;
     background-color: #f3f4f6;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .gallery-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 .gallery-item img {
@@ -334,126 +78,12 @@
     transform: scale(1.05);
 }
 
-/* ===== RESPONSIVE OPTIMIZATIONS ===== */
-@media (max-width: 640px) {
-    .gallery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 0.5rem;
-    }
-    
-    .skeleton-text {
-        height: 0.875rem;
-    }
-    
-    .loading-spinner {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .gallery-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* ===== CRITICAL CSS INLINES ===== */
-.critical-image {
-    display: block;
-    max-width: 100%;
-    height: auto;
-}
-
-.critical-text {
-    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    line-height: 1.5;
-}
-
-/* ===== PERFORMANCE HINTS ===== */
-.will-change-transform {
-    will-change: transform;
-}
-
-.will-change-opacity {
-    will-change: opacity;
-}
-
-.will-change-auto {
-    will-change: auto;
-}
-
-/* ===== INTERSECTION OBSERVER OPTIMIZATIONS ===== */
-.observe-lazy {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.observe-lazy.in-view {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* ===== PRELOAD OPTIMIZATIONS ===== */
-.preload-image {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-}
-
-/* ===== ERROR STATES ===== */
-.image-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-    color: #9ca3af;
-    font-size: 0.875rem;
-    text-align: center;
-    padding: 1rem;
-}
-
-.image-error i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
 /* ===== ACCESSIBILITY ===== */
 @media (prefers-reduced-motion: reduce) {
-    .lazy-image,
-    .blur-placeholder,
-    .blur-placeholder-bg,
-    .skeleton,
-    .skeleton-image,
-    .skeleton-text,
-    .transition-smooth,
-    .transition-fast,
-    .transition-slow,
     .gallery-item,
     .gallery-item img,
-    .observe-lazy {
+    .fallback-placeholder i {
         animation: none !important;
         transition: none !important;
-    }
-}
-
-/* ===== PRINT OPTIMIZATIONS ===== */
-@media print {
-    .loading-overlay,
-    .loading-spinner,
-    .skeleton,
-    .skeleton-image,
-    .skeleton-text {
-        display: none !important;
-    }
-    
-    .lazy-image {
-        opacity: 1 !important;
-        filter: none !important;
-        transform: none !important;
     }
 }

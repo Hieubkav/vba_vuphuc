@@ -1,53 +1,99 @@
 @extends('layouts.shop')
 
+{{--
+    Dữ liệu được share từ ViewServiceProvider với cache tập trung
+    SimpleStorefrontService chỉ là helper để check dữ liệu và fallback
+--}}
+
 @section('content')
     <!-- Hero Banner -->
     @include('components.storefront.hero-banner')
 
-    <!-- Giới thiệu khóa học - Tối ưu hóa với tone đỏ-trắng minimalist -->
-    <section class="storefront-section bg-white bg-pattern-subtle animate-fade-in-optimized">
+    <!-- Giới thiệu khóa học -->
+    <x-storefront-section
+        title="Khóa học VBA Excel chuyên nghiệp"
+        description="Nâng cao kỹ năng Excel với các khóa học VBA từ cơ bản đến nâng cao"
+        bg-color="bg-white"
+        :has-data="true">
         @livewire('courses-overview')
-    </section>
+    </x-storefront-section>
 
     <!-- Album timeline khóa học -->
-    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+    <x-storefront-section
+        title="Thư viện tài liệu"
+        description="Tài liệu và hình ảnh từ các khóa học đã diễn ra"
+        bg-color="bg-gray-25"
+        :has-data="isset($albums) && $albums->isNotEmpty()"
+        empty-icon="fas fa-images"
+        empty-message="Chưa có album nào được tải lên">
         @include('components.storefront.album-timeline')
-    </section>
+    </x-storefront-section>
 
     <!-- Nhóm khóa học -->
-    <section class="storefront-section bg-white animate-fade-in-optimized">
+    <x-storefront-section
+        title="Nhóm học tập"
+        description="Tham gia các nhóm Facebook/Zalo để học hỏi và trao đổi kinh nghiệm"
+        bg-color="bg-white"
+        :has-data="isset($courseGroups) && $courseGroups->isNotEmpty()"
+        empty-icon="fas fa-users"
+        empty-message="Chưa có nhóm khóa học nào">
         @include('components.storefront.course-groups')
-    </section>
+    </x-storefront-section>
 
     <!-- Khóa học theo từng danh mục -->
-    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+    <x-storefront-section
+        title="Khóa học theo chuyên mục"
+        description="Khám phá các khóa học được phân loại theo từng chuyên mục"
+        bg-color="bg-gray-25"
+        :has-data="isset($courseCategories) && $courseCategories->isNotEmpty()"
+        empty-icon="fas fa-graduation-cap"
+        empty-message="Chưa có khóa học nào">
         @include('components.storefront.course-categories-sections')
-    </section>
+    </x-storefront-section>
 
     <!-- Đánh giá của khách hàng -->
-    <section class="storefront-section bg-white animate-fade-in-optimized">
+    <x-storefront-section
+        title="Đánh giá từ học viên"
+        description="Chia sẻ từ những học viên đã tham gia khóa học"
+        bg-color="bg-white"
+        :has-data="isset($testimonials) && $testimonials->isNotEmpty()"
+        empty-icon="fas fa-star"
+        empty-message="Chưa có đánh giá nào">
         @include('components.storefront.testimonials')
-    </section>
+    </x-storefront-section>
 
-    <!-- FAQ - Câu hỏi thường gặp -->
-    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
+    <!-- FAQ -->
+    <x-storefront-section
+        title="Câu hỏi thường gặp"
+        description="Giải đáp những thắc mắc phổ biến về khóa học"
+        bg-color="bg-gray-25"
+        :has-data="isset($faqs) && $faqs->isNotEmpty()"
+        empty-icon="fas fa-question-circle"
+        empty-message="Chưa có câu hỏi nào">
         @include('components.storefront.faq-section')
-    </section>
+    </x-storefront-section>
 
-    <!-- Trusted Partners Gallery -->
-    <section class="storefront-section bg-white animate-fade-in-optimized">
+    <!-- Đối tác -->
+    <x-storefront-section
+        title="Đối tác tin cậy"
+        description="Những đối tác đồng hành cùng chúng tôi"
+        bg-color="bg-white"
+        :has-data="isset($partners) && $partners->isNotEmpty()"
+        empty-icon="fas fa-handshake"
+        empty-message="Chưa có đối tác nào">
         @include('components.storefront.partners')
-    </section>
-
-    <!-- Curated Articles & Insights -->
-    <section class="storefront-section bg-gray-25 animate-fade-in-optimized">
-        @include('components.storefront.course-posts')
-    </section>
+    </x-storefront-section>
 
     <!-- Blog Posts -->
-    <section class="storefront-section bg-white animate-fade-in-optimized">
+    <x-storefront-section
+        title="Bài viết mới nhất"
+        description="Cập nhật kiến thức và thông tin hữu ích"
+        bg-color="bg-gray-25"
+        :has-data="isset($latestPosts) && $latestPosts->isNotEmpty()"
+        empty-icon="fas fa-newspaper"
+        empty-message="Chưa có bài viết nào">
         @include('components.storefront.blog-posts')
-    </section>
+    </x-storefront-section>
 
     <!-- Call to Action -->
     <section class="storefront-section bg-gradient-to-r from-red-700 via-red-600 to-red-700 text-white relative overflow-hidden">
@@ -55,145 +101,4 @@
     </section>
 @endsection
 
-@push('styles')
-    <style>
-        /* Tối ưu hóa styling minimalist với tone đỏ-trắng */
-        section {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        /* Smooth scroll animations - tối ưu performance */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-
-        .animate-on-scroll.animate-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Minimalist section separators */
-        section::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.1), transparent);
-        }
-
-        section:last-of-type::after {
-            display: none;
-        }
-
-        /* Optimized scrollbar với tone đỏ */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #fafafa;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #dc2626, #b91c1c);
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #b91c1c, #991b1b);
-        }
-
-        /* Custom background colors */
-        .bg-gray-25 {
-            background-color: #fafafa;
-        }
-
-        .bg-red-25 {
-            background-color: #fef7f7;
-        }
-
-        /* Responsive spacing optimization */
-        @media (max-width: 768px) {
-            section {
-                padding-top: 1.5rem !important;
-                padding-bottom: 1.5rem !important;
-            }
-        }
-
-        /* Performance optimizations */
-        .animate-on-scroll {
-            will-change: opacity, transform;
-        }
-
-        .animate-on-scroll.animate-visible {
-            will-change: auto;
-        }
-    </style>
-@endpush
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Tối ưu scroll animations với performance cao
-            const observerOptions = {
-                root: null,
-                rootMargin: '50px',
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-visible');
-
-                        // Staggered animation cho children elements
-                        const animatedChildren = entry.target.querySelectorAll('.stagger-item');
-                        if (animatedChildren.length) {
-                            animatedChildren.forEach((child, index) => {
-                                setTimeout(() => {
-                                    child.classList.add('animate-visible');
-                                }, 100 * index);
-                            });
-                        }
-
-                        // Unobserve để tối ưu performance
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            const sections = document.querySelectorAll('.animate-on-scroll');
-            sections.forEach(section => {
-                observer.observe(section);
-            });
-
-            // Smooth scroll behavior cho internal links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
-        });
-
-        // Initialize storefront lazy loading
-        if (window.storefrontLazyLoader) {
-            // Refresh lazy loading sau khi tất cả animations đã setup
-            setTimeout(() => {
-                window.storefrontLazyLoader.refresh();
-            }, 100);
-        }
-    </script>
-@endpush
+{{-- Styles và scripts được handle bởi simple-storefront.css và simple-storefront.js --}}

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Blade;
 use Livewire\Livewire;
 use App\Models\Instructor;
 use App\Models\Testimonial;
@@ -18,7 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Load helper functions
+        if (!function_exists('simpleLazyImage')) {
+            require_once app_path('Helpers/PerformanceHelper.php');
+        }
     }
 
     /**
@@ -29,6 +33,11 @@ class AppServiceProvider extends ServiceProvider
         // Đăng ký Observer
         Instructor::observe(InstructorObserver::class);
         Testimonial::observe(TestimonialObserver::class);
+
+        // Đăng ký Blade directive đơn giản cho lazy loading
+        Blade::directive('simpleLazyImage', function ($expression) {
+            return "<?php echo simpleLazyImage({$expression}); ?>";
+        });
 
     //    Livewire::setScriptRoute(function ($handle) {
     //         return Route::get('/vuphuc/livewire/livewire.min.js?id=13b7c601', $handle);

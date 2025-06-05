@@ -5,7 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\AlbumImageResource\Pages;
 use App\Models\AlbumImage;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use App\Models\Album;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AlbumImageResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = AlbumImage::class;
 
@@ -194,15 +194,7 @@ class AlbumImageResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-        
-        return $optimizationService->cacheQuery(
-            'AlbumImageResource_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     /**

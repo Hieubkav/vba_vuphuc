@@ -12,12 +12,12 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Illuminate\Support\Str;
 
 class CourseGroupResource extends Resource
 {
-    use OptimizedFilamentResource;
+    use SimpleFilamentOptimization;
 
     protected static ?string $model = CourseGroup::class;
 
@@ -340,15 +340,7 @@ class CourseGroupResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-        
-        return $optimizationService->cacheQuery(
-            'CourseGroupResource_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     /**

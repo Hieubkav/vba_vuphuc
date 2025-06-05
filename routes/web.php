@@ -169,10 +169,10 @@ Route::get('/test-simple-image', function () {
     return view('test.simple-image-test');
 })->name('test.simple-image');
 
-// Test route cho lazy loading
-Route::get('/test-lazy-loading', function () {
-    return view('test-lazy-loading');
-})->name('test.lazy-loading');
+// Test route cho simple lazy loading
+Route::get('/test-simple-lazy', function () {
+    return view('test-simple-lazy');
+})->name('test.simple-lazy');
 
 
 

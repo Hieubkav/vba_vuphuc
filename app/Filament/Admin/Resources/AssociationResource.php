@@ -5,7 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\AssociationResource\Pages;
 use App\Models\Association;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -22,7 +22,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 
 class AssociationResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Association::class;
 
@@ -173,7 +173,7 @@ class AssociationResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): ?string

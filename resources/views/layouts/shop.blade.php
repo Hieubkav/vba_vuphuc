@@ -446,17 +446,10 @@
     @livewireStyles
     @vite('resources/css/app.css')
 
-    <!-- Custom CSS cho responsive images -->
-    <link rel="stylesheet" href="{{ asset('css/image-responsive.css') }}">
-
-    <!-- Storefront Optimized CSS -->
-    <link rel="stylesheet" href="{{ asset('css/storefront-optimized.css') }}">
+    <!-- Simple Storefront CSS - Clean & Minimal -->
+    <link rel="stylesheet" href="{{ asset('css/simple-storefront.css') }}">
 
     @stack('styles')
-
-    <!-- Lazy Loading Configuration -->
-    @lazyLoadConfig
-    @adaptiveLoadingConfig
 
 </head>
 
@@ -509,11 +502,8 @@
     <!-- Performance CSS -->
     <link rel="stylesheet" href="{{ asset('css/performance.css') }}">
 
-    <!-- Smart Lazy Loading -->
-    <script defer src="{{ asset('js/smart-lazy-loading.js') }}"></script>
-
-    <!-- Enhanced Lazy Loading for Storefront -->
-    <script defer src="{{ asset('js/storefront-lazy-loading.js') }}"></script>
+    <!-- Simple Storefront JS - Clean & Minimal -->
+    <script defer src="{{ asset('js/simple-storefront.js') }}"></script>
 
     <!-- Defer non-critical scripts -->
     <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

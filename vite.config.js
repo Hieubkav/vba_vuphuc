@@ -7,8 +7,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/performance.css',
-                'resources/js/app.js',
-                'resources/js/smart-lazy-loading.js'
+                'resources/js/app.js'
             ],
             refresh: [
                 ...refreshPaths,

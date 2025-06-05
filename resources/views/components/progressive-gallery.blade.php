@@ -11,16 +11,9 @@
 ])
 
 @php
-    use App\Services\LazyLoadService;
-    
-    $lazyLoadService = app(LazyLoadService::class);
-    
-    // Tạo progressive gallery data
-    $galleryData = $lazyLoadService->generateProgressiveGalleryAttributes($images, [
-        'batchSize' => $batchSize,
-        'thumbnails' => $enableThumbnails
-    ]);
-    
+    // Tạo gallery data đơn giản
+    $galleryData = array_chunk($images, $batchSize);
+
     $aspectRatioClass = match($aspectRatio) {
         '16:9' => 'aspect-[16/9]',
         '4:3' => 'aspect-[4/3]',
@@ -37,47 +30,20 @@
      
     <div class="grid {{ $columns }} {{ $gap }}">
         @foreach($galleryData as $batchIndex => $batch)
-            @foreach($batch['images'] as $imageIndex => $image)
+            @foreach($batch as $imageIndex => $image)
                 <div class="gallery-item relative group overflow-hidden rounded-lg bg-gray-100 {{ $aspectRatioClass }}"
-                     data-batch="{{ $batch['batch'] }}"
-                     data-load-on-scroll="{{ $batch['loadOnScroll'] ? 'true' : 'false' }}"
+                     data-batch="{{ $batchIndex }}"
                      data-image-index="{{ $imageIndex }}">
-                     
-                    {{-- Thumbnail placeholder --}}
-                    @if($enableThumbnails && isset($image['thumbnail']))
-                        <div class="absolute inset-0 bg-cover bg-center filter blur-sm scale-110 transition-all duration-300"
-                             style="background-image: url('{{ $image['thumbnail'] }}');"
-                             data-thumbnail="true"></div>
-                    @endif
-                    
-                    {{-- Main image --}}
-                    <img class="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 {{ $image['lazy'] ? 'opacity-0' : '' }}"
-                         @if($image['lazy'])
-                             data-src="{{ $image['src'] }}"
-                             @if(isset($image['srcset']))
-                                 data-srcset="{{ $image['srcset'] }}"
-                                 sizes="{{ $image['sizes'] ?? '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw' }}"
-                             @endif
-                         @else
-                             src="{{ $image['src'] }}"
-                             @if(isset($image['srcset']))
-                                 srcset="{{ $image['srcset'] }}"
-                                 sizes="{{ $image['sizes'] ?? '(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw' }}"
-                             @endif
-                         @endif
-                         alt="{{ $image['alt'] }}"
-                         loading="{{ $image['lazy'] ? 'lazy' : 'eager' }}"
+
+                    {{-- Main image với native lazy loading --}}
+                    <img class="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+                         src="{{ asset('storage/' . $image['path']) }}"
+                         alt="{{ $image['alt'] ?? '' }}"
+                         loading="{{ $batchIndex > 0 ? 'lazy' : 'eager' }}"
+                         decoding="async"
                          onload="handleGalleryImageLoad(this)"
                          onerror="handleGalleryImageError(this)">
-                    
-                    {{-- Loading overlay --}}
-                    @if($image['lazy'])
-                        <div class="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-75 gallery-loading"
-                             data-loading="true">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                        </div>
-                    @endif
-                    
+
                     {{-- Lightbox trigger --}}
                     @if($lightbox)
                         <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 cursor-pointer flex items-center justify-center"
@@ -85,13 +51,18 @@
                             <i class="fas fa-expand text-white text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
                         </div>
                     @endif
-                    
+
                     {{-- Image info overlay --}}
                     @if(!empty($image['alt']))
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                             <p class="text-white text-sm font-medium">{{ $image['alt'] }}</p>
                         </div>
                     @endif
+
+                    {{-- Fallback UI --}}
+                    <div class="fallback-placeholder absolute inset-0 bg-gray-50 flex items-center justify-center" style="display: none;">
+                        <i class="fas fa-images text-2xl text-gray-400"></i>
+                    </div>
                 </div>
             @endforeach
         @endforeach
@@ -110,7 +81,7 @@
 
 {{-- Lightbox Modal --}}
 @if($lightbox)
-    <div id="gallery-lightbox" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+    <div id="gallery-lightbox" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4">
         <div class="relative max-w-7xl max-h-full">
             {{-- Close button --}}
             <button class="absolute top-4 right-4 text-white text-3xl z-10 hover:text-gray-300 transition-colors"
@@ -191,34 +162,26 @@
         let currentGallery = null;
         
         function handleGalleryImageLoad(img) {
-            // Hide loading overlay
-            const loadingOverlay = img.parentElement.querySelector('[data-loading="true"]');
-            if (loadingOverlay) {
-                loadingOverlay.classList.add('hidden');
-            }
-            
-            // Hide thumbnail
-            const thumbnail = img.parentElement.querySelector('[data-thumbnail="true"]');
-            if (thumbnail) {
-                thumbnail.style.opacity = '0';
-            }
-            
-            // Show main image
+            // Image loaded successfully
             img.classList.add('loaded');
         }
-        
+
         function handleGalleryImageError(img) {
-            const loadingOverlay = img.parentElement.querySelector('[data-loading="true"]');
-            if (loadingOverlay) {
-                loadingOverlay.classList.add('hidden');
-            }
-            
-            // Show error state
+            console.log('Gallery image error:', img.src);
+
+            // Ẩn ảnh lỗi
             img.style.display = 'none';
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'absolute inset-0 flex items-center justify-center bg-gray-200 text-gray-500';
-            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle text-2xl"></i>';
-            img.parentElement.appendChild(errorDiv);
+
+            // Hiển thị fallback
+            const fallback = img.parentElement.querySelector('.fallback-placeholder');
+            if (fallback) {
+                fallback.style.display = 'flex';
+                fallback.style.opacity = '0';
+                setTimeout(() => {
+                    fallback.style.transition = 'opacity 0.3s ease';
+                    fallback.style.opacity = '1';
+                }, 50);
+            }
         }
         
         function openLightbox(index, gallery) {

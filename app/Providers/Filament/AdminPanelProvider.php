@@ -78,7 +78,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                \App\Http\Middleware\FilamentOptimizationMiddleware::class,
+                // Removed complex optimization middleware
             ])
             ->authGuard('web')
             ->authMiddleware([

@@ -6,7 +6,7 @@ use App\Filament\Admin\Resources\InstructorResource\Pages;
 use App\Filament\Admin\Resources\CourseResource;
 use App\Models\Instructor;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Filament\Tables\Table;
 
 class InstructorResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Instructor::class;
 
@@ -318,7 +318,7 @@ class InstructorResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('status', 'active')->count();
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): string|array|null

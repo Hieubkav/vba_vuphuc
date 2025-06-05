@@ -5,7 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\PostCategoryResource\Pages;
 use App\Models\CatPost;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class PostCategoryResource extends Resource
 {
-    use OptimizedFilamentResource, HasImageUpload;
+    use SimpleFilamentOptimization, HasImageUpload;
 
     protected static ?string $model = CatPost::class;
 

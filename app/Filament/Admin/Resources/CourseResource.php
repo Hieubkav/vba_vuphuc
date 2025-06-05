@@ -8,7 +8,7 @@ use App\Filament\Admin\Resources\CatCourseResource;
 use App\Filament\Admin\Resources\InstructorResource;
 use App\Models\Course;
 use App\Traits\HasImageUpload;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class CourseResource extends Resource
 {
-    use HasImageUpload, OptimizedFilamentResource;
+    use HasImageUpload, SimpleFilamentOptimization;
 
     protected static ?string $model = Course::class;
 
@@ -546,15 +546,7 @@ class CourseResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $optimizationService = app(\App\Services\FilamentOptimizationService::class);
-
-        return $optimizationService->cacheQuery(
-            'courses_count_badge',
-            function() {
-                return static::getModel()::where('status', 'active')->count();
-            },
-            300 // Cache 5 phút
-        );
+        return (string) static::getModel()::where('status', 'active')->count();
     }
 
     public static function getNavigationBadgeColor(): string|array|null

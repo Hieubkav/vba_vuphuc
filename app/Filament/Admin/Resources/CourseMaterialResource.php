@@ -9,11 +9,11 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Traits\OptimizedFilamentResource;
+use App\Traits\SimpleFilamentOptimization;
 
 class CourseMaterialResource extends Resource
 {
-    use OptimizedFilamentResource;
+    use SimpleFilamentOptimization;
 
     protected static ?string $model = CourseMaterial::class;
 
