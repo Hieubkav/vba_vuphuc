@@ -13,17 +13,36 @@ use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Models\Setting;
 
 class AdminPanelProvider extends PanelProvider
 {
+    /**
+     * Cấu hình hiển thị brand - true: hiển thị logo, false: chỉ hiển thị text
+     */
+    private const SHOW_LOGO = false;
+
     public function panel(Panel $panel): Panel
     {
+        // Lấy thông tin từ Setting
+        $settings = Setting::where('status', 'active')->first();
+
+        // Xác định brand name
+        $brandName = $this->getBrandName($settings);
+
+        // Xác định logo
+        $brandLogo = $this->getBrandLogo($settings);
+
+        // Xác định favicon
+        $favicon = $this->getFavicon($settings);
+
         return $panel
             ->id('admin')
             ->path('admin')
@@ -31,10 +50,9 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Red,
                 'gray' => Color::Slate,
             ])
-            ->brandName('VBA Vũ Phúc')
-            ->brandLogo(asset('images/logo.png'))
-            ->brandLogoHeight('2rem')
-            ->favicon(asset('favicon.ico'))
+            ->brandName($brandName)
+            ->brandLogo($brandLogo)
+            ->favicon($favicon)
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
@@ -108,5 +126,39 @@ class AdminPanelProvider extends PanelProvider
                 ')
             )
             ->login();
+    }
+
+    /**
+     * Lấy brand name từ settings hoặc fallback
+     */
+    private function getBrandName($settings): string
+    {
+        return $settings && $settings->site_name
+            ? $settings->site_name
+            : 'VBA Vũ Phúc';
+    }
+
+    /**
+     * Lấy brand logo từ settings hoặc fallback
+     */
+    private function getBrandLogo($settings): ?string
+    {
+        if (!self::SHOW_LOGO) {
+            return null; // Chỉ hiển thị text
+        }
+
+        return $settings && $settings->logo_link && Storage::disk('public')->exists($settings->logo_link)
+            ? asset('storage/' . $settings->logo_link)
+            : asset('images/logo.png');
+    }
+
+    /**
+     * Lấy favicon từ settings hoặc fallback
+     */
+    private function getFavicon($settings): string
+    {
+        return $settings && $settings->favicon_link && Storage::disk('public')->exists($settings->favicon_link)
+            ? asset('storage/' . $settings->favicon_link)
+            : asset('favicon.ico');
     }
 }

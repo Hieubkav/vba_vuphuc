@@ -7,84 +7,13 @@
     @section('og_image', asset('storage/' . $post->og_image_link))
 @endif
 
-@push('styles')
-<style>
-    .prose {
-        font-family: 'Open Sans', sans-serif;
-        line-height: 1.8;
-        color: #374151;
-        max-width: none;
-    }
-
-    .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 600;
-        color: #1f2937;
-        margin-top: 2.5rem;
-        margin-bottom: 1rem;
-        line-height: 1.3;
-    }
-
-    .prose h1 { font-size: 2rem; }
-    .prose h2 { font-size: 1.75rem; }
-    .prose h3 { font-size: 1.5rem; }
-    .prose h4 { font-size: 1.25rem; }
-
-    .prose p {
-        margin-bottom: 1.5rem;
-        text-align: justify;
-    }
-
-    .prose ul, .prose ol {
-        margin: 1.5rem 0;
-        padding-left: 1.5rem;
-    }
-
-    .prose li {
-        margin: 0.75rem 0;
-    }
-
-    .prose strong {
-        font-weight: 600;
-        color: #1f2937;
-    }
-
-    .prose a {
-        color: #dc2626;
-        text-decoration: none;
-        font-weight: 500;
-        border-bottom: 1px solid transparent;
-        transition: border-color 0.2s ease;
-    }
-
-    .prose a:hover {
-        border-bottom-color: #dc2626;
-    }
-
-    .prose img {
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        margin: 2rem auto;
-    }
-
-    .prose blockquote {
-        border-left: 4px solid #dc2626;
-        background: #fef2f2;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-radius: 0.5rem;
-        font-style: italic;
-    }
-</style>
-@endpush
-
 @section('content')
-<!-- Minimalist Header -->
+<!-- Simple Header -->
 <header class="bg-white border-b border-gray-100">
     <div class="container mx-auto px-4 py-6">
         <!-- Breadcrumb -->
         <nav class="mb-6">
-            <div class="flex items-center space-x-2 text-sm text-gray-500 font-open-sans">
+            <div class="flex items-center space-x-2 text-sm text-gray-500">
                 <a href="{{ route('storeFront') }}" class="hover:text-red-600 transition-colors">
                     <i class="fas fa-home mr-1"></i>Trang chủ
                 </a>
@@ -123,12 +52,12 @@
             </div>
 
             <!-- Title -->
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 font-montserrat leading-tight">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 {{ $post->title }}
             </h1>
 
             <!-- Meta Info -->
-            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 font-open-sans">
+            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
                 <div class="flex items-center">
                     <i class="far fa-calendar mr-2"></i>
                     <time datetime="{{ $post->created_at->format('Y-m-d') }}">
@@ -154,23 +83,33 @@
 
 <!-- Main Content -->
 <main class="bg-white">
-    <div class="container mx-auto px-4 py-12">
+    <div class="container mx-auto px-4 py-6 md:py-8">
         <div class="max-w-4xl mx-auto">
-            <!-- Featured Image - Responsive và thông minh -->
-            @if($post->thumbnail)
-                <div class="mb-12">
-                    <div class="relative overflow-hidden rounded-lg shadow-lg">
+            <!-- Featured Image - Không cắt xén, giữ nguyên tỷ lệ -->
+            <div class="mb-6 md:mb-8">
+                @if(isset($post->thumbnail) && !empty($post->thumbnail) && \App\Services\ImageService::imageExists($post->thumbnail))
+                    <!-- Ảnh thực tế - giữ nguyên tỷ lệ, không cắt xén -->
+                    <div class="post-image-container">
                         <img src="{{ asset('storage/' . $post->thumbnail) }}"
                              alt="{{ $post->title }}"
-                             class="w-full h-auto object-cover"
-                             style="max-height: 500px;"
-                             loading="eager">
+                             loading="eager"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                        <!-- Fallback UI khi ảnh lỗi -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center" style="display: none;">
+                            <i class="fas fa-image text-4xl md:text-6xl text-red-300"></i>
+                        </div>
                     </div>
-                </div>
-            @endif
+                @else
+                    <!-- Fallback UI khi không có ảnh -->
+                    <div class="w-full h-48 md:h-64 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center rounded-lg shadow-lg">
+                        <i class="{{ \App\Services\ImageService::getIconByType($post->type ?? 'normal') }} text-4xl md:text-6xl text-red-300"></i>
+                    </div>
+                @endif
+            </div>
 
             <!-- Article Content -->
-            <article class="prose prose-lg max-w-none">
+            <article class="prose prose-lg max-w-none prose-red">
                 {!! $post->content !!}
             </article>
         </div>
@@ -179,12 +118,12 @@
 
 <!-- Related Posts -->
 @if($relatedPosts->count() > 0)
-<section class="bg-gray-50 py-16">
+<section class="bg-gray-50 py-12">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">
             <!-- Section Header -->
-            <div class="text-center mb-12">
-                <h3 class="text-2xl font-bold text-gray-900 mb-2 font-montserrat">
+            <div class="text-center mb-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">
                     @php
                         $relatedTitle = [
                             'service' => 'Dịch vụ liên quan',
@@ -203,23 +142,32 @@
                 @foreach($relatedPosts->take(4) as $relatedPost)
                     <article class="group">
                         <a href="{{ route('posts.show', $relatedPost->slug) }}" class="block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-                            @if($relatedPost->thumbnail)
-                                <div class="aspect-video overflow-hidden">
+                            <!-- Ảnh với fallback UI -->
+                            <div class="aspect-video overflow-hidden">
+                                @if(isset($relatedPost->thumbnail) && !empty($relatedPost->thumbnail) && \App\Services\ImageService::imageExists($relatedPost->thumbnail))
                                     <img src="{{ asset('storage/' . $relatedPost->thumbnail) }}"
                                          alt="{{ $relatedPost->title }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                </div>
-                            @else
-                                <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <i class="fas fa-file-alt text-3xl text-gray-400"></i>
-                                </div>
-                            @endif
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                                    <!-- Fallback khi ảnh lỗi -->
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center" style="display: none;">
+                                        <i class="{{ \App\Services\ImageService::getIconByType($relatedPost->type ?? 'normal') }} text-3xl text-red-300"></i>
+                                    </div>
+                                @else
+                                    <!-- Fallback khi không có ảnh -->
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                        <i class="{{ \App\Services\ImageService::getIconByType($relatedPost->type ?? 'normal') }} text-3xl text-red-300"></i>
+                                    </div>
+                                @endif
+                            </div>
 
                             <div class="p-6">
-                                <h4 class="font-semibold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-2 mb-2 font-montserrat">
+                                <h4 class="font-semibold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-2 mb-2">
                                     {{ $relatedPost->title }}
                                 </h4>
-                                <p class="text-sm text-gray-600 line-clamp-2 font-open-sans mb-3">
+                                <p class="text-sm text-gray-600 line-clamp-2 mb-3">
                                     {{ Str::limit(strip_tags($relatedPost->content), 100) }}
                                 </p>
                                 <div class="flex items-center text-xs text-gray-500">
@@ -237,7 +185,7 @@
             <!-- View All Button -->
             <div class="text-center">
                 <a href="{{ route('posts.index', ['type' => $post->type]) }}"
-                   class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-300 font-open-sans">
+                   class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-300">
                     <span>Xem tất cả</span>
                     <i class="fas fa-arrow-right ml-2"></i>
                 </a>
@@ -246,4 +194,128 @@
     </div>
 </section>
 @endif
+
+@push('styles')
+<style>
+/* Simple Prose Styles - KISS Principle */
+.prose {
+    line-height: 1.8;
+    color: #374151;
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    font-weight: 600;
+    color: #1f2937;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+/* Responsive font sizes */
+.prose h1 { font-size: 1.75rem; }
+.prose h2 { font-size: 1.5rem; }
+.prose h3 { font-size: 1.25rem; }
+.prose h4 { font-size: 1.125rem; }
+
+@media (min-width: 768px) {
+    .prose h1 { font-size: 2rem; }
+    .prose h2 { font-size: 1.75rem; }
+    .prose h3 { font-size: 1.5rem; }
+    .prose h4 { font-size: 1.25rem; }
+}
+
+.prose p {
+    margin-bottom: 1.5rem;
+    text-align: justify;
+}
+
+.prose ul, .prose ol {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.prose li {
+    margin: 0.5rem 0;
+}
+
+.prose strong {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.prose a {
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s ease;
+}
+
+.prose a:hover {
+    border-bottom-color: #dc2626;
+}
+
+.prose img {
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin: 1.5rem auto;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.prose blockquote {
+    border-left: 4px solid #dc2626;
+    background: #fef2f2;
+    padding: 1rem;
+    margin: 1.5rem 0;
+    border-radius: 0.5rem;
+    font-style: italic;
+}
+
+@media (min-width: 768px) {
+    .prose blockquote {
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Responsive image container */
+.post-image-container {
+    position: relative;
+    width: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.post-image-container img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    max-height: 50vh;
+}
+
+@media (min-width: 768px) {
+    .post-image-container img {
+        max-height: 60vh;
+    }
+}
+
+@media (min-width: 1024px) {
+    .post-image-container img {
+        max-height: 70vh;
+    }
+}
+</style>
+@endpush
 @endsection

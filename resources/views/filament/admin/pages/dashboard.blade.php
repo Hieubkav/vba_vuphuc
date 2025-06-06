@@ -114,7 +114,187 @@
         </div>
     </div>
 
+    <!-- Realtime Stats Section -->
+    <div class="realtime-stats-section mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+                Thống kê Realtime
+            </h2>
+            <div class="text-right">
+                <div class="text-xs text-gray-500 dark:text-gray-400">
+                    Tổng {{ \App\Models\Visitor::count() }} records • Cập nhật {{ now()->format('H:i:s') }}
+                </div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    Auto-refresh mỗi 30 giây
+                </div>
+            </div>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            @php
+                try {
+                    $visitorService = new \App\Services\VisitorStatsService();
+                    $realtimeStats = $visitorService->getRealtimeStats();
+                } catch (\Exception $e) {
+                    $realtimeStats = [
+                        'unique_visitors_today' => 0,
+                        'total_page_views_today' => 0,
+                        'unique_visitors_total' => 0,
+                        'total_page_views_total' => 0,
+                        'top_courses' => []
+                    ];
+                }
+            @endphp
+
+            <!-- Người truy cập hôm nay -->
+            <div class="stat-card bg-gradient-to-br from-emerald-500 to-emerald-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-emerald-100 text-sm font-medium">Người truy cập hôm nay</p>
+                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['unique_visitors_today']) }}</p>
+                        <p class="text-emerald-200 text-xs mt-1">Unique visitors</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lượt truy cập hôm nay -->
+            <div class="stat-card bg-gradient-to-br from-cyan-500 to-cyan-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-cyan-100 text-sm font-medium">Lượt truy cập hôm nay</p>
+                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['total_page_views_today']) }}</p>
+                        <p class="text-cyan-200 text-xs mt-1">Page views</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng người truy cập -->
+            <div class="stat-card bg-gradient-to-br from-rose-500 to-rose-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-rose-100 text-sm font-medium">Tổng người truy cập</p>
+                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['unique_visitors_total']) }}</p>
+                        <p class="text-rose-200 text-xs mt-1">Tất cả thời gian</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tổng lượt truy cập -->
+            <div class="stat-card bg-gradient-to-br from-indigo-500 to-indigo-600">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-indigo-100 text-sm font-medium">Tổng lượt truy cập</p>
+                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['total_page_views_total']) }}</p>
+                        <p class="text-indigo-200 text-xs mt-1">Tất cả thời gian</p>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Courses Section -->
+    <div class="top-courses-section mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z" clip-rule="evenodd"/>
+            </svg>
+            Top 3 khóa học được truy cập nhiều nhất
+        </h2>
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            @if(!empty($realtimeStats['top_courses']) && count($realtimeStats['top_courses']) > 0)
+                <div class="space-y-4">
+                    @foreach($realtimeStats['top_courses'] as $index => $item)
+                        @php
+                            $course = $item['course'] ?? null;
+                            $views = $item['views'] ?? 0;
+                            $rankColors = ['text-yellow-600', 'text-gray-500', 'text-orange-600'];
+                            $rankBgs = ['bg-yellow-100', 'bg-gray-100', 'bg-orange-100'];
+                            $rankIcons = ['🏆', '🥈', '🥉'];
+                        @endphp
+
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                            <!-- Rank -->
+                            <div class="flex-shrink-0">
+                                <div class="w-12 h-12 {{ $rankBgs[$index] ?? 'bg-gray-100' }} rounded-full flex items-center justify-center">
+                                    <span class="text-2xl">{{ $rankIcons[$index] ?? '🎖️' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Course Info -->
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                    {{ $course->title ?? 'Khóa học không xác định' }}
+                                </h4>
+                                @if($course && $course->slug)
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <a href="{{ route('courses.show', $course->slug) }}"
+                                           target="_blank"
+                                           class="hover:text-blue-600 dark:hover:text-blue-400">
+                                            Xem khóa học →
+                                        </a>
+                                    </p>
+                                @endif
+                            </div>
+
+                            <!-- Views Count -->
+                            <div class="flex-shrink-0 text-right">
+                                <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                    {{ number_format($views) }}
+                                </div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    lượt xem
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                        <span>Cập nhật realtime</span>
+                        <span>{{ now()->format('H:i d/m/Y') }}</span>
+                    </div>
+                </div>
+            @else
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Chưa có dữ liệu truy cập khóa học
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                        Dữ liệu sẽ xuất hiện khi có người truy cập các trang khóa học
+                    </p>
+                </div>
+            @endif
+        </div>
+    </div>
 
     @push('scripts')
         <script>
@@ -183,6 +363,61 @@
                 // Cập nhật thời gian ngay khi load và mỗi giây
                 updateCurrentTime();
                 setInterval(updateCurrentTime, 1000);
+
+                // Auto-refresh realtime stats mỗi 30 giây
+                function refreshRealtimeStats() {
+                    // Tạo endpoint API riêng cho việc refresh stats
+                    fetch('/api/realtime-stats')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success && data.stats) {
+                                // Cập nhật các số liệu realtime
+                                updateStatCard('unique_visitors_today', data.stats.unique_visitors_today);
+                                updateStatCard('total_page_views_today', data.stats.total_page_views_today);
+                                updateStatCard('unique_visitors_total', data.stats.unique_visitors_total);
+                                updateStatCard('total_page_views_total', data.stats.total_page_views_total);
+
+                                console.log('✅ Realtime stats updated:', data.stats);
+                            }
+                        })
+                        .catch(error => {
+                            console.log('⚠️ Failed to update realtime stats:', error);
+                        });
+                }
+
+                function updateStatCard(type, value) {
+                    const cards = document.querySelectorAll('.stat-card');
+                    cards.forEach(card => {
+                        const title = card.querySelector('p').textContent.toLowerCase();
+                        let shouldUpdate = false;
+
+                        if (type === 'unique_visitors_today' && title.includes('người truy cập hôm nay')) {
+                            shouldUpdate = true;
+                        } else if (type === 'total_page_views_today' && title.includes('lượt truy cập hôm nay')) {
+                            shouldUpdate = true;
+                        } else if (type === 'unique_visitors_total' && title.includes('tổng người truy cập')) {
+                            shouldUpdate = true;
+                        } else if (type === 'total_page_views_total' && title.includes('tổng lượt truy cập')) {
+                            shouldUpdate = true;
+                        }
+
+                        if (shouldUpdate) {
+                            const numberElement = card.querySelector('.text-3xl');
+                            if (numberElement) {
+                                // Hiệu ứng fade khi cập nhật
+                                numberElement.style.opacity = '0.7';
+                                setTimeout(() => {
+                                    numberElement.textContent = new Intl.NumberFormat('vi-VN').format(value);
+                                    numberElement.style.opacity = '1';
+                                }, 200);
+                            }
+                        }
+                    });
+                }
+
+                // Refresh stats ngay khi load và mỗi 30 giây
+                setTimeout(refreshRealtimeStats, 2000); // Delay 2s để trang load xong
+                setInterval(refreshRealtimeStats, 30000); // Mỗi 30 giây
 
                 // Thêm animation cho các elements khi load
                 const animatedElements = document.querySelectorAll('.stat-card, .quick-action-btn');

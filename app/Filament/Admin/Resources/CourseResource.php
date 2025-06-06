@@ -530,7 +530,7 @@ class CourseResource extends Resource
     {
         return [
             RelationManagers\ImagesRelationManager::class,
-            // RelationManagers\MaterialsRelationManager::class,
+            RelationManagers\MaterialsRelationManager::class,
             // RelationManagers\StudentsRelationManager::class,
         ];
     }
