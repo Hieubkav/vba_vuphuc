@@ -1,18 +1,18 @@
 <x-filament-panels::page class="fi-dashboard-page">
-    <!-- Dashboard Header với gradient đẹp mắt -->
-    <div class="dashboard-header">
+    <!-- Clean Dashboard Header -->
+    <div class="dashboard-header-clean">
         <div class="flex items-center justify-between flex-wrap gap-6">
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-4 mb-3">
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
                         <span class="text-2xl">🎓</span>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-bold text-white dark:text-gray-100">VBA Vũ Phúc</h1>
-                        <p class="text-blue-100 dark:text-blue-200 text-sm">Hệ thống quản lý khóa học chuyên nghiệp</p>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">VBA Vũ Phúc</h1>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm">Hệ thống quản lý khóa học chuyên nghiệp</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 text-sm text-blue-100">
+                <div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span class="flex items-center gap-1">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
@@ -29,29 +29,29 @@
                 </div>
             </div>
             <div class="text-right flex-shrink-0">
-                <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                    <div class="text-sm text-blue-100 mb-1">Thời gian hiện tại</div>
-                    <div class="text-2xl font-bold text-white" id="current-time">{{ now()->format('H:i:s') }}</div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mb-1">Thời gian hiện tại</div>
+                    <div class="text-2xl font-bold text-gray-900 dark:text-gray-100" id="current-time">{{ now()->format('H:i:s') }}</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Clean Stats Cards -->
     <div class="stats-grid mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Khóa học -->
-            <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600">
+            <div class="clean-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-100 text-sm font-medium">Tổng khóa học</p>
-                        <p class="text-3xl font-bold text-white">{{ \App\Models\Course::count() }}</p>
-                        <p class="text-blue-200 text-xs mt-1">
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng khóa học</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ \App\Models\Course::count() }}</p>
+                        <p class="text-blue-600 dark:text-blue-400 text-xs font-medium">
                             {{ \App\Models\Course::where('status', 'active')->count() }} đang hoạt động
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
                         </svg>
                     </div>
@@ -59,17 +59,17 @@
             </div>
 
             <!-- Học viên -->
-            <div class="stat-card bg-gradient-to-br from-green-500 to-green-600">
+            <div class="clean-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-green-100 text-sm font-medium">Tổng học viên</p>
-                        <p class="text-3xl font-bold text-white">{{ \App\Models\Student::count() }}</p>
-                        <p class="text-green-200 text-xs mt-1">
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng học viên</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ \App\Models\Student::count() }}</p>
+                        <p class="text-green-600 dark:text-green-400 text-xs font-medium">
                             {{ \App\Models\Student::where('status', 'active')->count() }} đang học
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                         </svg>
                     </div>
@@ -77,17 +77,17 @@
             </div>
 
             <!-- Bài viết -->
-            <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600">
+            <div class="clean-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-purple-100 text-sm font-medium">Tổng bài viết</p>
-                        <p class="text-3xl font-bold text-white">{{ \App\Models\Post::count() }}</p>
-                        <p class="text-purple-200 text-xs mt-1">
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng bài viết</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ \App\Models\Post::count() }}</p>
+                        <p class="text-purple-600 dark:text-purple-400 text-xs font-medium">
                             {{ \App\Models\Post::where('status', 'active')->count() }} đã xuất bản
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
                         </svg>
                     </div>
@@ -95,17 +95,17 @@
             </div>
 
             <!-- Giảng viên -->
-            <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600">
+            <div class="clean-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-orange-100 text-sm font-medium">Tổng giảng viên</p>
-                        <p class="text-3xl font-bold text-white">{{ \App\Models\Instructor::count() }}</p>
-                        <p class="text-orange-200 text-xs mt-1">
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng giảng viên</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ \App\Models\Instructor::count() }}</p>
+                        <p class="text-orange-600 dark:text-orange-400 text-xs font-medium">
                             {{ \App\Models\Instructor::where('status', 'active')->count() }} đang hoạt động
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-orange-100 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-orange-600 dark:text-orange-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                         </svg>
                     </div>
@@ -150,15 +150,15 @@
             @endphp
 
             <!-- Người truy cập hôm nay -->
-            <div class="stat-card bg-gradient-to-br from-emerald-500 to-emerald-600">
+            <div class="realtime-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-emerald-100 text-sm font-medium">Người truy cập hôm nay</p>
-                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['unique_visitors_today']) }}</p>
-                        <p class="text-emerald-200 text-xs mt-1">Unique visitors</p>
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Người truy cập hôm nay</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ number_format($realtimeStats['unique_visitors_today']) }}</p>
+                        <p class="text-emerald-600 dark:text-emerald-400 text-xs font-medium">Unique visitors</p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
                         </svg>
                     </div>
@@ -166,15 +166,15 @@
             </div>
 
             <!-- Lượt truy cập hôm nay -->
-            <div class="stat-card bg-gradient-to-br from-cyan-500 to-cyan-600">
+            <div class="realtime-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-cyan-100 text-sm font-medium">Lượt truy cập hôm nay</p>
-                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['total_page_views_today']) }}</p>
-                        <p class="text-cyan-200 text-xs mt-1">Page views</p>
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Lượt truy cập hôm nay</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ number_format($realtimeStats['total_page_views_today']) }}</p>
+                        <p class="text-cyan-600 dark:text-cyan-400 text-xs font-medium">Page views</p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-cyan-100 dark:bg-cyan-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-cyan-600 dark:text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
                             <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
                         </svg>
@@ -183,15 +183,15 @@
             </div>
 
             <!-- Tổng người truy cập -->
-            <div class="stat-card bg-gradient-to-br from-rose-500 to-rose-600">
+            <div class="realtime-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-rose-100 text-sm font-medium">Tổng người truy cập</p>
-                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['unique_visitors_total']) }}</p>
-                        <p class="text-rose-200 text-xs mt-1">Tất cả thời gian</p>
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng người truy cập</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ number_format($realtimeStats['unique_visitors_total']) }}</p>
+                        <p class="text-rose-600 dark:text-rose-400 text-xs font-medium">Tất cả thời gian</p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-rose-600 dark:text-rose-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
                         </svg>
                     </div>
@@ -199,15 +199,15 @@
             </div>
 
             <!-- Tổng lượt truy cập -->
-            <div class="stat-card bg-gradient-to-br from-indigo-500 to-indigo-600">
+            <div class="realtime-stat-card group">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-indigo-100 text-sm font-medium">Tổng lượt truy cập</p>
-                        <p class="text-3xl font-bold text-white">{{ number_format($realtimeStats['total_page_views_total']) }}</p>
-                        <p class="text-indigo-200 text-xs mt-1">Tất cả thời gian</p>
+                    <div class="flex-1">
+                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tổng lượt truy cập</p>
+                        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ number_format($realtimeStats['total_page_views_total']) }}</p>
+                        <p class="text-indigo-600 dark:text-indigo-400 text-xs font-medium">Tất cả thời gian</p>
                     </div>
-                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="w-14 h-14 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7 text-indigo-600 dark:text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                     </div>
@@ -318,16 +318,18 @@
                     }
                 }
 
-                // Thêm hiệu ứng hover cho stat cards
-                const statCards = document.querySelectorAll('.stat-card');
-                statCards.forEach(card => {
-                    card.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-4px) scale(1.02)';
-                    });
+                // Clean hover effects for stat cards
+                const statCards = document.querySelectorAll('.clean-stat-card, .realtime-stat-card');
+                statCards.forEach((card, index) => {
+                    // Add staggered animation on load
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
 
-                    card.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0) scale(1)';
-                    });
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.4s ease';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
                 });
 
                 // Thêm hiệu ứng loading cho quick actions
@@ -386,7 +388,7 @@
                 }
 
                 function updateStatCard(type, value) {
-                    const cards = document.querySelectorAll('.stat-card');
+                    const cards = document.querySelectorAll('.realtime-stat-card');
                     cards.forEach(card => {
                         const title = card.querySelector('p').textContent.toLowerCase();
                         let shouldUpdate = false;
@@ -404,12 +406,14 @@
                         if (shouldUpdate) {
                             const numberElement = card.querySelector('.text-3xl');
                             if (numberElement) {
-                                // Hiệu ứng fade khi cập nhật
+                                // Simple update animation
+                                numberElement.style.transition = 'all 0.3s ease';
                                 numberElement.style.opacity = '0.7';
+
                                 setTimeout(() => {
                                     numberElement.textContent = new Intl.NumberFormat('vi-VN').format(value);
                                     numberElement.style.opacity = '1';
-                                }, 200);
+                                }, 150);
                             }
                         }
                     });
@@ -419,17 +423,30 @@
                 setTimeout(refreshRealtimeStats, 2000); // Delay 2s để trang load xong
                 setInterval(refreshRealtimeStats, 30000); // Mỗi 30 giây
 
-                // Thêm animation cho các elements khi load
-                const animatedElements = document.querySelectorAll('.stat-card, .quick-action-btn');
-                animatedElements.forEach((el, index) => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
+                // Clean page load animations
+                const headerElement = document.querySelector('.dashboard-header-clean');
+                if (headerElement) {
+                    headerElement.style.opacity = '0';
+                    headerElement.style.transform = 'translateY(-10px)';
 
                     setTimeout(() => {
-                        el.style.transition = 'all 0.5s ease';
-                        el.style.opacity = '1';
-                        el.style.transform = 'translateY(0)';
-                    }, index * 100);
+                        headerElement.style.transition = 'all 0.5s ease';
+                        headerElement.style.opacity = '1';
+                        headerElement.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+
+                // Animate sections with stagger
+                const sections = document.querySelectorAll('.realtime-stats-section, .top-courses-section');
+                sections.forEach((section, index) => {
+                    section.style.opacity = '0';
+                    section.style.transform = 'translateY(30px)';
+
+                    setTimeout(() => {
+                        section.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateY(0)';
+                    }, (index + 1) * 200 + 800); // After stat cards
                 });
             });
 
@@ -449,66 +466,55 @@
 
     @push('styles')
         <style>
-            /* Dashboard Styles - Dark/Light Mode Compatible */
+            /* Clean Dashboard Styles */
             .fi-dashboard-page {
-                @apply bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800;
+                @apply bg-gray-50 dark:bg-gray-900;
                 min-height: 100vh;
-                transition: background 0.3s ease;
+                transition: background-color 0.3s ease;
             }
 
-            /* Dashboard Header - Theme Compatible */
-            .dashboard-header {
-                @apply bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-700 dark:via-blue-600 dark:to-indigo-700;
-                @apply text-white dark:text-gray-100;
-                @apply shadow-lg shadow-blue-500/25 dark:shadow-blue-600/25;
-                @apply rounded-xl p-6 mb-8;
+            /* Clean Dashboard Header */
+            .dashboard-header-clean {
+                @apply bg-white dark:bg-gray-800;
+                @apply shadow-lg border border-gray-200 dark:border-gray-700;
+                @apply rounded-2xl p-6 mb-8;
                 transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
             }
 
-            .dashboard-header::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-                pointer-events: none;
-            }
-
-            .dashboard-header:hover {
-                @apply shadow-xl shadow-blue-500/30 dark:shadow-blue-600/30;
+            .dashboard-header-clean:hover {
+                @apply shadow-xl;
                 transform: translateY(-1px);
             }
 
-            /* Stats Cards */
+            /* Clean Stats Cards */
             .stats-grid {
                 @apply mb-8;
             }
 
-            .stat-card {
-                @apply rounded-xl p-6 shadow-lg border border-white/20;
+            .clean-stat-card, .realtime-stat-card {
+                @apply bg-white dark:bg-gray-800;
+                @apply border border-gray-200 dark:border-gray-700;
+                @apply rounded-2xl p-6 shadow-lg;
                 transition: all 0.3s ease;
-                position: relative;
-                overflow: hidden;
             }
 
-            .stat-card::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
-                pointer-events: none;
-            }
-
-            .stat-card:hover {
+            .clean-stat-card:hover, .realtime-stat-card:hover {
+                @apply shadow-xl border-gray-300 dark:border-gray-600;
                 transform: translateY(-2px);
-                @apply shadow-xl;
+            }
+
+            /* Realtime Stats Section */
+            .realtime-stats-section {
+                @apply mb-8;
+            }
+
+            /* Top Courses Section */
+            .top-courses-section .bg-white {
+                @apply rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700;
+            }
+
+            .dark .top-courses-section .bg-white {
+                @apply bg-gray-800;
             }
 
             /* Quick Action Buttons */
@@ -524,18 +530,32 @@
                 transform: translateY(-1px);
             }
 
-            /* Responsive Improvements */
+            /* Simple Animations */
+            @keyframes slideInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Responsive Design */
             @media (max-width: 768px) {
-                .dashboard-header {
-                    @apply p-4;
+                .dashboard-header-clean {
+                    @apply p-4 rounded-xl;
                 }
 
-                .dashboard-header h1 {
-                    @apply text-xl;
+                .dashboard-header-clean h1 {
+                    @apply text-2xl;
                 }
 
-                .welcome-content .grid {
-                    @apply grid-cols-1;
+                .clean-stat-card, .realtime-stat-card {
+                    @apply p-4 rounded-xl;
+                }
+            }
                 }
             }
 

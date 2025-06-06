@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Pages;
 
 use App\Filament\Admin\Widgets\StatsOverviewWidget;
 use App\Filament\Admin\Widgets\QuickActionsWidget;
+use App\Filament\Admin\Widgets\WebDesignStatsWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -17,6 +18,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             StatsOverviewWidget::class,
+            WebDesignStatsWidget::class,
             QuickActionsWidget::class,
         ];
     }
@@ -95,40 +97,6 @@ class Dashboard extends BaseDashboard
                         \Filament\Notifications\Notification::make()
                             ->title('Lỗi khi reset thống kê')
                             ->body('Không thể xóa dữ liệu: ' . $e->getMessage())
-                            ->danger()
-                            ->send();
-                    }
-                }),
-
-            \Filament\Actions\Action::make('generate_sample_data')
-                ->label('Tạo dữ liệu mẫu')
-                ->icon('heroicon-o-plus-circle')
-                ->color('warning')
-                ->requiresConfirmation()
-                ->modalHeading('Tạo dữ liệu thống kê mẫu')
-                ->modalDescription('Tạo dữ liệu thống kê mẫu cho 7 ngày gần nhất để test hệ thống?')
-                ->modalSubmitActionLabel('Tạo dữ liệu')
-                ->action(function () {
-                    try {
-                        // Chạy seeder để tạo dữ liệu mẫu
-                        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'VisitorSeeder']);
-
-                        // Clear cache để load dữ liệu mới
-                        \Illuminate\Support\Facades\Cache::forget('visitor_realtime_stats');
-                        $visitorService = new \App\Services\VisitorStatsService();
-                        $visitorService->clearCache();
-
-                        $this->dispatch('$refresh');
-
-                        \Filament\Notifications\Notification::make()
-                            ->title('Đã tạo dữ liệu mẫu thành công')
-                            ->body('Dữ liệu thống kê mẫu cho 7 ngày đã được tạo.')
-                            ->success()
-                            ->send();
-                    } catch (\Exception $e) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('Lỗi khi tạo dữ liệu mẫu')
-                            ->body('Không thể tạo dữ liệu: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }

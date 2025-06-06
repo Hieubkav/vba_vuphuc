@@ -28,7 +28,9 @@ class AlbumImageResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Ảnh Albums';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?string $navigationGroup = 'Quản lý khóa học';
+
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {

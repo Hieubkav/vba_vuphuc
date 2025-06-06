@@ -194,26 +194,7 @@ Route::get('/api/realtime-stats', function () {
     }
 })->middleware('auth');
 
-// Route reset thống kê (backup method)
-Route::post('/admin/reset-visitor-stats', function () {
-    try {
-        \App\Models\Visitor::truncate();
-        \Illuminate\Support\Facades\Cache::forget('visitor_realtime_stats');
 
-        $visitorService = new \App\Services\VisitorStatsService();
-        $visitorService->clearCache();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Đã reset thống kê thành công'
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-})->middleware('auth');
 
 
 

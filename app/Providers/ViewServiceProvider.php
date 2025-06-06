@@ -15,6 +15,7 @@ use App\Models\Student;
 use App\Models\CatCourse;
 use App\Models\CourseGroup;
 use App\Models\Testimonial;
+use App\Models\WebDesign;
 use App\Models\Faq;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -70,9 +71,15 @@ class ViewServiceProvider extends ServiceProvider
             return Setting::where('status', 'active')->first();
         });
 
+        // Cache web design settings trong 1 giờ
+        $webDesign = Cache::remember('web_design_settings', 3600, function () {
+            return WebDesign::first();
+        });
+
         $view->with([
             'globalSettings' => $settings,
-            'settings' => $settings // Giữ lại để tương thích với code cũ
+            'settings' => $settings, // Giữ lại để tương thích với code cũ
+            'webDesign' => $webDesign
         ]);
     }
 
@@ -437,6 +444,9 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('storefront_faqs');
                 Cache::forget('storefront_course_groups');
                 Cache::forget('storefront_albums');
+                break;
+            case 'webdesign':
+                Cache::forget('web_design_settings');
                 break;
             case 'courses':
                 Cache::forget('storefront_featured_courses');
