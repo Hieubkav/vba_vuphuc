@@ -98,4 +98,32 @@ class Album extends Model
     {
         $this->increment('download_count');
     }
+
+    // Auto-generate SEO fields if empty
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($album) {
+            // Auto-generate SEO title if empty
+            if (empty($album->seo_title) && !empty($album->title)) {
+                $album->seo_title = $album->title;
+            }
+
+            // Auto-generate SEO description if empty
+            if (empty($album->seo_description) && !empty($album->description)) {
+                $album->seo_description = \Illuminate\Support\Str::limit(strip_tags($album->description), 160);
+            }
+
+            // Auto-generate OG image from thumbnail if empty
+            if (empty($album->og_image_link) && !empty($album->thumbnail)) {
+                $album->og_image_link = $album->thumbnail;
+            }
+
+            // Auto-generate slug if empty
+            if (empty($album->slug) && !empty($album->title)) {
+                $album->slug = \Illuminate\Support\Str::slug($album->title);
+            }
+        });
+    }
 }

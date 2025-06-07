@@ -29,6 +29,16 @@
                     'component' => 'courses-overview',
                     'type' => 'livewire'
                 ],
+                'testimonials' => [
+                    'enabled' => true,
+                    'order' => 6,
+                    'title' => 'Đánh giá từ học viên',
+                    'description' => 'Chia sẻ từ những học viên đã tham gia khóa học',
+                    'bg_color' => 'bg-white',
+                    'animation_class' => 'animate-fade-in-optimized',
+                    'component' => 'components.storefront.testimonials',
+                    'type' => 'include'
+                ],
                 // ... các section khác với fallback values
             ];
         }
@@ -136,7 +146,7 @@
                     description="{{ $section['description'] ?? 'Cập nhật kiến thức và thông tin hữu ích' }}"
                     bg-color="{{ $section['bg_color'] ?? 'bg-gray-25' }}"
                     animation-class="{{ $section['animation_class'] ?? 'animate-fade-in-optimized' }}"
-                    :has-data="isset($latestPosts) && $latestPosts->isNotEmpty()"
+                    :has-data="(isset($newsPosts) && $newsPosts->isNotEmpty()) || (isset($latestPosts) && $latestPosts->isNotEmpty())"
                     empty-icon="fas fa-newspaper"
                     empty-message="Chưa có bài viết nào">
                     @include('components.storefront.blog-posts')

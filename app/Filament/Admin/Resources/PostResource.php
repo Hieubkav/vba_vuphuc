@@ -7,12 +7,14 @@ use App\Filament\Admin\Resources\PostResource\RelationManagers;
 use App\Filament\Admin\Resources\PostCategoryResource;
 use App\Models\Post;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -30,7 +32,7 @@ use Illuminate\Support\Str;
 
 class PostResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = Post::class;
 
@@ -50,174 +52,132 @@ class PostResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Thông tin bài viết')
-                    ->schema([
-                        TextInput::make('title')
-                            ->label('Tiêu đề')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
-
-                        TextInput::make('slug')
-                            ->label('Đường dẫn')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255)
-                            ->suffixAction(
-                                Action::make('generateSlug')
-                                    ->icon('heroicon-m-link')
-                                    ->tooltip('Tự động tạo từ tiêu đề')
-                                    ->action(function (Set $set, Get $get) {
-                                        $title = $get('title');
-                                        if (!empty($title)) {
-                                            $set('slug', Str::slug($title));
-                                        }
-                                    })
-                            ),
-
-                        Select::make('type')
-                            ->label('Loại bài viết')
-                            ->options([
-                                'normal' => 'Bài viết thường',
-                                'news' => 'Tin tức',
-                                'service' => 'Dịch vụ',
-                                'course' => 'Khóa học',
-                            ])
-                            ->default('normal')
-                            ->required(),
-
-                        Select::make('category_id')
-                            ->label('Danh mục')
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->nullable()
-                            ->createOptionForm([
-                                TextInput::make('name')
-                                    ->label('Tên danh mục')
+                Tabs::make('Thông tin bài viết')
+                    ->tabs([
+                        Tabs\Tab::make('Thông tin cơ bản')
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label('Tiêu đề')
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
+
                                 TextInput::make('slug')
                                     ->label('Đường dẫn')
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(255)
+                                    ->helperText('Để trống để tự động tạo từ tiêu đề')
+                                    ->suffixAction(
+                                        Action::make('generateSlug')
+                                            ->icon('heroicon-m-link')
+                                            ->tooltip('Tự động tạo từ tiêu đề')
+                                            ->action(function (Set $set, Get $get) {
+                                                $title = $get('title');
+                                                if (!empty($title)) {
+                                                    $set('slug', Str::slug($title));
+                                                }
+                                            })
+                                    ),
+
+                                Select::make('category_id')
+                                    ->label('Danh mục')
+                                    ->relationship('category', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
+                                    ->createOptionForm([
+                                        TextInput::make('name')
+                                            ->label('Tên danh mục')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
+                                        TextInput::make('slug')
+                                            ->label('Đường dẫn')
+                                            ->required()
+                                            ->maxLength(255),
+                                    ]),
+
+                                FileUpload::make('thumbnail')
+                                    ->label('Hình đại diện')
+                                    ->image()
+                                    ->directory('posts/thumbnails')
+                                    ->visibility('public')
+                                    ->maxSize(5120)
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        '16:9',
+                                        '4:3',
+                                        '1:1',
+                                    ])
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->saveUploadedFileUsing(function ($file, $get) {
+                                        $webpService = app(\App\Services\SimpleWebpService::class);
+                                        $title = $get('title') ?? 'post';
+
+                                        // Tạo tên file SEO-friendly
+                                        $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'post');
+
+                                        return $webpService->convertToWebP(
+                                            $file,
+                                            'posts/thumbnails',
+                                            $seoFileName,
+                                            1200, // width
+                                            630   // height
+                                        );
+                                    })
+                                    ->helperText('Ảnh sẽ được tự động chuyển sang WebP với tên SEO-friendly. Kích thước tối ưu: 1200x630px')
+                                    ->imagePreviewHeight('200'),
+
+                                TextInput::make('order')
+                                    ->label('Thứ tự')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->helperText('Số thứ tự hiển thị (càng nhỏ càng ưu tiên)'),
+
+                                Select::make('status')
+                                    ->label('Trạng thái')
+                                    ->options([
+                                        'active' => 'Hiển thị',
+                                        'inactive' => 'Ẩn',
+                                    ])
+                                    ->default('active')
+                                    ->required(),
+                            ])->columns(2),
+
+                        Tabs\Tab::make('Nội dung & SEO')
+                            ->schema([
+                                RichEditor::make('content')
+                                    ->label('Nội dung chi tiết')
+                                    ->fileAttachmentsDisk('public')
+                                    ->fileAttachmentsDirectory('posts')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->columnSpanFull(),
+
+                                Section::make('SEO & Tối ưu hóa')
+                                    ->description('Các trường SEO sẽ tự động tạo nếu để trống khi lưu')
+                                    ->schema([
+                                        TextInput::make('seo_title')
+                                            ->label('Tiêu đề SEO')
+                                            // ->maxLength(255)
+                                            ->helperText('Để trống để tự động tạo từ tiêu đề bài viết'),
+
+                                        Textarea::make('seo_description')
+                                            ->label('Mô tả SEO')
+                                            ->rows(3)
+                                            // ->maxLength(160)
+                                            ->helperText('Để trống để tự động tạo từ nội dung bài viết'),
+
+                                        TextInput::make('og_image_link')
+                                            ->label('Ảnh OG (Open Graph)')
+                                            // ->url()
+                                            ->helperText('Để trống để tự động sử dụng ảnh đại diện'),
+                                    ])->columns(1)
+                                    ->columnSpanFull(),
                             ]),
-
-                        self::createThumbnailUpload(
-                            'thumbnail',
-                            'Hình đại diện',
-                            'posts/thumbnails',
-                            1200,
-                            630
-                        )->imagePreviewHeight('200'),
-                    ])->columns(2),
-
-                Section::make('Nội dung bài viết')
-                    ->schema([
-                        RichEditor::make('content')
-                            ->label('Nội dung chi tiết')
-                            ->fileAttachmentsDisk('public')
-                            ->fileAttachmentsDirectory('posts')
-                            ->required()
-                            ->columnSpanFull(),
-                    ]),
-
-                Section::make('SEO và Thông tin khác')
-                    ->description('Sử dụng nút bên dưới để tự động tạo SEO title và description. OG image sẽ tự động copy từ hình đại diện khi lưu.')
-                    ->schema([
-                        Actions::make([
-                            Action::make('generateAllSeo')
-                                ->label('🚀 Tự động tạo SEO')
-                                ->icon('heroicon-m-sparkles')
-                                ->color('success')
-                                ->size('lg')
-                                ->action(function (Set $set, Get $get) {
-                                    $title = $get('title');
-                                    $content = $get('content');
-
-                                    $messages = [];
-
-                                    // Tạo SEO title
-                                    if (!empty($title)) {
-                                        $seoTitle = static::generateSeoTitle($title);
-                                        $set('seo_title', $seoTitle);
-                                        $messages[] = 'SEO title';
-                                    }
-
-                                    // Tạo SEO description
-                                    if (!empty($content)) {
-                                        $seoDescription = static::generateSeoDescription($content);
-                                        $set('seo_description', $seoDescription);
-                                        $messages[] = 'SEO description';
-                                    }
-
-                                    // Thông báo kết quả
-                                    if (empty($messages)) {
-                                        \Filament\Notifications\Notification::make()
-                                            ->title('Chưa thể tạo SEO')
-                                            ->body('Vui lòng nhập tiêu đề và nội dung trước khi tạo SEO.')
-                                            ->warning()
-                                            ->send();
-                                    } else {
-                                        \Filament\Notifications\Notification::make()
-                                            ->title('Đã tạo SEO thành công!')
-                                            ->body('Đã tạo: ' . implode(', ', $messages) . '. OG image sẽ tự động copy từ hình đại diện khi lưu.')
-                                            ->success()
-                                            ->send();
-                                    }
-                                })
-                        ])->columnSpanFull(),
-
-                        TextInput::make('seo_title')
-                            ->label('Tiêu đề SEO')
-                            ->helperText('Tối đa 60 ký tự cho SEO tốt nhất')
-                            ->maxLength(255),
-
-                        Textarea::make('seo_description')
-                            ->label('Mô tả SEO')
-                            ->helperText('Tối đa 155 ký tự cho SEO tốt nhất')
-                            ->rows(3)
-                            ->maxLength(255),
-
-                        self::createImageUpload(
-                            'og_image_link',
-                            'Hình ảnh OG (Social Media)',
-                            'posts/og-images',
-                            1200,
-                            630,
-                            5120,
-                            'Kích thước tối ưu: 1200x630px cho mạng xã hội',
-                            ['16:9'],
-                            false,
-                            false
-                        ),
-                    ])->columns(2),
-
-                Section::make('Cấu hình hiển thị')
-                    ->schema([
-                        Toggle::make('is_featured')
-                            ->label('Nổi bật')
-                            ->default(false)
-                            ->onColor('success')
-                            ->offColor('danger'),
-
-                        Select::make('status')
-                            ->label('Trạng thái')
-                            ->options([
-                                'active' => 'Hiển thị',
-                                'inactive' => 'Ẩn',
-                            ])
-                            ->default('active')
-                            ->required(),
-
-                        TextInput::make('order')
-                            ->label('Thứ tự hiển thị')
-                            ->integer()
-                            ->default(0),
-                    ])->columns(3),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -225,6 +185,12 @@ class PostResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->sortable()
+                    ->alignCenter()
+                    ->width('80px'),
+
                 ImageColumn::make('thumbnail')
                     ->label('Ảnh')
                     ->circular()
@@ -236,41 +202,15 @@ class PostResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->description(fn ($record): string =>
-                        ($record->category ? "Danh mục: {$record->category->name}" : '') .
-                        ($record->type !== 'normal' ? " • " . match($record->type) {
-                            'service' => 'Dịch vụ',
-                            'news' => 'Tin tức',
-                            'course' => 'Khóa học',
-                            default => 'Bài viết'
-                        } : '')
+                        $record->category ? "Danh mục: {$record->category->name}" : 'Chưa phân loại'
                     ),
 
-                TextColumn::make('type')
-                    ->label('Loại')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'service' => 'danger',
-                        'news' => 'info',
-                        'course' => 'warning',
-                        'normal' => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'service' => 'Dịch vụ',
-                        'news' => 'Tin tức',
-                        'course' => 'Khóa học',
-                        'normal' => 'Bài viết',
-                    })
-                    ->width(100),
-
-                ToggleColumn::make('is_featured')
-                    ->label('Nổi bật')
-                    ->width(80),
-
-                TextColumn::make('order')
-                    ->label('Thứ tự')
+                TextColumn::make('category.name')
+                    ->label('Danh mục')
+                    ->searchable()
                     ->sortable()
-                    ->alignCenter()
-                    ->width(80),
+                    ->badge()
+                    ->color('info'),
 
                 TextColumn::make('status')
                     ->label('Trạng thái')
@@ -283,14 +223,7 @@ class PostResource extends Resource
                         'active' => 'Hiển thị',
                         'inactive' => 'Ẩn',
                     })
-                    ->width(100),
-
-                // Cột ẩn mặc định
-                TextColumn::make('category.name')
-                    ->label('Danh mục')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->width('100px'),
 
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
@@ -300,21 +233,9 @@ class PostResource extends Resource
             ])
             ->reorderable('order')
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->label('Loại bài viết')
-                    ->options([
-                        'normal' => 'Bài viết thường',
-                        'news' => 'Tin tức',
-                        'service' => 'Dịch vụ',
-                        'course' => 'Khóa học',
-                    ]),
-
                 Tables\Filters\SelectFilter::make('category_id')
                     ->relationship('category', 'name')
                     ->label('Danh mục'),
-
-                Tables\Filters\TernaryFilter::make('is_featured')
-                    ->label('Nổi bật'),
 
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Trạng thái')

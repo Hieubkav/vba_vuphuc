@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\ClearsViewCache;
 use App\Traits\HandlesFileObserver;
 
 class Partner extends Model
 {
-    use HasFactory, ClearsViewCache, HandlesFileObserver;
+    use HasFactory, HandlesFileObserver;
 
     protected $fillable = [
         'name',

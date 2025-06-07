@@ -36,14 +36,13 @@ class ViewDataHelper
                     ->get(),
 
                 'courseCategories' => CatPost::where('status', 'active')
-                    ->whereNull('parent_id')
                     ->orderBy('order')
                     ->take(12)
                     ->get(),
 
                 'featuredCourses' => Course::where('status', 'active')
                     ->where('is_featured', true)
-                    ->with(['category', 'images'])
+                    ->with(['courseCategory', 'images'])
                     ->orderBy('order')
                     ->take(8)
                     ->get(),
@@ -60,13 +59,13 @@ class ViewDataHelper
 
                 'popularCourses' => Course::where('status', 'active')
                     ->where('is_featured', true)
-                    ->with(['category', 'images'])
+                    ->with(['courseCategory', 'images'])
                     ->orderBy('order')
                     ->take(8)
                     ->get(),
 
                 'newCourses' => Course::where('status', 'active')
-                    ->with(['category', 'images'])
+                    ->with(['courseCategory', 'images'])
                     ->orderBy('created_at', 'desc')
                     ->take(8)
                     ->get(),
@@ -85,15 +84,10 @@ class ViewDataHelper
         return Cache::remember('navigation_data', 7200, function () {
             return [
                 'mainCategories' => CatPost::where('status', 'active')
-                    ->whereNull('parent_id')
-                    ->with(['children' => function ($query) {
-                        $query->where('status', 'active')->orderBy('order');
-                    }])
                     ->orderBy('order')
                     ->get(),
 
                 'footerCategories' => CatPost::where('status', 'active')
-                    ->whereNull('parent_id')
                     ->orderBy('order')
                     ->take(6)
                     ->get(),

@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Services\ImageService;
+use App\Services\SimpleWebpService;
 use Filament\Forms\Components\FileUpload;
 
 trait HasImageUpload
@@ -41,45 +41,13 @@ trait HasImageUpload
             ->visibility('public')
             ->maxSize($maxSize)
             ->imageEditor()
-            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-            ->saveUploadedFileUsing(function ($file, $get) use ($directory, $maxWidth, $maxHeight, $keepAspectRatio, $field) {
-                $imageService = app(ImageService::class);
-                
-                // Tạo tên file SEO-friendly từ các trường có sẵn
-                $customName = null;
-                if ($get('title')) {
-                    $customName = $get('title');
-                } elseif ($get('name')) {
-                    $customName = $get('name');
-                }
-                
-                // Sử dụng method phù hợp dựa trên keepAspectRatio
-                if ($keepAspectRatio) {
-                    return $imageService->saveImageWithAspectRatio(
-                        $file,
-                        $directory,
-                        $maxWidth ?: 400,
-                        $maxHeight ?: 300,
-                        95, // Chất lượng 95%
-                        $customName
-                    );
-                } else {
-                    return $imageService->saveImage(
-                        $file,
-                        $directory,
-                        $maxWidth,
-                        $maxHeight,
-                        95, // Chất lượng 95%
-                        $customName
-                    );
-                }
-            });
+            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp']);
 
         // Thêm helper text nếu có
         if ($helperText) {
             $upload->helperText($helperText);
         } else {
-            $upload->helperText('Ảnh sẽ được tự động chuyển sang định dạng WebP với chất lượng 95% để tối ưu tốc độ tải.');
+            $upload->helperText('Chọn ảnh định dạng JPG, PNG hoặc WebP. Kích thước tối đa: ' . ($maxSize/1024) . 'MB');
         }
 
         // Thêm aspect ratios cho image editor
@@ -192,7 +160,7 @@ trait HasImageUpload
             ->imageEditor()
             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->saveUploadedFileUsing(function ($file, $get, $livewire) use ($directory, $width, $height) {
-                $imageService = app(ImageService::class);
+                $webpService = app(SimpleWebpService::class);
 
                 // Lấy tên từ owner record
                 $customName = null;
@@ -204,13 +172,12 @@ trait HasImageUpload
                     }
                 }
 
-                return $imageService->saveImage(
+                return $webpService->convertToWebP(
                     $file,
                     $directory,
+                    $customName ? "gallery-{$customName}" : null,
                     $width,
-                    $height,
-                    95, // Chất lượng 95%
-                    $customName ? "gallery-{$customName}" : null
+                    $height
                 );
             })
             ->helperText('Ảnh sẽ được tự động chuyển sang định dạng WebP với chất lượng 95%');

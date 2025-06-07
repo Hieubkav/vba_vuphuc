@@ -6,8 +6,7 @@ use App\Filament\Admin\Resources\CatCourseResource\Pages;
 use App\Filament\Admin\Resources\CatCourseResource\RelationManagers;
 use App\Filament\Admin\Resources\CourseResource;
 use App\Models\CatCourse;
-use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+// Bỏ traits để đơn giản hóa
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +16,7 @@ use Illuminate\Support\Str;
 
 class CatCourseResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    // Bỏ hết traits để đơn giản hóa
 
     protected static ?string $model = CatCourse::class;
 
@@ -49,42 +48,40 @@ class CatCourseResource extends Resource
                             ),
                         Forms\Components\TextInput::make('slug')
                             ->label('Slug')
-                            ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
-                            ->rules(['alpha_dash']),
+                            ->rules(['alpha_dash'])
+                            ->helperText('Để trống sẽ tự động tạo từ tên danh mục khi lưu')
+                            ->suffixActions([
+                                Forms\Components\Actions\Action::make('generateSlug')
+                                    ->icon('heroicon-m-arrow-path')
+                                    ->tooltip('Tự động tạo slug')
+                                    ->action(function ($get, $set) {
+                                        $name = $get('name');
+                                        if ($name) {
+                                            $set('slug', Str::slug($name));
+                                        }
+                                    })
+                            ]),
                         Forms\Components\Textarea::make('description')
                             ->label('Mô tả')
                             ->rows(3)
                             ->columnSpanFull(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Hiển thị & Thiết kế')
+                Forms\Components\Section::make('Hình ảnh')
                     ->schema([
-                        self::createThumbnailUpload(
-                            'image',
-                            'Hình ảnh danh mục',
-                            'cat-courses',
-                            600,
-                            400
-                        )->columnSpanFull(),
-                        Forms\Components\ColorPicker::make('color')
-                            ->label('Màu sắc đại diện')
-                            ->default('#dc2626'),
-                        Forms\Components\Select::make('icon')
-                            ->label('Icon')
-                            ->options([
-                                'excel' => 'Excel',
-                                'calculator' => 'Calculator',
-                                'users' => 'Users',
-                                'computer' => 'Computer',
-                                'chart' => 'Chart',
-                                'heart' => 'Heart',
-                                'code' => 'Code',
-                                'megaphone' => 'Megaphone',
-                            ])
-                            ->searchable(),
-                    ])->columns(2),
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Hình ảnh danh mục')
+                            ->image()
+                            ->directory('cat-courses')
+                            ->visibility('public')
+                            ->maxSize(5120)
+                            ->imageEditor()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Chọn ảnh định dạng JPG, PNG hoặc WebP. Kích thước tối đa: 5MB')
+                            ->columnSpanFull(),
+                    ]),
 
                 Forms\Components\Section::make('Cấu trúc & Trạng thái')
                     ->schema([
@@ -113,17 +110,17 @@ class CatCourseResource extends Resource
                         Forms\Components\TextInput::make('seo_title')
                             ->label('Tiêu đề SEO')
                             ->maxLength(255)
-                            ->helperText('Để trống sẽ tự động sử dụng tên danh mục'),
+                            ->helperText('Để trống sẽ tự động tạo: "[Tên danh mục] - Khóa học VBA Vũ Phúc"'),
                         Forms\Components\Textarea::make('seo_description')
                             ->label('Mô tả SEO')
                             ->rows(3)
                             ->maxLength(160)
-                            ->helperText('Tối đa 160 ký tự'),
+                            ->helperText('Để trống sẽ tự động tạo từ mô tả danh mục hoặc tạo mô tả mặc định. Tối đa 160 ký tự.'),
                         Forms\Components\FileUpload::make('og_image_link')
                             ->label('Hình ảnh OG')
                             ->image()
                             ->directory('cat-courses/og-images')
-                            ->helperText('Hình ảnh hiển thị khi chia sẻ trên mạng xã hội'),
+                            ->helperText('Để trống sẽ tự động sử dụng hình ảnh danh mục. Hình ảnh hiển thị khi chia sẻ trên mạng xã hội.'),
                     ])->columns(2)->collapsible(),
             ]);
     }
@@ -143,8 +140,7 @@ class CatCourseResource extends Resource
                     ->sortable()
                     ->weight('bold')
                     ->description(fn ($record): string =>
-                        ($record->parent ? "Thuộc: {$record->parent->name}" : '') .
-                        ($record->icon ? " • Icon: {$record->icon}" : '')
+                        $record->parent ? "Thuộc: {$record->parent->name}" : ''
                     ),
 
                 Tables\Columns\TextColumn::make('courses_count')
@@ -179,15 +175,7 @@ class CatCourseResource extends Resource
                     ->color('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\ColorColumn::make('color')
-                    ->label('Màu sắc')
-                    ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('icon')
-                    ->label('Icon')
-                    ->badge()
-                    ->color('info')
-                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Danh mục cha')

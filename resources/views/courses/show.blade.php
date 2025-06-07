@@ -152,7 +152,7 @@
                         <livewire:enrollment-form :course="$course" />
 
                         <!-- Google Form và Group Links -->
-                        @if(($course->gg_form && $course->show_form_link) || ($course->group_link && $course->show_group_link))
+                        @if(($course->gg_form && $course->show_form_link) || ($course->courseGroup?->group_link && $course->show_group_link))
                         <div class="mt-6 pt-6 border-t border-gray-200">
                             <h3 class="font-semibold text-gray-900 mb-4">Liên kết khóa học:</h3>
                             <div class="space-y-3">
@@ -165,8 +165,8 @@
                                 </a>
                                 @endif
 
-                                @if($course->group_link && $course->show_group_link)
-                                <a href="{{ $course->group_link }}"
+                                @if($course->courseGroup?->group_link && $course->show_group_link)
+                                <a href="{{ $course->courseGroup->group_link }}"
                                    target="_blank"
                                    class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300">
                                     <i class="fas fa-users mr-2"></i>

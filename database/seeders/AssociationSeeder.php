@@ -17,7 +17,7 @@ class AssociationSeeder extends Seeder
         $associations = [
             [
                 'name' => 'Hiệp hội Tin học Việt Nam',
-                'image_link' => 'associations/hiep-hoi-tin-hoc-vn.webp',
+                'image_link' => null, // KISS: Không có ảnh để test fallback UI
                 'website_link' => 'https://www.vaip.org.vn',
                 'description' => 'Hiệp hội Tin học Việt Nam - Tổ chức hàng đầu về công nghệ thông tin',
                 'status' => 'active',
@@ -25,7 +25,7 @@ class AssociationSeeder extends Seeder
             ],
             [
                 'name' => 'Hiệp hội Phần mềm và Dịch vụ CNTT Việt Nam',
-                'image_link' => 'associations/vinasa.webp',
+                'image_link' => null, // KISS: Không có ảnh để test fallback UI
                 'website_link' => 'https://www.vinasa.org.vn',
                 'description' => 'VINASA - Hiệp hội Phần mềm và Dịch vụ CNTT Việt Nam',
                 'status' => 'active',
@@ -33,7 +33,7 @@ class AssociationSeeder extends Seeder
             ],
             [
                 'name' => 'Hiệp hội Doanh nghiệp nhỏ và vừa Việt Nam',
-                'image_link' => 'associations/vinasme.webp',
+                'image_link' => null, // KISS: Không có ảnh để test fallback UI
                 'website_link' => 'https://www.vinasme.org.vn',
                 'description' => 'VINASME - Hiệp hội Doanh nghiệp nhỏ và vừa Việt Nam',
                 'status' => 'active',
@@ -41,7 +41,7 @@ class AssociationSeeder extends Seeder
             ],
             [
                 'name' => 'Hiệp hội Kế toán và Kiểm toán Việt Nam',
-                'image_link' => 'associations/vaa.webp',
+                'image_link' => null, // KISS: Không có ảnh để test fallback UI
                 'website_link' => 'https://www.vaa.net.vn',
                 'description' => 'VAA - Hiệp hội Kế toán và Kiểm toán Việt Nam',
                 'status' => 'active',
@@ -49,7 +49,7 @@ class AssociationSeeder extends Seeder
             ],
             [
                 'name' => 'Hiệp hội Đào tạo và Phát triển Nguồn nhân lực',
-                'image_link' => 'associations/hrda.webp',
+                'image_link' => null, // KISS: Không có ảnh để test fallback UI
                 'website_link' => 'https://www.hrda.org.vn',
                 'description' => 'HRDA - Hiệp hội Đào tạo và Phát triển Nguồn nhân lực Việt Nam',
                 'status' => 'active',

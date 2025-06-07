@@ -31,13 +31,10 @@
                     @foreach($courseGroups as $group)
                         <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100">
                             <div class="p-6">
-                                <!-- Group Icon & Type -->
+                                <!-- Group Type Badge -->
                                 <div class="flex items-center justify-between mb-4">
-                                    <div class="w-12 h-12 rounded-lg bg-red-50 flex items-center justify-center">
-                                        <i class="{{ $group->icon ?? 'fas fa-users' }} text-lg text-red-600"></i>
-                                    </div>
                                     <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                        {{ ucfirst($group->group_type ?? 'Nhóm') }}
+                                        {{ $group->formatted_group_type ?? ucfirst($group->group_type ?? 'Nhóm') }}
                                     </span>
                                 </div>
 
@@ -47,38 +44,21 @@
                                 </h3>
 
                                 <!-- Group Description -->
-                                <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                                    {{ Str::limit($group->description, 120) }}
-                                </p>
+                                @if($group->description)
+                                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
+                                        {{ Str::limit($group->description, 120) }}
+                                    </p>
+                                @endif
 
-                                <!-- Members & Level -->
-                                <div class="flex items-center justify-between text-sm mb-4">
-                                    <div class="flex items-center text-gray-600">
+                                <!-- Members Count - Đơn giản -->
+                                @if(isset($group->current_members) && $group->current_members > 0)
+                                    <div class="flex items-center text-sm mb-4 text-gray-600">
                                         <i class="fas fa-users mr-2 text-xs"></i>
-                                        <span>{{ $group->current_members ?? 0 }}</span>
+                                        <span>{{ $group->current_members }}</span>
                                         @if($group->max_members)
                                             <span class="text-gray-400">/{{ $group->max_members }}</span>
                                         @endif
                                         <span class="ml-1">thành viên</span>
-                                    </div>
-                                    
-                                    <span class="text-xs font-medium px-2 py-1 rounded-full
-                                        @if($group->level === 'beginner') bg-green-100 text-green-800
-                                        @elseif($group->level === 'intermediate') bg-yellow-100 text-yellow-800
-                                        @else bg-red-100 text-red-800
-                                        @endif">
-                                        @if($group->level === 'beginner') Cơ bản
-                                        @elseif($group->level === 'intermediate') Trung cấp
-                                        @else Nâng cao
-                                        @endif
-                                    </span>
-                                </div>
-
-                                <!-- Instructor -->
-                                @if($group->instructor_name)
-                                    <div class="flex items-center text-sm text-gray-600 mb-4">
-                                        <i class="fas fa-user-tie mr-2 text-xs"></i>
-                                        <span>{{ $group->instructor_name }}</span>
                                     </div>
                                 @endif
 
@@ -88,7 +68,7 @@
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-300">
-                                        <i class="{{ $group->icon ?? 'fas fa-external-link-alt' }} mr-2 text-xs"></i>
+                                        <i class="{{ $group->group_type_icon ?? 'fas fa-external-link-alt' }} mr-2 text-xs"></i>
                                         @if(isset($group->max_members) && $group->current_members >= $group->max_members)
                                             <span>Nhóm đã đầy</span>
                                         @else

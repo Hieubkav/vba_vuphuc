@@ -32,7 +32,7 @@
                     <div class="mb-2 pb-2 border-b border-gray-200 last:border-b-0">
                         <strong>{{ $course->title }}</strong><br>
                         Level: {{ $course->level }}<br>
-                        Group Link: {{ $course->group_link ? 'Available' : 'Not set' }}<br>
+                        Group Link: {{ $course->courseGroup?->group_link ? 'Available' : 'Not set' }}<br>
                         Show Group Link: {{ $course->show_group_link ? 'Yes' : 'No' }}
                     </div>
                     @endforeach

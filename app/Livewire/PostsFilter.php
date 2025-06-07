@@ -8,29 +8,22 @@ use Livewire\Component;
 class PostsFilter extends Component
 {
     public $search = '';
-    public $type = '';
+    public $category_id = '';
     public $sort = 'newest';
     public $perPage = 12;
     public $loadedPosts = [];
     public $hasMorePosts = true;
 
-    public $typeNames = [
-        'normal' => 'Bài viết',
-        'news' => 'Tin tức',
-        'service' => 'Dịch vụ',
-        'course' => 'Khóa học'
-    ];
-
     protected $queryString = [
         'search' => ['except' => ''],
-        'type' => ['except' => ''],
+        'category_id' => ['except' => ''],
         'sort' => ['except' => 'newest'],
     ];
 
     public function mount()
     {
         $this->search = request('search', '');
-        $this->type = request('type', '');
+        $this->category_id = request('category_id', '');
         $this->sort = request('sort', 'newest');
         $this->loadPosts();
     }
@@ -40,7 +33,7 @@ class PostsFilter extends Component
         $this->resetPosts();
     }
 
-    public function updatedType()
+    public function updatedCategoryId()
     {
         $this->resetPosts();
     }
@@ -53,7 +46,7 @@ class PostsFilter extends Component
     public function clearFilters()
     {
         $this->search = '';
-        $this->type = '';
+        $this->category_id = '';
         $this->sort = 'newest';
         $this->resetPosts();
     }
@@ -90,11 +83,11 @@ class PostsFilter extends Component
             ->with(['category:id,name,slug', 'images' => function($query) {
                 $query->where('status', 'active')->orderBy('order')->limit(1);
             }])
-            ->select(['id', 'title', 'content', 'slug', 'thumbnail', 'type', 'is_featured', 'category_id', 'created_at', 'order']);
+            ->select(['id', 'title', 'content', 'slug', 'thumbnail', 'category_id', 'created_at', 'order']);
 
-        // Lọc theo type
-        if ($this->type && in_array($this->type, ['normal', 'news', 'service', 'course'])) {
-            $query->where('type', $this->type);
+        // Lọc theo danh mục
+        if ($this->category_id) {
+            $query->where('category_id', $this->category_id);
         }
 
         // Tìm kiếm theo từ khóa với tối ưu performance
@@ -112,9 +105,6 @@ class PostsFilter extends Component
         switch ($this->sort) {
             case 'oldest':
                 $query->orderBy('created_at', 'asc');
-                break;
-            case 'featured':
-                $query->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc');
                 break;
             case 'newest':
             default:

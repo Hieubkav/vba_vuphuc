@@ -87,7 +87,7 @@
         <div class="max-w-4xl mx-auto">
             <!-- Featured Image - Không cắt xén, giữ nguyên tỷ lệ -->
             <div class="mb-6 md:mb-8">
-                @if(isset($post->thumbnail) && !empty($post->thumbnail) && \App\Services\ImageService::imageExists($post->thumbnail))
+                @if(isset($post->thumbnail) && !empty($post->thumbnail) && \Illuminate\Support\Facades\Storage::disk('public')->exists($post->thumbnail))
                     <!-- Ảnh thực tế - giữ nguyên tỷ lệ, không cắt xén -->
                     <div class="post-image-container">
                         <img src="{{ asset('storage/' . $post->thumbnail) }}"
@@ -103,7 +103,7 @@
                 @else
                     <!-- Fallback UI khi không có ảnh -->
                     <div class="w-full h-48 md:h-64 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center rounded-lg shadow-lg">
-                        <i class="{{ \App\Services\ImageService::getIconByType($post->type ?? 'normal') }} text-4xl md:text-6xl text-red-300"></i>
+                        <i class="fas fa-newspaper text-4xl md:text-6xl text-red-300"></i>
                     </div>
                 @endif
             </div>
@@ -124,15 +124,7 @@
             <!-- Section Header -->
             <div class="text-center mb-8">
                 <h3 class="text-2xl font-bold text-gray-900 mb-2">
-                    @php
-                        $relatedTitle = [
-                            'service' => 'Dịch vụ liên quan',
-                            'news' => 'Tin tức liên quan',
-                            'course' => 'Khóa học liên quan',
-                            'normal' => 'Bài viết liên quan'
-                        ];
-                    @endphp
-                    {{ $relatedTitle[$post->type] ?? 'Bài viết liên quan' }}
+                    Bài viết liên quan
                 </h3>
                 <div class="w-16 h-0.5 bg-red-600 mx-auto"></div>
             </div>
@@ -144,7 +136,7 @@
                         <a href="{{ route('posts.show', $relatedPost->slug) }}" class="block bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
                             <!-- Ảnh với fallback UI -->
                             <div class="aspect-video overflow-hidden">
-                                @if(isset($relatedPost->thumbnail) && !empty($relatedPost->thumbnail) && \App\Services\ImageService::imageExists($relatedPost->thumbnail))
+                                @if(isset($relatedPost->thumbnail) && !empty($relatedPost->thumbnail) && \Illuminate\Support\Facades\Storage::disk('public')->exists($relatedPost->thumbnail))
                                     <img src="{{ asset('storage/' . $relatedPost->thumbnail) }}"
                                          alt="{{ $relatedPost->title }}"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -153,12 +145,12 @@
 
                                     <!-- Fallback khi ảnh lỗi -->
                                     <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center" style="display: none;">
-                                        <i class="{{ \App\Services\ImageService::getIconByType($relatedPost->type ?? 'normal') }} text-3xl text-red-300"></i>
+                                        <i class="fas fa-newspaper text-3xl text-red-300"></i>
                                     </div>
                                 @else
                                     <!-- Fallback khi không có ảnh -->
                                     <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-                                        <i class="{{ \App\Services\ImageService::getIconByType($relatedPost->type ?? 'normal') }} text-3xl text-red-300"></i>
+                                        <i class="fas fa-newspaper text-3xl text-red-300"></i>
                                     </div>
                                 @endif
                             </div>
@@ -184,9 +176,9 @@
 
             <!-- View All Button -->
             <div class="text-center">
-                <a href="{{ route('posts.index', ['type' => $post->type]) }}"
+                <a href="{{ route('posts.index') }}"
                    class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-300">
-                    <span>Xem tất cả</span>
+                    <span>Xem tất cả bài viết</span>
                     <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>

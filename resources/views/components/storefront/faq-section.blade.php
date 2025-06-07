@@ -4,12 +4,12 @@
     <div class="hidden lg:block absolute -top-8 -right-12 w-20 h-20 bg-red-25 rounded-full opacity-40"></div>
     <div class="hidden lg:block absolute -bottom-8 -left-12 w-16 h-16 bg-red-25 rounded-full opacity-40"></div>
 
-    <!-- FAQ Section Header -->
+    {{-- <!-- FAQ Section Header -->
     <div class="text-center max-w-3xl mx-auto mb-12 relative z-10">
         <span class="inline-block py-1 px-3 text-xs font-semibold bg-red-100 text-red-800 rounded-full tracking-wider uppercase">Hỏi đáp</span>
         <h2 class="mt-3 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Câu hỏi <span class="text-red-700">thường gặp</span></h2>
         <p class="mt-4 text-base md:text-lg text-gray-600">Các thông tin quan trọng giúp bạn hiểu rõ hơn về khóa học và dịch vụ của VBA Vũ Phúc</p>
-    </div>
+    </div> --}}
     
     <!-- FAQ Accordion -->
     <div class="max-w-3xl mx-auto" x-data="{ activeAccordion: null }">
@@ -42,7 +42,7 @@
             <p class="text-gray-600 text-sm">Liên hệ với đội ngũ hỗ trợ của chúng tôi để được giải đáp nhanh chóng.</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-3">
-            <a href="tel:{{ $globalSettings->phone ?? '#' }}" class="inline-flex items-center justify-center px-5 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors text-sm">
+            <a href="tel:{{ $globalSettings->hotline ?? '#' }}" class="inline-flex items-center justify-center px-5 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors text-sm">
                 <i class="fas fa-phone mr-2"></i>
                 Gọi ngay
             </a>

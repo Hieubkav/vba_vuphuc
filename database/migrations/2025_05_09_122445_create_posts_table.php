@@ -20,8 +20,6 @@ return new class extends Migration
             $table->string('og_image_link')->nullable();
             $table->string('slug')->unique();
             $table->string('thumbnail')->nullable();
-            $table->boolean('is_featured')->default(false);
-            $table->enum('type', ['normal', 'news', 'service', 'course'])->default('normal');
             $table->integer('order')->default(0);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->foreignId('category_id')->nullable()->constrained('cat_posts')->nullOnDelete();

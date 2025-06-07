@@ -9,11 +9,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Traits\SimpleFilamentOptimization;
+
 
 class FaqResource extends Resource
 {
-    use SimpleFilamentOptimization;
 
     protected static ?string $model = Faq::class;
 

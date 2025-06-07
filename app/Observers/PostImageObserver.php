@@ -3,18 +3,18 @@
 namespace App\Observers;
 
 use App\Models\PostImage;
-use App\Services\ImageService;
+use App\Services\SimpleWebpService;
 use App\Traits\HandlesFileObserver;
 
 class PostImageObserver
 {
     use HandlesFileObserver;
 
-    protected $imageService;
+    protected $webpService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(SimpleWebpService $webpService)
     {
-        $this->imageService = $imageService;
+        $this->webpService = $webpService;
     }
 
     /**
@@ -50,7 +50,7 @@ class PostImageObserver
         // Lấy và xóa image_link cũ
         $oldImage = $this->getAndDeleteOldFile($modelClass, $modelId, 'image_link');
         if ($oldImage) {
-            $this->imageService->deleteImage($oldImage);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
         }
     }
 
@@ -61,7 +61,7 @@ class PostImageObserver
     {
         // Xóa hình ảnh khi xóa record
         if ($postImage->image_link) {
-            $this->imageService->deleteImage($postImage->image_link);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($postImage->image_link);
         }
     }
 

@@ -18,9 +18,7 @@ return new class extends Migration
             $table->string('seo_title')->nullable();
             $table->text('seo_description')->nullable();
             $table->string('og_image_link')->nullable();
-            $table->string('image')->nullable();
             $table->text('description')->nullable();
-            $table->foreignId('parent_id')->nullable()->constrained('cat_posts')->nullOnDelete();
             $table->integer('order')->default(0);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();

@@ -121,20 +121,8 @@ function initCounterAnimations() {
 }
 
 function initImageOptimization() {
-    const images = document.querySelectorAll('img[loading="lazy"]');
-    images.forEach(img => {
-        img.addEventListener('load', function() {
-            this.style.opacity = '1';
-        });
-        
-        img.addEventListener('error', function() {
-            this.style.display = 'none';
-            const fallback = this.parentElement.querySelector('.fallback-placeholder');
-            if (fallback) {
-                fallback.style.display = 'flex';
-            }
-        });
-    });
+    // KISS: Đơn giản hóa - chỉ để browser tự xử lý lazy loading
+    // Không can thiệp vào opacity hay display
 }
 </script>
 @endpush

@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Providers\ViewServiceProvider;
-use App\Services\PerformanceService;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
@@ -78,10 +78,9 @@ class OptimizeStorefront extends Command
         $cacheKeys = [
             'storefront_sliders',
             'storefront_categories',
-            'storefront_products',
-            'storefront_services',
-            'storefront_news',
-            'storefront_partners',
+            'storefront_courses',
+            'storefront_posts',
+            'storefront_testimonials',
             'navigation_data',
             'global_settings'
         ];
@@ -129,7 +128,7 @@ class OptimizeStorefront extends Command
     }
 
     /**
-     * Warm up storefront specific data
+     * Warm up storefront specific data - Đã sửa cho website khóa học
      */
     private function warmUpStorefrontData(): void
     {
@@ -146,59 +145,41 @@ class OptimizeStorefront extends Command
                 ->get();
         });
 
-        // Warm up categories
+        // Warm up course categories
         Cache::remember('storefront_categories', 7200, function () {
-            return \App\Models\CatProduct::where('status', 'active')
-                ->whereNull('parent_id')
+            return \App\Models\CatCourse::where('status', 'active')
                 ->orderBy('order')
-                ->select(['id', 'name', 'slug', 'image', 'order'])
+                ->select(['id', 'name', 'slug', 'description', 'order'])
                 ->take(12)
                 ->get();
         });
 
-        // Warm up featured products
-        Cache::remember('storefront_products', 1800, function () {
-            return \App\Models\Product::where('status', 'active')
-                ->where('is_hot', true)
-                ->with(['category:id,name', 'images' => function($query) {
-                    $query->where('status', 'active')->orderBy('order')->take(1);
-                }])
-                ->select(['id', 'name', 'slug', 'price', 'compare_price', 'is_hot', 'category_id', 'seo_title', 'order'])
+        // Warm up featured courses
+        Cache::remember('storefront_courses', 1800, function () {
+            return \App\Models\Course::where('status', 'active')
+                ->where('is_featured', true)
+                ->with(['category:id,name', 'instructor:id,name'])
+                ->select(['id', 'title', 'slug', 'price', 'thumbnail', 'cat_course_id', 'instructor_id', 'level', 'order'])
                 ->orderBy('order')
                 ->take(8)
                 ->get();
         });
 
-        // Warm up services
-        Cache::remember('storefront_services', 3600, function () {
+        // Warm up posts/news
+        Cache::remember('storefront_posts', 1800, function () {
             return \App\Models\Post::where('status', 'active')
-                ->where('type', 'service')
-                ->with(['category:id,name', 'images' => function($query) {
-                    $query->where('status', 'active')->orderBy('order')->take(1);
-                }])
-                ->select(['id', 'title', 'slug', 'seo_description', 'thumbnail', 'category_id', 'order'])
-                ->orderBy('order')
-                ->get();
-        });
-
-        // Warm up news
-        Cache::remember('storefront_news', 1800, function () {
-            return \App\Models\Post::where('status', 'active')
-                ->where('type', 'news')
-                ->with(['category:id,name', 'images' => function($query) {
-                    $query->where('status', 'active')->orderBy('order')->take(1);
-                }])
-                ->select(['id', 'title', 'slug', 'seo_description', 'thumbnail', 'category_id', 'order', 'created_at'])
+                ->with(['category:id,name'])
+                ->select(['id', 'title', 'slug', 'seo_description', 'thumbnail', 'cat_post_id', 'order', 'created_at'])
                 ->orderBy('order')
                 ->orderBy('created_at', 'desc')
                 ->take(6)
                 ->get();
         });
 
-        // Warm up partners
-        Cache::remember('storefront_partners', 7200, function () {
-            return \App\Models\Partner::where('status', 'active')
-                ->select(['id', 'name', 'logo_link', 'website_link', 'order'])
+        // Warm up testimonials
+        Cache::remember('storefront_testimonials', 7200, function () {
+            return \App\Models\Testimonial::where('status', 'active')
+                ->select(['id', 'name', 'position', 'content', 'avatar', 'order'])
                 ->orderBy('order')
                 ->get();
         });
@@ -206,11 +187,7 @@ class OptimizeStorefront extends Command
         // Warm up navigation data
         Cache::remember('navigation_data', 7200, function () {
             return [
-                'mainCategories' => \App\Models\CatProduct::where('status', 'active')
-                    ->whereNull('parent_id')
-                    ->with(['children' => function ($query) {
-                        $query->where('status', 'active')->orderBy('order');
-                    }])
+                'courseCategories' => \App\Models\CatCourse::where('status', 'active')
                     ->orderBy('order')
                     ->get(),
                 'menuItems' => \App\Models\MenuItem::where('status', 'active')

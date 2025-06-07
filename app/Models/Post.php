@@ -18,17 +18,13 @@ class Post extends Model
         'og_image_link',
         'slug',
         'thumbnail',
-        'is_featured',
-        'type',
         'order',
         'status',
         'category_id',
     ];
 
     protected $casts = [
-        'is_featured' => 'boolean',
         'status' => 'string',
-        'type' => 'string',
         'order' => 'integer',
     ];
 

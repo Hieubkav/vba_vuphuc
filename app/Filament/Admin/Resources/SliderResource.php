@@ -5,7 +5,7 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -22,7 +22,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 
 class SliderResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = Slider::class;
 

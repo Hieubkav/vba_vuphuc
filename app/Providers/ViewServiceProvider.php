@@ -98,46 +98,49 @@ class ViewServiceProvider extends ServiceProvider
                     ->get();
             }),
 
-            // Course Categories với khóa học mới nhất - Cache 2 giờ (Sử dụng CatCourse thay vì CatPost)
+            // Course Categories với khóa học mới nhất - Cache 2 giờ (Hiển thị tất cả danh mục có khóa học)
             'courseCategories' => Cache::remember('storefront_course_categories', 7200, function () {
-                return CatCourse::where('status', 'active')
+                // Lấy tất cả danh mục có trạng thái active và có khóa học
+                $categories = CatCourse::where('status', 'active')
                     ->whereHas('courses', function($query) {
                         $query->where('status', 'active');
                     })
-                    ->with(['courses' => function($query) {
-                        $query->where('status', 'active')
-                            ->with('instructor:id,name')
-                            ->select([
-                                'id', 'title', 'slug', 'description', 'price', 'compare_price',
-                                'duration_hours', 'level', 'start_date', 'end_date', 'thumbnail',
-                                'instructor_id', 'gg_form', 'group_link', 'show_form_link',
-                                'show_group_link', 'cat_course_id', 'created_at', 'seo_title', 'seo_description'
-                            ])
-                            ->orderBy('created_at', 'desc')
-                            ->take(1);
-                    }])
-                    ->withCount(['courses' => function($query) {
-                        $query->where('status', 'active');
-                    }])
-                    ->orderBy('order')
                     ->select(['id', 'name', 'slug', 'description', 'image', 'order'])
-                    ->whereIn('slug', ['ky-nang', 'ky-thuat', 'hoi-thao']) // Chỉ lấy 3 danh mục chính
-                    ->get()
-                    ->map(function($category) {
-                        $category->latest_course = $category->courses->first();
-                        unset($category->courses);
-                        return $category;
-                    });
+                    ->orderBy('order')
+                    ->get();
+
+                // Lấy khóa học mới nhất cho từng danh mục riêng biệt để tránh bug eager loading
+                return $categories->map(function ($category) {
+                    $latestCourse = \App\Models\Course::where('cat_course_id', $category->id)
+                        ->where('status', 'active')
+                        ->with(['instructor:id,name', 'courseGroup:id,group_link'])
+                        ->select([
+                            'id', 'title', 'slug', 'description', 'price', 'compare_price',
+                            'duration_hours', 'level', 'start_date', 'end_date', 'thumbnail',
+                            'instructor_id', 'gg_form', 'show_form_link',
+                            'show_group_link', 'cat_course_id', 'course_group_id', 'created_at', 'seo_title', 'seo_description'
+                        ])
+                        ->orderBy('created_at', 'desc')
+                        ->first(); // Lấy khóa học mới nhất
+
+                    // Gán khóa học mới nhất vào category
+                    $category->latest_course = $latestCourse;
+
+                    return $category;
+                })->filter(function ($category) {
+                    // Chỉ giữ lại các danh mục có khóa học
+                    return $category->latest_course !== null;
+                });
             }),
 
             // Featured Courses - Cache 30 phút
             'featuredCourses' => Cache::remember('storefront_featured_courses', 1800, function () {
                 return Course::where('status', 'active')
                     ->where('is_featured', true)
-                    ->with(['category:id,name,slug', 'instructor:id,name'])
+                    ->with(['courseCategory:id,name,slug', 'instructor:id,name'])
                     ->select([
                         'id', 'title', 'slug', 'price', 'compare_price', 'duration_hours',
-                        'level', 'is_featured', 'category_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail',
+                        'level', 'is_featured', 'cat_course_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail',
                         'order', 'max_students'
                     ])
                     ->orderBy('order', 'asc')
@@ -148,42 +151,30 @@ class ViewServiceProvider extends ServiceProvider
             // Latest Courses - Cache 30 phút
             'latestCourses' => Cache::remember('storefront_latest_courses', 1800, function () {
                 return Course::where('status', 'active')
-                    ->with(['category:id,name,slug', 'instructor:id,name'])
+                    ->with(['courseCategory:id,name,slug', 'instructor:id,name'])
                     ->select([
                         'id', 'title', 'slug', 'price', 'compare_price', 'duration_hours',
-                        'level', 'category_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail', 'created_at'
+                        'level', 'cat_course_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail', 'created_at'
                     ])
                     ->orderBy('created_at', 'desc')
                     ->take(6)
                     ->get();
             }),
 
-            // Services data - Cache 1 giờ
-            'services' => Cache::remember('storefront_services', 3600, function () {
-                return Post::where('status', 'active')
-                    ->where('type', 'service')
-                    ->with(['category:id,name', 'images' => function($query) {
-                        $query->where('status', 'active')->orderBy('order')->take(1);
-                    }])
-                    ->select(['id', 'title', 'slug', 'seo_description', 'thumbnail', 'category_id', 'order'])
-                    ->orderBy('order')
-                    ->take(6)
-                    ->get();
-            }),
 
-            // News Posts - Cache 30 phút với tối ưu performance
-            'newsPosts' => Cache::remember('storefront_news', 1800, function () {
+
+            // Latest Posts - Cache 30 phút với tối ưu performance
+            'latestPosts' => Cache::remember('storefront_latest_posts', 1800, function () {
                 return Post::where('status', 'active')
-                    ->where('type', 'news')
                     ->with(['category:id,name,slug'])
-                    ->select(['id', 'title', 'slug', 'content', 'thumbnail', 'category_id', 'order', 'created_at', 'type'])
+                    ->select(['id', 'title', 'slug', 'content', 'thumbnail', 'category_id', 'order', 'created_at'])
                     ->orderBy('order')
                     ->orderBy('created_at', 'desc')
-                    ->take(6)
+                    ->take(4) // Giới hạn 4 bài viết: 1 chính + 3 phụ
                     ->get()
                     ->map(function ($post) {
                         // Pre-check image existence để tránh check lại trong view
-                        $post->has_valid_image = !empty($post->thumbnail) && \App\Services\ImageService::imageExists($post->thumbnail);
+                        $post->has_valid_image = !empty($post->thumbnail) && \Illuminate\Support\Facades\Storage::exists('public/' . $post->thumbnail);
                         return $post;
                     });
             }),
@@ -243,12 +234,10 @@ class ViewServiceProvider extends ServiceProvider
                     return CourseGroup::where('status', 'active')
                         ->whereNotNull('group_link')
                         ->select([
-                            'id', 'name', 'slug', 'description', 'thumbnail', 'level',
+                            'id', 'name', 'description',
                             'group_link', 'group_type', 'max_members', 'current_members',
-                            'instructor_name', 'instructor_bio', 'color', 'icon',
-                            'is_featured', 'order'
+                            'order'
                         ])
-                        ->orderBy('is_featured', 'desc')
                         ->orderBy('order', 'asc')
                         ->orderBy('created_at', 'desc')
                         ->take(6) // Giới hạn tối đa 6 nhóm để layout đẹp mắt
@@ -274,9 +263,9 @@ class ViewServiceProvider extends ServiceProvider
                             'published_date', 'featured', 'total_pages', 'file_size',
                             'download_count', 'view_count', 'created_at', 'order'
                         ])
+                        ->orderBy('order', 'asc')
                         ->orderBy('featured', 'desc')
                         ->orderBy('published_date', 'desc')
-                        ->orderBy('order')
                         ->take(10)
                         ->get();
                 } catch (\Exception $e) {
@@ -332,7 +321,7 @@ class ViewServiceProvider extends ServiceProvider
         $navigationData = Cache::remember('navigation_data', 7200, function () {
             return [
                 // Course Categories cho navigation
-                'courseCategories' => CatPost::where('status', 'active')
+                'courseCategories' => CatCourse::where('status', 'active')
                     ->whereHas('courses', function($query) {
                         $query->where('status', 'active');
                     })
@@ -413,12 +402,13 @@ class ViewServiceProvider extends ServiceProvider
         Cache::forget('storefront_course_categories');
         Cache::forget('storefront_featured_courses');
         Cache::forget('storefront_latest_courses');
-        Cache::forget('storefront_services');
-        Cache::forget('storefront_news');
+        Cache::forget('storefront_latest_posts');
         Cache::forget('storefront_course_stats');
         Cache::forget('storefront_testimonials');
         Cache::forget('storefront_course_groups');
         Cache::forget('storefront_albums');
+        Cache::forget('storefront_partners');
+        Cache::forget('storefront_faqs');
 
         Cache::forget('navigation_data');
     }
@@ -444,6 +434,7 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('storefront_faqs');
                 Cache::forget('storefront_course_groups');
                 Cache::forget('storefront_albums');
+                Cache::forget('storefront_partners');
                 break;
             case 'webdesign':
                 Cache::forget('web_design_settings');
@@ -462,8 +453,10 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('navigation_data');
                 break;
             case 'posts':
-                Cache::forget('storefront_services');
-                Cache::forget('storefront_news');
+                Cache::forget('storefront_latest_posts');
+                break;
+            case 'testimonials':
+                Cache::forget('storefront_testimonials');
                 break;
             case 'all':
             default:

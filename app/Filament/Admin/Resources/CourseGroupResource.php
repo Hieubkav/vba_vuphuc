@@ -3,21 +3,15 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\CourseGroupResource\Pages;
-use App\Filament\Admin\Resources\CourseGroupResource\RelationManagers;
 use App\Models\CourseGroup;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Traits\SimpleFilamentOptimization;
-use Illuminate\Support\Str;
 
 class CourseGroupResource extends Resource
 {
-    use SimpleFilamentOptimization;
 
     protected static ?string $model = CourseGroup::class;
 
@@ -42,15 +36,9 @@ class CourseGroupResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Tên nhóm')
                             ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create' ? $set('slug', Str::slug($state)) : null),
+                            ->maxLength(255),
 
-                        Forms\Components\TextInput::make('slug')
-                            ->label('Slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(CourseGroup::class, 'slug', ignoreRecord: true),
+
 
                         Forms\Components\Textarea::make('description')
                             ->label('Mô tả nhóm')
@@ -76,30 +64,7 @@ class CourseGroupResource extends Resource
                             ])
                             ->default('facebook'),
 
-                        Forms\Components\Select::make('level')
-                            ->label('Cấp độ')
-                            ->required()
-                            ->options([
-                                'beginner' => 'Cơ bản',
-                                'intermediate' => 'Trung cấp',
-                                'advanced' => 'Nâng cao',
-                            ])
-                            ->default('beginner'),
 
-                        Forms\Components\Select::make('color')
-                            ->label('Màu chủ đạo')
-                            ->options([
-                                '#dc2626' => '🔴 Đỏ',
-                                '#2563eb' => '🔵 Xanh dương',
-                                '#16a34a' => '🟢 Xanh lá',
-                                '#ca8a04' => '🟡 Vàng',
-                                '#9333ea' => '🟣 Tím',
-                                '#ea580c' => '🟠 Cam',
-                                '#0891b2' => '🔷 Xanh cyan',
-                                '#be185d' => '🩷 Hồng',
-                            ])
-                            ->default('#dc2626')
-                            ->required(),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Thành viên')
@@ -111,55 +76,14 @@ class CourseGroupResource extends Resource
 
                         Forms\Components\TextInput::make('current_members')
                             ->label('Số thành viên hiện tại')
-                            ->required()
                             ->numeric()
                             ->default(0)
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->placeholder('Để trống sẽ mặc định là 0'),
                     ])->columns(2),
-
-                Forms\Components\Section::make('Giảng viên')
-                    ->schema([
-                        Forms\Components\TextInput::make('instructor_name')
-                            ->label('Tên giảng viên')
-                            ->maxLength(255),
-
-                        Forms\Components\Textarea::make('instructor_bio')
-                            ->label('Tiểu sử giảng viên')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(1),
 
                 Forms\Components\Section::make('Cài đặt')
                     ->schema([
-                        Forms\Components\FileUpload::make('thumbnail')
-                            ->label('Hình đại diện')
-                            ->image()
-                            ->directory('course-groups')
-                            ->visibility('public'),
-
-                        Forms\Components\Select::make('icon')
-                            ->label('Icon nhóm')
-                            ->options([
-                                'fas fa-users' => '👥 Nhóm người',
-                                'fas fa-comments' => '💬 Chat',
-                                'fas fa-graduation-cap' => '🎓 Học tập',
-                                'fas fa-book' => '📚 Sách',
-                                'fas fa-laptop-code' => '💻 Lập trình',
-                                'fas fa-chart-bar' => '📊 Biểu đồ',
-                                'fas fa-calculator' => '🧮 Máy tính',
-                                'fas fa-file-excel' => '📗 Excel',
-                                'fas fa-database' => '🗄️ Dữ liệu',
-                                'fas fa-lightbulb' => '💡 Ý tưởng',
-                                'fas fa-rocket' => '🚀 Khởi nghiệp',
-                                'fas fa-handshake' => '🤝 Hợp tác',
-                            ])
-                            ->default('fas fa-users')
-                            ->required(),
-
-                        Forms\Components\Toggle::make('is_featured')
-                            ->label('Nổi bật')
-                            ->default(false),
-
                         Forms\Components\TextInput::make('order')
                             ->label('Thứ tự hiển thị')
                             ->required()
@@ -182,10 +106,13 @@ class CourseGroupResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('thumbnail')
-                    ->label('Hình ảnh')
-                    ->circular()
-                    ->size(40),
+                Tables\Columns\TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->numeric()
+                    ->sortable()
+                    ->alignCenter()
+                    ->badge()
+                    ->color('gray'),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Tên nhóm')
@@ -208,49 +135,16 @@ class CourseGroupResource extends Resource
                         default => $state,
                     }),
 
-                Tables\Columns\TextColumn::make('level')
-                    ->label('Cấp độ')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'beginner' => 'success',
-                        'intermediate' => 'warning',
-                        'advanced' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'beginner' => 'Cơ bản',
-                        'intermediate' => 'Trung cấp',
-                        'advanced' => 'Nâng cao',
-                        default => $state,
-                    }),
-
                 Tables\Columns\TextColumn::make('members')
                     ->label('Thành viên')
                     ->getStateUsing(function ($record) {
+                        $current = $record->current_members ?? 0;
                         if ($record->max_members) {
-                            return "{$record->current_members}/{$record->max_members}";
+                            return "{$current}/{$record->max_members}";
                         }
-                        return $record->current_members;
+                        return $current;
                     })
                     ->sortable(['current_members']),
-
-                Tables\Columns\TextColumn::make('instructor_name')
-                    ->label('Giảng viên')
-                    ->searchable()
-                    ->toggleable(),
-
-                Tables\Columns\IconColumn::make('is_featured')
-                    ->label('Nổi bật')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray'),
-
-                Tables\Columns\TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->numeric()
-                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Trạng thái')
@@ -279,14 +173,6 @@ class CourseGroupResource extends Resource
                         'facebook' => 'Facebook',
                         'zalo' => 'Zalo',
                         'telegram' => 'Telegram',
-                    ]),
-
-                Tables\Filters\SelectFilter::make('level')
-                    ->label('Cấp độ')
-                    ->options([
-                        'beginner' => 'Cơ bản',
-                        'intermediate' => 'Trung cấp',
-                        'advanced' => 'Nâng cao',
                     ]),
 
                 Tables\Filters\SelectFilter::make('status')
@@ -319,7 +205,8 @@ class CourseGroupResource extends Resource
                         ->label('Xóa đã chọn'),
                 ]),
             ])
-            ->defaultSort('order');
+            ->defaultSort('order')
+            ->reorderable('order');
     }
 
     public static function getRelations(): array
@@ -342,43 +229,5 @@ class CourseGroupResource extends Resource
     {
         return (string) static::getModel()::where('status', 'active')->count();
     }
-
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return array (
-  0 => 'id',
-  1 => 'name',
-  2 => 'description',
-  3 => 'group_link',
-  4 => 'group_type',
-  5 => 'order',
-  6 => 'status',
-  7 => 'created_at',
-);
-    }
-
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [];
-    }
-
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return array (
-  0 => 'name',
-  1 => 'description',
-);
-    }
-
-
 
 }

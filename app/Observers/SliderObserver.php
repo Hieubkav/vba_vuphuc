@@ -3,18 +3,18 @@
 namespace App\Observers;
 
 use App\Models\Slider;
-use App\Services\ImageService;
+use App\Services\SimpleWebpService;
 use App\Traits\HandlesFileObserver;
 
 class SliderObserver
 {
     use HandlesFileObserver;
 
-    protected $imageService;
+    protected $webpService;
 
-    public function __construct(ImageService $imageService)
+    public function __construct(SimpleWebpService $webpService)
     {
-        $this->imageService = $imageService;
+        $this->webpService = $webpService;
     }
 
     /**
@@ -50,7 +50,7 @@ class SliderObserver
         // Lấy và xóa image_link cũ
         $oldImage = $this->getAndDeleteOldFile($modelClass, $modelId, 'image_link');
         if ($oldImage) {
-            $this->imageService->deleteImage($oldImage);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($oldImage);
         }
     }
 
@@ -61,7 +61,7 @@ class SliderObserver
     {
         // Xóa hình ảnh khi xóa record
         if ($slider->image_link) {
-            $this->imageService->deleteImage($slider->image_link);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($slider->image_link);
         }
     }
 

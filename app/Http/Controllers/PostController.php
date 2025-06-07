@@ -31,10 +31,7 @@ class PostController extends Controller
                 $query->where('status', 'active')->orderBy('order');
             }]);
 
-        // Áp dụng filter theo type nếu có
-        if ($request->has('type') && in_array($request->type, ['normal', 'news', 'service', 'course'])) {
-            $query->where('type', $request->type);
-        }
+
 
         // Sắp xếp
         $sort = $request->get('sort', 'newest');
@@ -62,10 +59,6 @@ class PostController extends Controller
     public function categories()
     {
         $categories = CatPost::where('status', 'active')
-            ->whereNull('parent_id')
-            ->with(['children' => function($query) {
-                $query->where('status', 'active')->orderBy('order');
-            }])
             ->withCount(['posts' => function($query) {
                 $query->where('status', 'active');
             }])
@@ -97,7 +90,7 @@ class PostController extends Controller
             ->with(['images' => function($query) {
                 $query->where('status', 'active')->orderBy('order')->limit(1);
             }])
-            ->orderBy('is_featured', 'desc')
+            ->orderBy('order')
             ->orderBy('created_at', 'desc')
             ->limit(6)
             ->get();

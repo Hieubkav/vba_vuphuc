@@ -5,7 +5,6 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\TestimonialResource\Pages;
 use App\Models\Testimonial;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,7 +13,7 @@ use Filament\Tables\Table;
 
 class TestimonialResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = Testimonial::class;
 
@@ -51,12 +50,23 @@ class TestimonialResource extends Resource
                             ->label('Địa điểm')
                             ->maxLength(255),
 
-                        self::createLogoUpload(
-                            'avatar',
-                            'Ảnh đại diện',
-                            'testimonials/avatars',
-                            200
-                        ),
+                        Forms\Components\FileUpload::make('avatar')
+                            ->label('Ảnh đại diện')
+                            ->image()
+                            ->directory('testimonials/avatars')
+                            ->visibility('public')
+                            ->maxSize(5120)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Ảnh sẽ được tự động tối ưu thành WebP với tên SEO-friendly')
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $webpService = app(\App\Services\SimpleWebpService::class);
+                                $customerName = $get('name') ?: 'khach-hang';
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($customerName, 'avatar', 'webp');
+
+                                return $webpService->convertToWebP($file, 'testimonials/avatars', $seoFileName);
+                            }),
                     ])
                     ->columns(2),
 
@@ -109,7 +119,7 @@ class TestimonialResource extends Resource
                 Tables\Columns\ImageColumn::make('avatar')
                     ->label('Ảnh')
                     ->circular()
-                    ->defaultImageUrl(fn($record) => $record->avatar_url),
+                    ->disk('public'),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Tên khách hàng')
@@ -200,42 +210,5 @@ class TestimonialResource extends Resource
         return (string) static::getModel()::where('status', 'active')->count();
     }
 
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return array (
-  0 => 'id',
-  1 => 'name',
-  2 => 'position',
-  3 => 'company',
-  4 => 'content',
-  5 => 'rating',
-  6 => 'order',
-  7 => 'status',
-  8 => 'created_at',
-);
-    }
 
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [];
-    }
-
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return array (
-  0 => 'name',
-  1 => 'position',
-  2 => 'company',
-  3 => 'content',
-);
-    }
 }

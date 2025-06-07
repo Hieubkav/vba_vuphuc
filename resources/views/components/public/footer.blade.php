@@ -68,7 +68,7 @@
                 <p class="text-gray-600 mb-3">Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009</p>
                 <p class="text-gray-600 mb-3">Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc</p>
 
-                <!-- Certification Images -->
+                <!-- Certification Images - KISS: Chỉ hiển thị khi có ảnh -->
                 @if(isset($associations) && !empty($associations) && $associations->count() > 0)
                     <div class="mt-4 flex flex-wrap gap-3">
                         @foreach($associations as $association)
@@ -78,13 +78,13 @@
                                         <img src="{{ asset('storage/' . $association->image_link) }}"
                                              alt="{{ $association->name }}"
                                              class="h-12 hover:opacity-80 transition-opacity"
-                                             onerror="this.style.display='none'">
+                                             onerror="handleImageError(this)">
                                     </a>
                                 @else
                                     <img src="{{ asset('storage/' . $association->image_link) }}"
                                          alt="{{ $association->name }}"
                                          class="h-12"
-                                         onerror="this.style.display='none'">
+                                         onerror="handleImageError(this)">
                                 @endif
                             @endif
                         @endforeach

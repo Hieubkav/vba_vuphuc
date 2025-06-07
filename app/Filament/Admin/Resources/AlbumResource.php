@@ -4,23 +4,19 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AlbumResource\Pages;
 use App\Filament\Admin\Resources\AlbumResource\RelationManagers;
+use App\Filament\Admin\Resources\AlbumImageResource;
 use App\Models\Album;
-use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class AlbumResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    // Bỏ hết traits để đơn giản hóa
 
     protected static ?string $model = Album::class;
 
@@ -40,100 +36,137 @@ class AlbumResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Thông tin cơ bản')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Tiêu đề')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) =>
-                                $context === 'create' ? $set('slug', Str::slug($state)) : null
-                            ),
+                Forms\Components\Tabs::make('Tabs')
+                    ->columnSpanFull()
+                    ->contained(false)
+                    ->tabs([
+                        // Tab 1: Thông tin quan trọng
+                        Forms\Components\Tabs\Tab::make('Thông tin quan trọng')
+                            ->icon('heroicon-o-information-circle')
+                            ->schema([
+                                Forms\Components\Section::make('Thông tin cơ bản')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title')
+                                            ->label('Tiêu đề album')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) =>
+                                                $context === 'create' ? $set('slug', Str::slug($state)) : null
+                                            )
+                                            ->helperText('Tên album sẽ hiển thị trên website'),
 
-                        Forms\Components\TextInput::make('slug')
-                            ->label('Slug')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Album::class, 'slug', ignoreRecord: true)
-                            ->rules(['alpha_dash']),
+                                        Forms\Components\TextInput::make('slug')
+                                            ->label('Đường dẫn (Slug)')
+                                            ->maxLength(255)
+                                            ->unique(Album::class, 'slug', ignoreRecord: true)
+                                            ->rules(['alpha_dash'])
+                                            ->suffixAction(
+                                                Forms\Components\Actions\Action::make('generateSlug')
+                                                    ->icon('heroicon-m-arrow-path')
+                                                    ->action(function (Forms\Set $set, Forms\Get $get) {
+                                                        $title = $get('title');
+                                                        if ($title) {
+                                                            $set('slug', Str::slug($title));
+                                                        }
+                                                    })
+                                            )
+                                            ->helperText('Để trống sẽ tự động tạo từ tiêu đề'),
 
-                        Forms\Components\Textarea::make('description')
-                            ->label('Mô tả')
-                            ->rows(3)
-                            ->columnSpanFull(),
+                                        Forms\Components\Textarea::make('description')
+                                            ->label('Mô tả album')
+                                            ->rows(4)
+                                            ->columnSpanFull()
+                                            ->helperText('Mô tả ngắn gọn về nội dung album'),
+                                    ])
+                                    ->columns(2),
+
+                                Forms\Components\Section::make('File và Media')
+                                    ->schema([
+                                        Forms\Components\FileUpload::make('thumbnail')
+                                            ->label('Ảnh thumbnail')
+                                            ->image()
+                                            ->directory('albums/thumbnails')
+                                            ->visibility('public')
+                                            ->maxSize(5120)
+                                            ->imageEditor()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->helperText('Ảnh đại diện cho album. Kích thước tối đa: 5MB'),
+
+                                        Forms\Components\FileUpload::make('pdf_file')
+                                            ->label('File PDF')
+                                            ->acceptedFileTypes(['application/pdf'])
+                                            ->directory('albums/pdfs')
+                                            ->maxSize(50000) // 50MB
+                                            ->downloadable()
+                                            ->previewable(false)
+                                            ->helperText('File PDF tài liệu (tùy chọn). Kích thước tối đa: 50MB'),
+                                    ])
+                                    ->columns(2),
+
+                                Forms\Components\Section::make('Cài đặt hiển thị')
+                                    ->schema([
+                                        Forms\Components\Select::make('status')
+                                            ->label('Trạng thái')
+                                            ->options([
+                                                'active' => 'Hoạt động',
+                                                'inactive' => 'Không hoạt động',
+                                            ])
+                                            ->default('active')
+                                            ->required(),
+
+                                        Forms\Components\DatePicker::make('published_date')
+                                            ->label('Ngày xuất bản')
+                                            ->default(now()),
+
+                                        Forms\Components\TextInput::make('order')
+                                            ->label('Thứ tự hiển thị')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->helperText('Số thứ tự sắp xếp (0 = đầu tiên)'),
+
+                                        Forms\Components\Toggle::make('featured')
+                                            ->label('Album nổi bật')
+                                            ->default(false)
+                                            ->helperText('Hiển thị trong danh sách album nổi bật'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        // Tab 2: Cài đặt nâng cao
+                        Forms\Components\Tabs\Tab::make('Cài đặt nâng cao')
+                            ->icon('heroicon-o-adjustments-horizontal')
+                            ->schema([
+                                Forms\Components\Section::make('Tối ưu SEO')
+                                    ->description('Cấu hình SEO để tối ưu hóa công cụ tìm kiếm')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('seo_title')
+                                            ->label('Tiêu đề SEO')
+                                            ->maxLength(255)
+                                            ->helperText('Tiêu đề hiển thị trên Google (khuyến nghị: 50-60 ký tự)'),
+
+                                        Forms\Components\Textarea::make('seo_description')
+                                            ->label('Mô tả SEO')
+                                            ->rows(3)
+                                            ->maxLength(160)
+                                            ->helperText('Mô tả hiển thị trên Google (khuyến nghị: 150-160 ký tự)')
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\FileUpload::make('og_image_link')
+                                            ->label('Hình ảnh OG (Social Media)')
+                                            ->image()
+                                            ->directory('albums/og-images')
+                                            ->visibility('public')
+                                            ->maxSize(5120)
+                                            ->imageEditor()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->helperText('Ảnh hiển thị khi chia sẻ trên mạng xã hội. Kích thước khuyến nghị: 1200x630px'),
+                                    ])
+                                    ->columns(2),
+
+
+                            ]),
                     ])
-                    ->columns(2),
-
-                Forms\Components\Section::make('File và Media')
-                    ->schema([
-                        Forms\Components\FileUpload::make('pdf_file')
-                            ->label('File PDF')
-                            ->acceptedFileTypes(['application/pdf'])
-                            ->directory('albums/pdfs')
-                            ->maxSize(50000) // 50MB
-                            ->downloadable()
-                            ->previewable(false),
-
-                        self::createThumbnailUpload(
-                            'thumbnail',
-                            'Ảnh thumbnail',
-                            'albums/thumbnails',
-                            800,
-                            600
-                        ),
-                    ])
-                    ->columns(2),
-
-                Forms\Components\Section::make('Cài đặt')
-                    ->schema([
-                        Forms\Components\DatePicker::make('published_date')
-                            ->label('Ngày xuất bản')
-                            ->default(now()),
-
-                        Forms\Components\Select::make('status')
-                            ->label('Trạng thái')
-                            ->options([
-                                'active' => 'Hoạt động',
-                                'inactive' => 'Không hoạt động',
-                            ])
-                            ->default('active')
-                            ->required(),
-
-                        Forms\Components\TextInput::make('order')
-                            ->label('Thứ tự')
-                            ->numeric()
-                            ->default(0),
-
-                        Forms\Components\Toggle::make('featured')
-                            ->label('Nổi bật')
-                            ->default(false),
-
-                        Forms\Components\TextInput::make('total_pages')
-                            ->label('Tổng số trang')
-                            ->numeric()
-                            ->minValue(1),
-                    ])
-                    ->columns(3),
-
-                Forms\Components\Section::make('SEO')
-                    ->schema([
-                        Forms\Components\TextInput::make('seo_title')
-                            ->label('Tiêu đề SEO')
-                            ->maxLength(255),
-
-                        Forms\Components\Textarea::make('seo_description')
-                            ->label('Mô tả SEO')
-                            ->rows(3)
-                            ->maxLength(500),
-
-                        Forms\Components\TextInput::make('og_image_link')
-                            ->label('Link ảnh OG')
-                            ->url()
-                            ->maxLength(255),
-                    ])
-                    ->columns(1)
-                    ->collapsible(),
             ]);
     }
 
@@ -141,6 +174,14 @@ class AlbumResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color('gray')
+                    ->width('80px'),
+
                 Tables\Columns\ImageColumn::make('thumbnail')
                     ->label('Thumbnail')
                     ->circular()
@@ -210,12 +251,6 @@ class AlbumResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime('d/m/Y H:i')
@@ -241,7 +276,23 @@ class AlbumResource extends Resource
                     ->label('Đã xuất bản')
                     ->query(fn (Builder $query): Builder => $query->where('published_date', '<=', now())),
             ])
+            ->headerActions([
+                Tables\Actions\Action::make('manage_images')
+                    ->label('Quản lý ảnh album')
+                    ->icon('heroicon-o-photo')
+                    ->color('info')
+                    ->url(fn () => AlbumImageResource::getUrl('index', [
+                        'tableFilters[album_id][value]' => null
+                    ])),
+            ])
             ->actions([
+                Tables\Actions\Action::make('view_images')
+                    ->label('Xem ảnh')
+                    ->icon('heroicon-o-photo')
+                    ->color('info')
+                    ->url(fn ($record) => AlbumImageResource::getUrl('index', [
+                        'tableFilters[album_id][value]' => $record->id
+                    ])),
                 Tables\Actions\EditAction::make()
                     ->label('Sửa'),
                 Tables\Actions\DeleteAction::make()
@@ -253,14 +304,14 @@ class AlbumResource extends Resource
                         ->label('Xóa đã chọn'),
                 ]),
             ])
-            ->defaultSort('order')
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('order', 'asc')
+            ->reorderable('order');
     }
 
     public static function getRelations(): array
     {
         return [
-            // RelationManagers\ImagesRelationManager::class,
+            RelationManagers\AlbumImagesRelationManager::class,
         ];
     }
 
@@ -278,47 +329,7 @@ class AlbumResource extends Resource
         return (string) static::getModel()::where('status', 'active')->count();
     }
 
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return [
-            'id',
-            'title',
-            'slug',
-            'status',
-            'featured',
-            'thumbnail',
-            'pdf_file',
-            'published_date',
-            'total_pages',
-            'view_count',
-            'download_count',
-            'order',
-            'created_at'
-        ];
-    }
 
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [
-            'images' => function($query) {
-                $query->where('status', 'active')
-                      ->orderBy('order')
-                      ->limit(20);
-            }
-        ];
-    }
 
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return ['title', 'description'];
-    }
+
 }

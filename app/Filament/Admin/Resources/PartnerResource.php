@@ -6,7 +6,7 @@ use App\Filament\Admin\Resources\PartnerResource\Pages;
 use App\Filament\Admin\Resources\PartnerResource\RelationManagers;
 use App\Models\Partner;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PartnerResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = Partner::class;
 
@@ -42,12 +42,35 @@ class PartnerResource extends Resource
                             ->required()
                             ->maxLength(255),
 
-                        self::createLogoUpload(
-                            'logo_link',
-                            'Logo đối tác',
-                            'partners',
-                            400
-                        ),
+                        Forms\Components\FileUpload::make('logo_link')
+                            ->label('Logo đối tác')
+                            ->image()
+                            ->directory('partners/logos')
+                            ->visibility('public')
+                            ->maxSize(5120)
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $webpService = app(\App\Services\SimpleWebpService::class);
+                                $partnerName = $get('name') ?? 'partner';
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($partnerName, 'partner');
+
+                                return $webpService->convertToWebP(
+                                    $file,
+                                    'partners/logos',
+                                    $seoFileName,
+                                    400, // width
+                                    300  // height
+                                );
+                            })
+                            ->helperText('Logo sẽ được tự động chuyển sang WebP với tên SEO-friendly. Kích thước tối ưu: 400x300px'),
 
                         Forms\Components\TextInput::make('website_link')
                             ->label('Website')

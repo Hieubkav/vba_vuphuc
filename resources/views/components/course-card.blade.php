@@ -51,9 +51,7 @@
             <img src="{{ $mainImageUrl }}"
                  alt="{{ $course->seo_title ?? $course->title }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                 loading="lazy"
-                 decoding="async"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                 loading="lazy">
         @endif
 
         <!-- Fallback UI khi không có ảnh hoặc ảnh lỗi -->

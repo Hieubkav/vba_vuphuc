@@ -9,8 +9,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">🎨 Quản lý giao diện trang chủ</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mt-1">Kéo thả để sắp xếp thứ tự, bật/tắt hiển thị và tùy chỉnh nội dung các section</p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Quản lý giao diện trang chủ</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-1">Kéo thả để sắp xếp thứ tự, bật/tắt hiển thị và tùy chỉnh nội dung các phần</p>
                 </div>
             </div>
 
@@ -18,25 +18,32 @@
             <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="flex items-center space-x-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-lg flex items-center justify-center">
-                        <span class="text-sm font-bold text-blue-600 dark:text-blue-300">🔄</span>
+                        <svg class="w-4 h-4 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
                     </div>
                     <div>
                         <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">Kéo thả</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">Sắp xếp thứ tự sections</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Sắp xếp thứ tự phần</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <div class="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-lg flex items-center justify-center">
-                        <span class="text-sm font-bold text-green-600 dark:text-green-300">🔘</span>
+                        <svg class="w-4 h-4 text-green-600 dark:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
                     </div>
                     <div>
-                        <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">Toggle</p>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">Ẩn/hiện sections</p>
+                        <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">Hiển thị</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">Ẩn/hiện phần</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-3 p-3 bg-white/50 dark:bg-gray-800/50 rounded-lg">
                     <div class="w-8 h-8 bg-purple-100 dark:bg-purple-800 rounded-lg flex items-center justify-center">
-                        <span class="text-sm font-bold text-purple-600 dark:text-purple-300">✏️</span>
+                        <svg class="w-4 h-4 text-purple-600 dark:text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
                     </div>
                     <div>
                         <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">Tùy chỉnh</p>
@@ -60,9 +67,9 @@
                         </svg>
                     </div>
 
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">🎨 Lưu cài đặt giao diện</h3>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Lưu cài đặt giao diện</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-md">
-                        Thay đổi sẽ được áp dụng ngay lập tức trên trang chủ. Thứ tự sections đã được cập nhật theo vị trí kéo thả.
+                        Thay đổi sẽ được áp dụng ngay lập tức trên trang chủ. Thứ tự phần đã được cập nhật theo vị trí kéo thả.
                     </p>
 
                     {{-- Save Button --}}
@@ -74,7 +81,7 @@
                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
-                        <span class="text-lg">💾 Lưu cài đặt giao diện</span>
+                        <span class="text-lg">Lưu cài đặt giao diện</span>
                     </x-filament::button>
 
                     {{-- Helper Text --}}

@@ -47,7 +47,7 @@ Route::controller(InstructorController::class)->group(function () {
 // Routes cho nhóm khóa học
 Route::controller(CourseGroupController::class)->group(function () {
     Route::get('/nhom-hoc-tap', 'index')->name('course-groups.index');
-    Route::get('/nhom-hoc-tap/{slug}', 'show')->name('course-groups.show');
+    Route::get('/nhom-hoc-tap/{id}', 'show')->name('course-groups.show');
 });
 
 // Routes cho album
@@ -63,23 +63,13 @@ Route::controller(PostController::class)->group(function () {
     Route::get('/danh-muc-bai-viet', 'categories')->name('posts.categories');
     Route::get('/bai-viet/{slug}', 'show')->name('posts.show');
 
-    // Route tổng thể cho tất cả bài viết với filter
+    // Route tổng thể cho tất cả bài viết
     Route::get('/bai-viet', 'index')->name('posts.index');
-
-    // Redirect các route cũ về trang filter tổng thể
-    Route::get('/dich-vu', function() {
-        return redirect()->route('posts.index', ['type' => 'service']);
-    })->name('posts.services');
-
-    Route::get('/tin-tuc', function() {
-        return redirect()->route('posts.index', ['type' => 'news']);
-    })->name('posts.news');
-
-    // Redirect route cũ về trang khóa học mới
-    Route::get('/khoa-hoc-cu', function() {
-        return redirect()->route('courses.index');
-    })->name('posts.courses');
 });
+
+
+
+
 
 // Routes cho tài liệu khóa học
 Route::get('/course-material/{id}/download', function($id) {
@@ -144,6 +134,14 @@ Route::get('/test-album-timeline', function () {
     return view('test.album-timeline');
 })->name('test.album-timeline');
 
+
+
+
+
+
+
+
+
 // Test route cho empty album timeline
 Route::get('/test-album-timeline-empty', function () {
     return view('test.album-timeline', ['albums' => collect()]);
@@ -174,6 +172,9 @@ Route::get('/test-simple-lazy', function () {
     return view('test-simple-lazy');
 })->name('test.simple-lazy');
 
+
+
+
 // API endpoint cho realtime stats (dành cho dashboard auto-refresh)
 Route::get('/api/realtime-stats', function () {
     try {
@@ -193,17 +194,5 @@ Route::get('/api/realtime-stats', function () {
         ], 500);
     }
 })->middleware('auth');
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -38,7 +38,19 @@
                         <!-- Customer Info -->
                         <div class="flex items-center mt-auto pt-3 border-t border-gray-100">
                             <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0">
-                                <img data-src="{{ $testimonial->avatar_url }}" alt="{{ $testimonial->name }}" class="w-full h-full object-cover testimonial-image lazy-loading" loading="lazy" style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;" onerror="this.style.display='none'; this.parentElement.classList.add('bg-red-100'); this.parentElement.innerHTML='<i class=\'fas fa-user text-red-400\'></i>'">
+                                @if($testimonial->avatar)
+                                    <img src="{{ asset('storage/' . $testimonial->avatar) }}"
+                                         alt="{{ \App\Services\SeoImageService::createSeoAltText($testimonial->name, 'Ảnh đại diện') }}"
+                                         title="{{ \App\Services\SeoImageService::createSeoTitle($testimonial->name, 'Ảnh đại diện') }}"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy"
+                                         onerror="handleImageError(this)">
+                                @else
+                                    <!-- Placeholder khi không có ảnh -->
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                        <i class="fas fa-user text-red-500 text-sm"></i>
+                                    </div>
+                                @endif
                             </div>
                             <div class="min-w-0 flex-1">
                                 <h4 class="font-semibold text-gray-900 text-sm truncate">{{ $testimonial->name }}</h4>
@@ -76,15 +88,28 @@
     </div>
 </div>
 
-<!-- Fallback UI khi không có testimonials -->
+<!-- Fallback UI đẹp khi không có testimonials -->
 @else
-<div class="container mx-auto px-4 text-center py-12">
-    <div class="max-w-md mx-auto">
-        <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <i class="fas fa-comments text-2xl text-gray-400"></i>
+<div class="container mx-auto px-4 text-center py-16">
+    <div class="max-w-lg mx-auto">
+        <!-- Icon với gradient đỏ -->
+        <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center shadow-lg">
+            <i class="fas fa-star text-3xl text-white"></i>
         </div>
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">Chưa có lời khen nào</h3>
-        <p class="text-gray-500 text-sm">Các lời khen từ học viên sẽ được hiển thị tại đây.</p>
+
+        <!-- Tiêu đề -->
+        <h3 class="text-2xl font-bold text-gray-800 mb-3">Chưa có đánh giá nào</h3>
+
+        <!-- Mô tả -->
+        <p class="text-gray-600 text-base leading-relaxed mb-6">
+            Hãy là người đầu tiên chia sẻ trải nghiệm học tập của bạn với chúng tôi!
+        </p>
+
+        <!-- Call to action -->
+        <div class="inline-flex items-center px-6 py-3 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <i class="fas fa-heart text-red-500 mr-2"></i>
+            <span class="font-medium">Đánh giá sẽ xuất hiện tại đây</span>
+        </div>
     </div>
 </div>
 @endif
@@ -196,6 +221,8 @@
             }, 6000);
         }
     });
+
+    // KISS: Không cần global handler phức tạp
 </script>
 @endpush
 @endif

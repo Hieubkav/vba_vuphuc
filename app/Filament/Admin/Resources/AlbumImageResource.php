@@ -3,20 +3,19 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AlbumImageResource\Pages;
+use App\Filament\Admin\Resources\AlbumResource;
 use App\Models\AlbumImage;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
-use App\Models\Album;
+
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class AlbumImageResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = AlbumImage::class;
 
@@ -36,14 +35,15 @@ class AlbumImageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Thông tin cơ bản')
+                Forms\Components\Section::make('Thông tin ảnh')
                     ->schema([
                         Forms\Components\Select::make('album_id')
                             ->label('Album')
                             ->relationship('album', 'title')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->helperText('Chọn album để thêm ảnh vào'),
 
                         self::createImageUpload(
                             'image_path',
@@ -57,38 +57,8 @@ class AlbumImageResource extends Resource
                             true,
                             true
                         ),
-
-                        Forms\Components\TextInput::make('alt_text')
-                            ->label('Alt text')
-                            ->maxLength(255),
-
-                        Forms\Components\Textarea::make('caption')
-                            ->label('Chú thích')
-                            ->rows(3),
                     ])
                     ->columns(2),
-
-                Forms\Components\Section::make('Cài đặt')
-                    ->schema([
-                        Forms\Components\TextInput::make('order')
-                            ->label('Thứ tự')
-                            ->numeric()
-                            ->default(0),
-
-                        Forms\Components\Select::make('status')
-                            ->label('Trạng thái')
-                            ->options([
-                                'active' => 'Hoạt động',
-                                'inactive' => 'Không hoạt động',
-                            ])
-                            ->default('active')
-                            ->required(),
-
-                        Forms\Components\Toggle::make('is_featured')
-                            ->label('Ảnh nổi bật')
-                            ->default(false),
-                    ])
-                    ->columns(3),
             ]);
     }
 
@@ -98,7 +68,7 @@ class AlbumImageResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image_path')
                     ->label('Hình ảnh')
-                    ->size(60)
+                    ->size(80)
                     ->square(),
 
                 Tables\Columns\TextColumn::make('album.title')
@@ -106,75 +76,40 @@ class AlbumImageResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('alt_text')
-                    ->label('Alt text')
-                    ->searchable()
-                    ->limit(50)
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('caption')
-                    ->label('Chú thích')
-                    ->limit(50)
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Trạng thái')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'active' => 'success',
-                        'inactive' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'Hoạt động',
-                        'inactive' => 'Không hoạt động',
-                        default => $state,
-                    }),
-
-                Tables\Columns\IconColumn::make('is_featured')
-                    ->label('Nổi bật')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray'),
-
-                Tables\Columns\TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->numeric()
-                    ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Ngày tạo')
+                    ->label('Ngày thêm')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('album_id')
                     ->label('Album')
                     ->relationship('album', 'title'),
-
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Trạng thái')
-                    ->options([
-                        'active' => 'Hoạt động',
-                        'inactive' => 'Không hoạt động',
-                    ]),
-
-                Tables\Filters\TernaryFilter::make('is_featured')
-                    ->label('Nổi bật'),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('manage_albums')
+                    ->label('Quản lý album')
+                    ->icon('heroicon-o-book-open')
+                    ->color('info')
+                    ->url(fn () => AlbumResource::getUrl('index')),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('view_album')
+                    ->label('Xem album')
+                    ->icon('heroicon-o-book-open')
+                    ->color('info')
+                    ->url(fn ($record) => AlbumResource::getUrl('edit', ['record' => $record->album_id]))
+                    ->visible(fn ($record) => $record->album_id),
+                Tables\Actions\EditAction::make()
+                    ->label('Sửa'),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Xóa'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('order')
             ->defaultSort('created_at', 'desc');
     }
 
@@ -199,43 +134,5 @@ class AlbumImageResource extends Resource
         return (string) static::getModel()::where('status', 'active')->count();
     }
 
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return array (
-  0 => 'id',
-  1 => 'album_id',
-  2 => 'image_path',
-  3 => 'alt_text',
-  4 => 'caption',
-  5 => 'order',
-  6 => 'status',
-  7 => 'created_at',
-);
-    }
 
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [
-            'album' => function($query) {
-                $query->select(['id,title']);
-            }
-        ];
-    }
-
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return array (
-  0 => 'alt_text',
-  1 => 'caption',
-);
-    }
 }

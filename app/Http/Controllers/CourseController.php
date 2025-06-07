@@ -19,7 +19,7 @@ class CourseController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Course::with(['category', 'instructor', 'images' => function($q) {
+        $query = Course::with(['courseCategory', 'instructor', 'images' => function($q) {
             $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
         }])
         ->where('status', 'active');
@@ -112,8 +112,9 @@ class CourseController extends Controller
     public function show(string $slug): View
     {
         $course = Course::with([
-            'category',
+            'courseCategory',
             'instructor',
+            'courseGroup', // Thêm quan hệ courseGroup để lấy group_link
             'images' => function($q) {
                 $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
             },
@@ -174,14 +175,14 @@ class CourseController extends Controller
      */
     public function category(string $slug): View
     {
-        $category = CatPost::where('slug', $slug)
+        $category = CatCourse::where('slug', $slug)
             ->where('status', 'active')
             ->firstOrFail();
 
-        $courses = Course::with(['category', 'images' => function($q) {
+        $courses = Course::with(['courseCategory', 'images' => function($q) {
             $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
         }])
-        ->where('category_id', $category->id)
+        ->where('cat_course_id', $category->id)
         ->where('status', 'active')
         ->orderBy('is_featured', 'desc')
         ->orderBy('order')
@@ -229,8 +230,8 @@ class CourseController extends Controller
                       $q->where('name', 'like', "%{$query}%");
                   });
             })
-            ->with(['category', 'instructor'])
-            ->select(['id', 'title', 'slug', 'thumbnail', 'price', 'category_id', 'instructor_id'])
+            ->with(['courseCategory', 'instructor'])
+            ->select(['id', 'title', 'slug', 'thumbnail', 'price', 'cat_course_id', 'instructor_id'])
             ->orderBy('is_featured', 'desc')
             ->take(8)
             ->get();

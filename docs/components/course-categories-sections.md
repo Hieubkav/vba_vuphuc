@@ -159,7 +159,7 @@ $hasActiveCourses = $category->courses()
 @if($course->thumbnail)
     <img src="{{ asset('storage/' . $course->thumbnail) }}" />
 @else
-    <div style="background: linear-gradient(135deg, {{ $category->display_color }}CC, {{ $category->display_color }}FF);">
+    <div class="bg-gradient-to-br from-red-500 to-red-600">
         <!-- SVG icon -->
     </div>
 @endif

@@ -10,10 +10,18 @@ class EditCourseGroup extends EditRecord
 {
     protected static string $resource = CourseGroupResource::class;
 
+
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->label('Xóa'),
         ];
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Nhóm khóa học đã được cập nhật thành công';
     }
 }

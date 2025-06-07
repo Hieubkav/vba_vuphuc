@@ -17,9 +17,7 @@ class CatPost extends Model
         'seo_title',
         'seo_description',
         'og_image_link',
-        'image',
         'description',
-        'parent_id',
         'order',
         'status',
     ];
@@ -35,22 +33,13 @@ class CatPost extends Model
         return $this->hasMany(Post::class, 'category_id');
     }
 
-    // Quan hệ với Course (one-to-many)
-    public function courses()
-    {
-        return $this->hasMany(Course::class, 'category_id');
-    }
+    // Quan hệ với Course đã bị xóa - Course giờ sử dụng CatCourse
+    // public function courses()
+    // {
+    //     return $this->hasMany(Course::class, 'category_id');
+    // }
 
-    // Quan hệ parent-child
-    public function parent()
-    {
-        return $this->belongsTo(CatPost::class, 'parent_id');
-    }
 
-    public function children()
-    {
-        return $this->hasMany(CatPost::class, 'parent_id');
-    }
 
     // Quan hệ với MenuItem
     public function menuItems()

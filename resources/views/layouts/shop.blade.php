@@ -32,14 +32,7 @@
     <meta name="author" content="Manh Hieu">
     <meta name="theme-color" content="#b91c1c">
 
-    <!-- Performance optimizations -->
-    @if(function_exists('preloadCriticalResources'))
-        {!! preloadCriticalResources() !!}
-    @else
-        <!-- Fallback preload -->
-        <link rel="preload" href="{{ asset('build/assets/app.css') }}" as="style">
-        <link rel="preload" href="{{ asset('build/assets/app.js') }}" as="script">
-    @endif
+    <!-- KISS: Không preload để tránh lỗi 404 -->
 
     <!-- Preconnects & DNS prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,6 +57,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Alpine.js CDN - For interactive components -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Font Awesome Fallback CSS -->
     <style>
@@ -497,23 +493,30 @@
     @filamentScripts
     @livewireScripts
 
-    @vite('resources/js/app.js')
-
-    <!-- Performance CSS -->
-    <link rel="stylesheet" href="{{ asset('css/performance.css') }}">
-
-    <!-- Simple Storefront JS - Clean & Minimal -->
-    <script defer src="{{ asset('js/simple-storefront.js') }}"></script>
-
-    <!-- Defer non-critical scripts -->
-    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
-    @if(file_exists(public_path('js/image-smart.js')))
-        <script defer src="{{ asset('js/image-smart.js') }}"></script>
+    <!-- KISS: Không dùng Vite để tránh lỗi 404 -->
+    @if(file_exists(public_path('build/assets/app-UxdMiINA.js')))
+        <script src="{{ asset('build/assets/app-UxdMiINA.js') }}"></script>
+    @endif
+    @if(file_exists(public_path('build/assets/app-GEV_umWj.css')))
+        <link rel="stylesheet" href="{{ asset('build/assets/app-GEV_umWj.css') }}">
     @endif
 
-    <!-- Storefront Optimized JavaScript -->
-    <script defer src="{{ asset('js/storefront-optimized.js') }}"></script>
+    {{-- KISS: Bỏ performance.css phức tạp gây conflict với lazy loading --}}
+
+    <!-- 🎯 KISS: Cực kỳ đơn giản - chỉ ẩn ảnh lỗi -->
+    <script>
+    // KISS: Chỉ ẩn ảnh lỗi, không có fallback UI gì cả
+    function handleImageError(img) {
+        console.log('🖼️ Image error - hiding:', img.src);
+        img.style.display = 'none';
+
+        // Ẩn luôn container nếu cần
+        const container = img.closest('.relative');
+        if (container && container.children.length === 1) {
+            container.style.display = 'none';
+        }
+    }
+    </script>
 
     @stack('scripts')
 
@@ -529,25 +532,7 @@
                 }, 300);
             }
 
-            // Optimized scroll animations with better performance
-            if ('IntersectionObserver' in window) {
-                const animateSections = document.querySelectorAll('.animate-on-scroll');
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('animate-fade-in');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.1,
-                    rootMargin: '50px 0px'
-                });
-
-                animateSections.forEach(section => {
-                    observer.observe(section);
-                });
-            }
+            // KISS: Bỏ scroll animations phức tạp để tránh conflict với lazy loading
         });
 
         // Hide preloader on window load as fallback

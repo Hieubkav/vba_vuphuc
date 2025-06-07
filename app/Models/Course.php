@@ -36,14 +36,13 @@ class Course extends Model
         'requirements',
         'what_you_learn',
         'gg_form',
-        'group_link',
         'show_form_link',
         'show_group_link',
         'show_instructor',
         'show_price',
-        'category_id',
         'cat_course_id',
         'instructor_id',
+        'course_group_id',
     ];
 
     protected $casts = [
@@ -64,6 +63,30 @@ class Course extends Model
         'show_instructor' => 'boolean',
         'show_price' => 'boolean',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($course) {
+            // Tự động set order nếu chưa có
+            if (is_null($course->order)) {
+                $course->order = 0;
+            }
+
+            // Tự động tạo slug nếu chưa có
+            if (empty($course->slug) && !empty($course->title)) {
+                $course->slug = $course->generateSlug();
+            }
+        });
+
+        static::updating(function ($course) {
+            // Tự động tạo slug nếu chưa có khi update
+            if (empty($course->slug) && !empty($course->title)) {
+                $course->slug = $course->generateSlug();
+            }
+        });
+    }
 
     // Mutators để xử lý dữ liệu cũ
     public function getRequirementsAttribute($value)
@@ -156,11 +179,6 @@ class Course extends Model
             ->withTimestamps();
     }
 
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(CatPost::class, 'category_id');
-    }
-
     public function courseCategory(): BelongsTo
     {
         return $this->belongsTo(CatCourse::class, 'cat_course_id');
@@ -169,6 +187,11 @@ class Course extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(Instructor::class);
+    }
+
+    public function courseGroup(): BelongsTo
+    {
+        return $this->belongsTo(CourseGroup::class, 'course_group_id');
     }
 
     // Scopes
@@ -219,9 +242,21 @@ class Course extends Model
         $slug = $baseSlug;
         $counter = 1;
 
-        while (static::where('slug', $slug)->where('id', '!=', $this->id)->exists()) {
+        $query = static::where('slug', $slug);
+
+        // Nếu đang update (có ID), loại trừ record hiện tại
+        if ($this->exists) {
+            $query->where('id', '!=', $this->id);
+        }
+
+        while ($query->exists()) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
+
+            $query = static::where('slug', $slug);
+            if ($this->exists) {
+                $query->where('id', '!=', $this->id);
+            }
         }
 
         return $slug;

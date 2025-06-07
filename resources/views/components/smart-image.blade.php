@@ -44,7 +44,7 @@
             'class' => $class,
             'loading' => $priority ? 'eager' : 'lazy',
             'decoding' => 'async',
-            'onerror' => 'handleSimpleImageError(this)',
+            'onerror' => 'handleImageError(this)',
             'style' => 'transition: opacity 0.3s ease;'
         ];
 
@@ -90,27 +90,4 @@
     @endif
 </div>
 
-@once
-@push('scripts')
-<script>
-// Simple image error handler
-function handleSimpleImageError(img) {
-    console.log('Image error:', img.src);
-
-    // Ẩn ảnh lỗi
-    img.style.display = 'none';
-
-    // Hiển thị fallback
-    const fallback = img.nextElementSibling;
-    if (fallback && fallback.classList.contains('fallback-placeholder')) {
-        fallback.style.display = 'flex';
-        fallback.style.opacity = '0';
-        setTimeout(() => {
-            fallback.style.transition = 'opacity 0.3s ease';
-            fallback.style.opacity = '1';
-        }, 50);
-    }
-}
-</script>
-@endpush
-@endonce
+{{-- KISS: Không cần JavaScript phức tạp, dùng global handler trong layout --}}

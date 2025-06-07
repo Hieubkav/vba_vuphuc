@@ -4,15 +4,19 @@
     'aspectRatio' => 'aspect-[16/9]',
     'size' => 'medium', // small, medium, large
     'showHover' => true,
-    'showType' => true,
     'customIcon' => null,
     'customMessage' => null
 ])
 
 @php
-    // Lấy dữ liệu ảnh từ ImageService
-    $imageData = \App\Services\ImageService::getImageData($model, $imageField);
-    
+    // Kiểm tra ảnh có tồn tại không
+    $hasImage = isset($model->{$imageField}) && !empty($model->{$imageField}) && \Illuminate\Support\Facades\Storage::disk('public')->exists($model->{$imageField});
+    $imageUrl = $hasImage ? asset('storage/' . $model->{$imageField}) : null;
+    $altText = $model->title ?? $model->name ?? 'Hình ảnh';
+
+    // Icon mặc định cho bài viết (không còn type)
+    $defaultIcon = 'fas fa-newspaper';
+
     // Xác định kích thước icon
     $iconSizes = [
         'small' => 'text-3xl',
@@ -20,28 +24,19 @@
         'large' => 'text-6xl'
     ];
     $iconSize = $iconSizes[$size] ?? 'text-5xl';
-    
-    // Xác định type names
-    $typeNames = [
-        'normal' => 'Bài viết',
-        'news' => 'Tin tức',
-        'service' => 'Dịch vụ',
-        'course' => 'Khóa học'
-    ];
-    
-    $typeName = $typeNames[$model->type ?? 'normal'] ?? 'Bài viết';
+
     $hoverClass = $showHover ? 'group-hover:scale-105 transition-transform duration-300' : '';
 @endphp
 
 <div class="relative overflow-hidden {{ $aspectRatio }} w-full">
-    @if($imageData['hasImage'])
+    @if($hasImage)
         <!-- Ảnh thực tế -->
-        <img src="{{ $imageData['imageUrl'] }}"
-             alt="{{ $imageData['altText'] }}"
+        <img src="{{ $imageUrl }}"
+             alt="{{ $altText }}"
              class="w-full h-full object-cover {{ $hoverClass }}"
              loading="lazy"
              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        
+
         <!-- Fallback UI khi ảnh không load được - chỉ icon -->
         <div class="{{ $aspectRatio }} w-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center relative overflow-hidden" style="display: none;">
             <i class="fas fa-image {{ $iconSize }} text-red-300"></i>
@@ -49,7 +44,7 @@
     @else
         <!-- Placeholder khi không có ảnh trong database - chỉ icon -->
         <div class="{{ $aspectRatio }} w-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center relative overflow-hidden">
-            <i class="{{ $customIcon ?? $imageData['iconClass'] }} {{ $iconSize }} text-red-300"></i>
+            <i class="{{ $customIcon ?? $defaultIcon }} {{ $iconSize }} text-red-300"></i>
         </div>
     @endif
 </div>

@@ -14,7 +14,6 @@ class CourseGroupController extends Controller
     {
         $courseGroups = CourseGroup::where('status', 'active')
             ->whereNotNull('group_link')
-            ->orderBy('is_featured', 'desc')
             ->orderBy('order', 'asc')
             ->orderBy('created_at', 'desc')
             ->paginate(12);
@@ -23,14 +22,19 @@ class CourseGroupController extends Controller
     }
 
     /**
-     * Hiển thị chi tiết nhóm khóa học
+     * Hiển thị chi tiết nhóm khóa học (không cần thiết vì chỉ redirect đến link nhóm)
      */
-    public function show($slug)
+    public function show($id)
     {
-        $courseGroup = CourseGroup::where('slug', $slug)
+        $courseGroup = CourseGroup::where('id', $id)
             ->where('status', 'active')
             ->firstOrFail();
 
-        return view('course-groups.show', compact('courseGroup'));
+        // Redirect trực tiếp đến link nhóm
+        if ($courseGroup->group_link) {
+            return redirect()->away($courseGroup->group_link);
+        }
+
+        abort(404);
     }
 }

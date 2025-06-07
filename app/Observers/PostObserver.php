@@ -3,28 +3,22 @@
 namespace App\Observers;
 
 use App\Models\Post;
-use App\Services\ImageService;
+use App\Providers\ViewServiceProvider;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostObserver
 {
-    protected $imageService;
     protected $oldThumbnails = []; // Array to store old thumbnails by post ID
     protected $oldOgImages = []; // Array to store old OG images by post ID
-
-    public function __construct(ImageService $imageService)
-    {
-        $this->imageService = $imageService;
-    }
 
     /**
      * Handle the Post "creating" event.
      */
     public function creating(Post $post): void
     {
-        // Tự động copy thumbnail làm OG image nếu OG image trống
-        if (empty($post->og_image_link) && !empty($post->thumbnail)) {
-            $post->og_image_link = $post->thumbnail;
-        }
+        $this->generateSeoFields($post);
+        $this->generateSlug($post);
     }
 
     /**
@@ -32,7 +26,7 @@ class PostObserver
      */
     public function created(Post $post): void
     {
-        // Hình ảnh đã được xử lý trong form Filament
+        ViewServiceProvider::refreshCache('posts');
     }
 
     /**
@@ -40,10 +34,8 @@ class PostObserver
      */
     public function updating(Post $post): void
     {
-        // Tự động copy thumbnail làm OG image nếu OG image trống
-        if (empty($post->og_image_link) && !empty($post->thumbnail)) {
-            $post->og_image_link = $post->thumbnail;
-        }
+        $this->generateSeoFields($post);
+        $this->generateSlug($post);
 
         // Xử lý xóa file cũ
         if ($post->isDirty('thumbnail') && $post->getOriginal('thumbnail')) {
@@ -64,15 +56,17 @@ class PostObserver
     {
         // Nếu có hình ảnh thumbnail cũ cần xóa
         if (isset($this->oldThumbnails[$post->id])) {
-            $this->imageService->deleteImage($this->oldThumbnails[$post->id]);
+            Storage::disk('public')->delete($this->oldThumbnails[$post->id]);
             unset($this->oldThumbnails[$post->id]);
         }
 
         // Nếu có OG image cũ cần xóa
         if (isset($this->oldOgImages[$post->id])) {
-            $this->imageService->deleteImage($this->oldOgImages[$post->id]);
+            Storage::disk('public')->delete($this->oldOgImages[$post->id]);
             unset($this->oldOgImages[$post->id]);
         }
+
+        ViewServiceProvider::refreshCache('posts');
     }
 
     /**
@@ -82,35 +76,62 @@ class PostObserver
     {
         // Xóa hình ảnh thumbnail khi xóa bài viết
         if ($post->thumbnail) {
-            $this->imageService->deleteImage($post->thumbnail);
+            Storage::disk('public')->delete($post->thumbnail);
         }
 
         // Xóa OG image khi xóa bài viết
         if ($post->og_image_link) {
-            $this->imageService->deleteImage($post->og_image_link);
+            Storage::disk('public')->delete($post->og_image_link);
         }
 
         // Xóa tất cả hình ảnh liên quan trong PostImage
         foreach ($post->images as $postImage) {
             if ($postImage->image_link) {
-                $this->imageService->deleteImage($postImage->image_link);
+                Storage::disk('public')->delete($postImage->image_link);
             }
+        }
+
+        ViewServiceProvider::refreshCache('posts');
+    }
+
+    /**
+     * Tự động sinh SEO fields nếu để trống
+     */
+    private function generateSeoFields(Post $post): void
+    {
+        // Tự động sinh SEO title nếu để trống
+        if (empty($post->seo_title)) {
+            $post->seo_title = $post->title;
+        }
+
+        // Tự động sinh SEO description nếu để trống
+        if (empty($post->seo_description)) {
+            $post->seo_description = Str::limit(strip_tags($post->content), 160);
+        }
+
+        // Tự động sinh OG image nếu để trống và có thumbnail
+        if (empty($post->og_image_link) && !empty($post->thumbnail)) {
+            $post->og_image_link = asset('storage/' . $post->thumbnail);
         }
     }
 
     /**
-     * Handle the Post "restored" event.
+     * Tự động sinh slug nếu để trống
      */
-    public function restored(Post $post): void
+    private function generateSlug(Post $post): void
     {
-        //
-    }
+        if (empty($post->slug)) {
+            $baseSlug = Str::slug($post->title);
+            $slug = $baseSlug;
+            $counter = 1;
 
-    /**
-     * Handle the Post "force deleted" event.
-     */
-    public function forceDeleted(Post $post): void
-    {
-        //
+            // Kiểm tra slug trùng lặp
+            while (Post::where('slug', $slug)->where('id', '!=', $post->id ?? 0)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
+
+            $post->slug = $slug;
+        }
     }
 }

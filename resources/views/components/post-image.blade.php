@@ -18,10 +18,15 @@
     $loading = $eager ? 'eager' : 'lazy';
     
     // Kiểm tra ảnh tồn tại
-    $hasImage = isset($post->thumbnail) && !empty($post->thumbnail) && \App\Services\ImageService::imageExists($post->thumbnail);
-    
-    // Icon fallback theo type
-    $iconClass = \App\Services\ImageService::getIconByType($post->type ?? 'normal');
+    $hasImage = isset($post->thumbnail) && !empty($post->thumbnail) && \Illuminate\Support\Facades\Storage::disk('public')->exists($post->thumbnail);
+
+    // Icon fallback theo type - đơn giản hóa
+    $iconClass = match($post->type ?? 'normal') {
+        'news' => 'fas fa-newspaper',
+        'service' => 'fas fa-cogs',
+        'course' => 'fas fa-graduation-cap',
+        default => 'fas fa-file-alt'
+    };
 @endphp
 
 <div class="relative w-full {{ $heightClass }} overflow-hidden rounded-lg">

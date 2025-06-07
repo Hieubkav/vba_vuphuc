@@ -5,9 +5,10 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\PostCategoryResource\Pages;
 use App\Models\CatPost;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -21,7 +22,7 @@ use Illuminate\Support\Str;
 
 class PostCategoryResource extends Resource
 {
-    use SimpleFilamentOptimization, HasImageUpload;
+    use HasImageUpload;
 
     protected static ?string $model = CatPost::class;
 
@@ -41,73 +42,65 @@ class PostCategoryResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Thông tin cơ bản')
-                    ->schema([
-                        TextInput::make('name')
-                            ->label('Tên danh mục')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
+                Tabs::make('Thông tin danh mục')
+                    ->tabs([
+                        Tabs\Tab::make('Thông tin cơ bản')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Tên danh mục')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
 
-                        TextInput::make('slug')
-                            ->label('Đường dẫn')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->rules(['alpha_dash']),
+                                TextInput::make('slug')
+                                    ->label('Đường dẫn')
+                                    ->maxLength(255)
+                                    ->unique(ignoreRecord: true)
+                                    ->rules(['alpha_dash'])
+                                    ->helperText('Để trống để tự động tạo từ tên danh mục'),
 
-                        Textarea::make('description')
-                            ->label('Mô tả')
-                            ->rows(3)
-                            ->columnSpanFull(),
+                                Textarea::make('description')
+                                    ->label('Mô tả')
+                                    ->rows(3)
+                                    ->columnSpanFull(),
 
-                        Select::make('parent_id')
-                            ->label('Danh mục cha')
-                            ->relationship('parent', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
+                                TextInput::make('order')
+                                    ->label('Thứ tự')
+                                    ->numeric()
+                                    ->default(0)
+                                    ->helperText('Số thứ tự hiển thị (càng nhỏ càng ưu tiên)'),
 
-                        self::createImageUpload(
-                            'image',
-                            'Hình ảnh danh mục',
-                            'categories',
-                            800,
-                            600
-                        )->imagePreviewHeight('150'),
-                    ])->columns(2),
+                                Select::make('status')
+                                    ->label('Trạng thái')
+                                    ->options([
+                                        'active' => 'Hiển thị',
+                                        'inactive' => 'Ẩn',
+                                    ])
+                                    ->default('active')
+                                    ->required(),
+                            ])->columns(2),
 
-                Section::make('SEO & Hiển thị')
-                    ->schema([
-                        TextInput::make('seo_title')
-                            ->label('Tiêu đề SEO')
-                            ->maxLength(255),
+                        Tabs\Tab::make('SEO & Tối ưu hóa')
+                            ->schema([
+                                TextInput::make('seo_title')
+                                    ->label('Tiêu đề SEO')
+                                    ->maxLength(255)
+                                    ->helperText('Để trống để tự động tạo từ tên danh mục'),
 
-                        Textarea::make('seo_description')
-                            ->label('Mô tả SEO')
-                            ->rows(3),
+                                Textarea::make('seo_description')
+                                    ->label('Mô tả SEO')
+                                    ->rows(3)
+                                    ->maxLength(160)
+                                    ->helperText('Để trống để tự động tạo từ mô tả danh mục'),
 
-                        TextInput::make('og_image_link')
-                            ->label('Link ảnh OG')
-                            ->url()
-                            ->maxLength(255),
-
-                        TextInput::make('order')
-                            ->label('Thứ tự hiển thị')
-                            ->numeric()
-                            ->default(0)
-                            ->required(),
-
-                        Select::make('status')
-                            ->label('Trạng thái')
-                            ->options([
-                                'active' => 'Hiển thị',
-                                'inactive' => 'Ẩn',
-                            ])
-                            ->default('active')
-                            ->required(),
-                    ])->columns(2),
+                                TextInput::make('og_image_link')
+                                    ->label('Ảnh OG (Open Graph)')
+                                    ->url()
+                                    ->helperText('Để trống để sử dụng ảnh mặc định'),
+                            ])->columns(1),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -115,15 +108,11 @@ class PostCategoryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID')
+                TextColumn::make('order')
+                    ->label('Thứ tự')
                     ->sortable()
-                    ->searchable(),
-
-                ImageColumn::make('image')
-                    ->label('Hình ảnh')
-                    ->circular()
-                    ->defaultImageUrl(asset('images/placeholder-category.jpg')),
+                    ->alignCenter()
+                    ->width('80px'),
 
                 TextColumn::make('name')
                     ->label('Tên danh mục')
@@ -138,22 +127,12 @@ class PostCategoryResource extends Resource
                     ->copyMessage('Đã sao chép!')
                     ->color('gray'),
 
-                TextColumn::make('parent.name')
-                    ->label('Danh mục cha')
-                    ->sortable()
-                    ->placeholder('Danh mục gốc'),
-
                 TextColumn::make('posts_count')
                     ->label('Số bài viết')
                     ->counts('posts')
                     ->sortable()
                     ->badge()
                     ->color('success'),
-
-                TextColumn::make('order')
-                    ->label('Thứ tự')
-                    ->sortable()
-                    ->alignCenter(),
 
                 SelectColumn::make('status')
                     ->label('Trạng thái')
@@ -176,12 +155,6 @@ class PostCategoryResource extends Resource
                         'active' => 'Hiển thị',
                         'inactive' => 'Ẩn',
                     ]),
-
-                Tables\Filters\SelectFilter::make('parent_id')
-                    ->label('Danh mục cha')
-                    ->relationship('parent', 'name')
-                    ->searchable()
-                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\Action::make('view_frontend')
@@ -207,7 +180,7 @@ class PostCategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // RelationManagers\PostsRelationManager::class, // Tạm thời comment để tránh lỗi
         ];
     }
 
@@ -220,46 +193,5 @@ class PostCategoryResource extends Resource
         ];
     }
 
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return [
-            'id',
-            'name',
-            'slug',
-            'description',
-            'parent_id',
-            'status',
-            'order',
-            'image',
-            'created_at'
-        ];
-    }
 
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [
-            'parent' => function($query) {
-                $query->select(['id', 'name', 'slug']);
-            },
-            'posts' => function($query) {
-                $query->where('status', 'active')
-                      ->orderBy('order')
-                      ->limit(10);
-            }
-        ];
-    }
-
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return ['name', 'description'];
-    }
 }

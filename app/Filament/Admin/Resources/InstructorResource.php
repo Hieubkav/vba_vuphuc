@@ -6,7 +6,7 @@ use App\Filament\Admin\Resources\InstructorResource\Pages;
 use App\Filament\Admin\Resources\CourseResource;
 use App\Models\Instructor;
 use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
+
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,7 +15,7 @@ use Filament\Tables\Table;
 
 class InstructorResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
+    use HasImageUpload;
 
     protected static ?string $model = Instructor::class;
 

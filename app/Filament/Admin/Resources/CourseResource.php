@@ -4,25 +4,16 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\CourseResource\Pages;
 use App\Filament\Admin\Resources\CourseResource\RelationManagers;
-use App\Filament\Admin\Resources\CatCourseResource;
-use App\Filament\Admin\Resources\InstructorResource;
 use App\Models\Course;
-use App\Traits\HasImageUpload;
-use App\Traits\SimpleFilamentOptimization;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Repeater;
-use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\Str;
 
 class CourseResource extends Resource
 {
-    use HasImageUpload, SimpleFilamentOptimization;
-
     protected static ?string $model = Course::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -31,296 +22,392 @@ class CourseResource extends Resource
 
     protected static ?string $modelLabel = 'khóa học';
 
-    protected static ?string $pluralModelLabel = 'khóa học';
+    protected static ?string $pluralModelLabel = 'Khóa học';
 
     protected static ?string $navigationGroup = 'Quản lý khóa học';
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'primary';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                // Thông tin cơ bản - luôn hiển thị
-                Section::make('📚 Thông tin cơ bản')
-                    ->description('Thông tin chính của khóa học')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Tiêu đề khóa học')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $context, $state, Forms\Set $set) =>
-                                $context === 'create' ? $set('slug', Str::slug($state)) : null
-                            ),
-
-                        Forms\Components\TextInput::make('slug')
-                            ->label('Đường dẫn (Slug)')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(Course::class, 'slug', ignoreRecord: true)
-                            ->rules(['alpha_dash']),
-
-                        Forms\Components\Select::make('cat_course_id')
-                            ->label('Danh mục khóa học')
-                            ->relationship('courseCategory', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->helperText('Chọn danh mục khóa học chính'),
-
-                        Forms\Components\Select::make('category_id')
-                            ->label('Danh mục bài viết')
-                            ->relationship('category', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Chọn để hiển thị khóa học trong blog')
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
-                                    ->label('Tên danh mục')
-                                    ->required(),
-                                Forms\Components\TextInput::make('slug')
-                                    ->label('Slug')
-                                    ->required(),
-                            ]),
-                    ])->columns(2),
-
-                // Mô tả khóa học
-                Section::make('📝 Mô tả khóa học')
-                    ->description('Nội dung chi tiết về khóa học')
-                    ->schema([
-                        Forms\Components\RichEditor::make('description')
-                            ->label('Mô tả chi tiết')
-                            ->required()
-                            ->columnSpanFull()
-                            ->toolbarButtons([
-                                'bold', 'italic', 'underline', 'strike',
-                                'bulletList', 'orderedList', 'h2', 'h3',
-                                'link', 'blockquote', 'codeBlock'
-                            ]),
-                    ]),
-
-                // Hình ảnh
-                Section::make('🖼️ Hình ảnh')
-                    ->description('Hình đại diện cho khóa học')
-                    ->schema([
-                        self::createThumbnailUpload(
-                            'thumbnail',
-                            'Hình đại diện',
-                            'courses/thumbnails',
-                            800,
-                            450
-                        ),
-                    ])
-                    ->collapsible(),
-
-                // Giá & Thời gian
-                Section::make('💰 Giá & Thời gian')
-                    ->description('Thông tin về giá cả và thời gian khóa học')
-                    ->schema([
-                        Forms\Components\TextInput::make('price')
-                            ->label('Giá khóa học (VNĐ)')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->suffix('VNĐ'),
-
-                        Forms\Components\TextInput::make('compare_price')
-                            ->label('Giá so sánh (VNĐ)')
-                            ->numeric()
-                            ->suffix('VNĐ')
-                            ->helperText('Giá gốc để hiển thị khuyến mãi'),
-
-                        Forms\Components\TextInput::make('duration_hours')
-                            ->label('Thời lượng (giờ)')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->suffix('giờ'),
-
-                        Forms\Components\TextInput::make('max_students')
-                            ->label('Số học viên tối đa')
-                            ->numeric()
-                            ->helperText('Để trống nếu không giới hạn'),
-
-                        Forms\Components\DatePicker::make('start_date')
-                            ->label('Ngày bắt đầu'),
-
-                        Forms\Components\DatePicker::make('end_date')
-                            ->label('Ngày kết thúc'),
-                    ])->columns(3)
-                    ->collapsible(),
-
-                // Cấu hình cơ bản
-                Section::make('⚙️ Cấu hình cơ bản')
-                    ->description('Cấp độ, trạng thái và thứ tự hiển thị')
-                    ->schema([
-                        Forms\Components\Select::make('level')
-                            ->label('Cấp độ')
-                            ->required()
-                            ->options([
-                                'beginner' => 'Cơ bản',
-                                'intermediate' => 'Trung cấp',
-                                'advanced' => 'Nâng cao',
-                            ])
-                            ->default('beginner'),
-
-                        Forms\Components\Select::make('status')
-                            ->label('Trạng thái')
-                            ->required()
-                            ->options([
-                                'draft' => 'Nháp',
-                                'active' => 'Hoạt động',
-                                'inactive' => 'Tạm dừng',
-                            ])
-                            ->default('draft'),
-
-                        Forms\Components\Toggle::make('is_featured')
-                            ->label('Khóa học nổi bật')
-                            ->helperText('Hiển thị trong danh sách khóa học nổi bật'),
-
-                        Forms\Components\TextInput::make('order')
-                            ->label('Thứ tự sắp xếp')
-                            ->numeric()
-                            ->default(0)
-                            ->helperText('Số nhỏ hơn sẽ hiển thị trước'),
-                    ])->columns(2),
-
-                // Thông tin giảng viên
-                Section::make('👨‍🏫 Thông tin giảng viên')
-                    ->description('Chọn giảng viên cho khóa học')
-                    ->schema([
-                        Forms\Components\Select::make('instructor_id')
-                            ->label('Giảng viên')
-                            ->relationship('instructor', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->helperText('Chọn giảng viên phụ trách khóa học này')
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
-                                    ->label('Họ và tên')
-                                    ->required(),
-                                Forms\Components\TextInput::make('email')
-                                    ->label('Email')
-                                    ->email()
-                                    ->required(),
-                                Forms\Components\TextInput::make('specialization')
-                                    ->label('Chuyên môn'),
-                            ]),
-                    ])
-                    ->collapsible(),
-
-                // Yêu cầu & Mục tiêu
-                Section::make('🎯 Yêu cầu & Mục tiêu')
-                    ->description('Yêu cầu đầu vào và mục tiêu học tập')
-                    ->schema([
-                        Repeater::make('requirements')
-                            ->label('Yêu cầu đầu vào')
+                Forms\Components\Tabs::make('Tabs')
+                    ->tabs([
+                        // Tab 1: Thông tin quan trọng
+                        Forms\Components\Tabs\Tab::make('Thông tin quan trọng')
+                            ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Forms\Components\TextInput::make('requirement')
-                                    ->label('Yêu cầu')
-                                    ->required(),
-                            ])
-                            ->defaultItems(1)
-                            ->addActionLabel('Thêm yêu cầu')
-                            ->collapsible()
-                            ->mutateDehydratedStateUsing(function ($state) {
-                                // Lọc bỏ các item rỗng trước khi lưu
-                                if (is_array($state)) {
-                                    return array_values(array_filter($state, function ($item) {
-                                        return !empty($item['requirement'] ?? '');
-                                    }));
-                                }
-                                return $state;
-                            }),
+                                Forms\Components\Section::make('Thông tin cơ bản')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('title')
+                                            ->label('Tiêu đề khóa học')
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(fn (string $context, $state, callable $set) =>
+                                                $context === 'create' ? $set('slug', Str::slug($state)) : null
+                                            )
+                                            ->helperText('Tên khóa học sẽ hiển thị trên website'),
 
-                        Repeater::make('what_you_learn')
-                            ->label('Những gì học được')
+                                        Forms\Components\TextInput::make('slug')
+                                            ->label('Đường dẫn (Slug)')
+                                            ->maxLength(255)
+                                            ->unique(ignoreRecord: true)
+                                            ->rules(['alpha_dash'])
+                                            ->suffixAction(
+                                                Forms\Components\Actions\Action::make('generateSlug')
+                                                    ->icon('heroicon-m-arrow-path')
+                                                    ->tooltip('Tự động tạo slug từ tiêu đề')
+                                                    ->action(function ($get, $set) {
+                                                        $title = $get('title');
+                                                        if ($title) {
+                                                            $set('slug', Str::slug($title));
+                                                        }
+                                                    })
+                                            )
+                                            ->helperText('Đường dẫn SEO-friendly. Để trống sẽ tự động tạo từ tiêu đề khi lưu.'),
+
+                                        Forms\Components\Textarea::make('description')
+                                            ->label('Mô tả khóa học')
+                                            ->rows(4)
+                                            ->columnSpanFull()
+                                            ->helperText('Mô tả chi tiết về nội dung và mục tiêu của khóa học'),
+
+                                        Forms\Components\FileUpload::make('thumbnail')
+                                            ->label('Ảnh đại diện')
+                                            ->image()
+                                            ->directory('courses/thumbnails')
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios([
+                                                '16:9',
+                                                '4:3',
+                                                '1:1',
+                                            ])
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(5120)
+                                            ->saveUploadedFileUsing(function ($file, $get) {
+                                                $webpService = app(\App\Services\SimpleWebpService::class);
+                                                $title = $get('title') ?? 'course';
+
+                                                // Tạo tên file SEO-friendly
+                                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'course');
+
+                                                return $webpService->convertToWebP(
+                                                    $file,
+                                                    'courses/thumbnails',
+                                                    $seoFileName,
+                                                    800, // width
+                                                    450  // height
+                                                );
+                                            })
+                                            ->helperText('Ảnh sẽ được tự động chuyển sang WebP và tối ưu kích thước. Khuyến nghị: 800x450px (16:9)')
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
+
+                                Forms\Components\Section::make('Cấu hình khóa học')
+                                    ->schema([
+                                        Forms\Components\Select::make('cat_course_id')
+                                            ->label('Danh mục khóa học')
+                                            ->relationship('courseCategory', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->live()
+                                            ->suffixActions([
+                                                Forms\Components\Actions\Action::make('viewCategory')
+                                                    ->icon('heroicon-m-eye')
+                                                    ->tooltip('Xem thông tin danh mục')
+                                                    ->color('info')
+                                                    ->action(function ($record, $get) {
+                                                        $categoryId = $get('cat_course_id') ?? $record?->cat_course_id;
+                                                        if ($categoryId) {
+                                                            $category = \App\Models\CatCourse::find($categoryId);
+                                                            if ($category) {
+                                                                \Filament\Notifications\Notification::make()
+                                                                    ->title('Thông tin danh mục')
+                                                                    ->body("**{$category->name}**\n\nSlug: {$category->slug}\nMô tả: " . ($category->description ?: 'Chưa có mô tả'))
+                                                                    ->info()
+                                                                    ->duration(8000)
+                                                                    ->send();
+                                                            }
+                                                        } else {
+                                                            \Filament\Notifications\Notification::make()
+                                                                ->title('Chưa chọn danh mục')
+                                                                ->body('Vui lòng chọn danh mục khóa học trước')
+                                                                ->warning()
+                                                                ->send();
+                                                        }
+                                                    })
+                                                    ->visible(function ($record, $get) {
+                                                        return !empty($get('cat_course_id')) || !empty($record?->cat_course_id);
+                                                    }),
+
+                                                Forms\Components\Actions\Action::make('editCategory')
+                                                    ->icon('heroicon-m-pencil-square')
+                                                    ->tooltip('Chỉnh sửa danh mục')
+                                                    ->color('warning')
+                                                    ->url(function ($record, $get) {
+                                                        $categoryId = $get('cat_course_id') ?? $record?->cat_course_id;
+                                                        if ($categoryId) {
+                                                            return route('filament.admin.resources.cat-courses.edit', ['record' => $categoryId]);
+                                                        }
+                                                        return null;
+                                                    })
+                                                    ->openUrlInNewTab()
+                                                    ->visible(function ($record, $get) {
+                                                        return !empty($get('cat_course_id')) || !empty($record?->cat_course_id);
+                                                    }),
+                                            ])
+                                            ->helperText('Chọn danh mục phù hợp cho khóa học. Sử dụng các nút bên phải để xem hoặc chỉnh sửa danh mục.'),
+
+                                        Forms\Components\Select::make('level')
+                                            ->label('Trình độ')
+                                            ->options([
+                                                'beginner' => 'Cơ bản',
+                                                'intermediate' => 'Trung cấp',
+                                                'advanced' => 'Nâng cao',
+                                            ])
+                                            ->required()
+                                            ->default('beginner')
+                                            ->helperText('Trình độ phù hợp cho học viên'),
+
+                                        Forms\Components\TextInput::make('duration_hours')
+                                            ->label('Thời lượng (giờ)')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0)
+                                            ->suffix('giờ')
+                                            ->helperText('Tổng thời lượng học của khóa học'),
+
+                                        Forms\Components\TextInput::make('max_students')
+                                            ->label('Số học viên tối đa')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->suffix('người')
+                                            ->helperText('Giới hạn số lượng học viên (để trống = không giới hạn)'),
+
+                                        Forms\Components\DatePicker::make('start_date')
+                                            ->label('Ngày bắt đầu')
+                                            ->helperText('Ngày dự kiến bắt đầu khóa học'),
+
+                                        Forms\Components\DatePicker::make('end_date')
+                                            ->label('Ngày kết thúc')
+                                            ->helperText('Ngày dự kiến kết thúc khóa học'),
+                                    ])->columns(3),
+
+                                Forms\Components\Section::make('Giá cả')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('price')
+                                            ->label('Giá khóa học')
+                                            ->numeric()
+                                            ->default(0.00)
+                                            ->prefix('VND')
+                                            ->helperText('Giá chính của khóa học'),
+
+                                        Forms\Components\TextInput::make('compare_price')
+                                            ->label('Giá so sánh')
+                                            ->numeric()
+                                            ->prefix('VND')
+                                            ->helperText('Giá gốc để hiển thị khuyến mãi (để trống nếu không có)'),
+
+                                        Forms\Components\Toggle::make('show_price')
+                                            ->label('Hiển thị giá')
+                                            ->default(true)
+                                            ->helperText('Bật/tắt hiển thị giá trên website'),
+                                    ])->columns(3),
+
+                                Forms\Components\Section::make('Liên kết & Nhóm học tập')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('gg_form')
+                                            ->label('Link Google Form đăng ký')
+                                            ->url()
+                                            ->maxLength(255)
+                                            ->helperText('Đường dẫn đến form đăng ký khóa học'),
+
+                                        Forms\Components\Toggle::make('show_form_link')
+                                            ->label('Hiển thị link đăng ký')
+                                            ->default(true)
+                                            ->helperText('Bật/tắt hiển thị nút đăng ký'),
+
+                                        Forms\Components\Select::make('course_group_id')
+                                            ->label('Nhóm học tập')
+                                            ->relationship('courseGroup', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, callable $set) {
+                                                if ($state) {
+                                                    $courseGroup = \App\Models\CourseGroup::find($state);
+                                                    $set('group_link_display', $courseGroup?->group_link ?? 'Chưa có link nhóm');
+                                                } else {
+                                                    $set('group_link_display', 'Chưa có nhóm học tập');
+                                                }
+                                            })
+                                            ->helperText('Chọn nhóm học tập cho khóa học'),
+
+                                        Forms\Components\TextInput::make('group_link_display')
+                                            ->label('Link nhóm (Zalo/Facebook)')
+                                            ->disabled()
+                                            ->dehydrated(false)
+                                            ->afterStateHydrated(function ($component, $get, $record) {
+                                                $courseGroupId = $get('course_group_id') ?? $record?->course_group_id;
+                                                if ($courseGroupId) {
+                                                    $courseGroup = \App\Models\CourseGroup::find($courseGroupId);
+                                                    $component->state($courseGroup?->group_link ?? 'Chưa có link nhóm');
+                                                } else {
+                                                    $component->state('Chưa có nhóm học tập');
+                                                }
+                                            })
+                                            ->suffixAction(
+                                                Forms\Components\Actions\Action::make('openGroupLink')
+                                                    ->icon('heroicon-m-arrow-top-right-on-square')
+                                                    ->tooltip('Mở link nhóm trong tab mới')
+                                                    ->url(function ($record, $get) {
+                                                        $courseGroupId = $get('course_group_id');
+                                                        if ($courseGroupId) {
+                                                            $courseGroup = \App\Models\CourseGroup::find($courseGroupId);
+                                                            return $courseGroup?->group_link;
+                                                        }
+                                                        return $record?->courseGroup?->group_link;
+                                                    })
+                                                    ->openUrlInNewTab()
+                                                    ->visible(function ($record, $get) {
+                                                        $courseGroupId = $get('course_group_id');
+                                                        if ($courseGroupId) {
+                                                            $courseGroup = \App\Models\CourseGroup::find($courseGroupId);
+                                                            return !empty($courseGroup?->group_link);
+                                                        }
+                                                        return !empty($record?->courseGroup?->group_link);
+                                                    })
+                                            )
+                                            ->helperText('Link nhóm được lấy từ nhóm học tập đã chọn'),
+
+                                        Forms\Components\Toggle::make('show_group_link')
+                                            ->label('Hiển thị link nhóm')
+                                            ->default(true)
+                                            ->helperText('Bật/tắt hiển thị nút tham gia nhóm'),
+
+                                        Forms\Components\Select::make('instructor_id')
+                                            ->label('Giảng viên')
+                                            ->relationship('instructor', 'name')
+                                            ->searchable()
+                                            ->preload()
+                                            ->helperText('Chọn giảng viên phụ trách khóa học'),
+
+                                        Forms\Components\Toggle::make('show_instructor')
+                                            ->label('Hiển thị thông tin giảng viên')
+                                            ->default(true)
+                                            ->helperText('Bật/tắt hiển thị thông tin giảng viên trên trang khóa học'),
+                                    ])->columns(3),
+
+                                Forms\Components\Section::make('Nội dung khóa học')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('requirements')
+                                            ->label('Yêu cầu đầu vào')
+                                            ->rows(4)
+                                            ->helperText('Các kiến thức, kỹ năng cần có trước khi học (mỗi yêu cầu một dòng)')
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\Textarea::make('what_you_learn')
+                                            ->label('Những gì học được')
+                                            ->rows(4)
+                                            ->helperText('Các kiến thức, kỹ năng học viên sẽ đạt được (mỗi mục một dòng)')
+                                            ->columnSpanFull(),
+                                    ]),
+
+                                Forms\Components\Section::make('Trạng thái & Thứ tự')
+                                    ->schema([
+                                        Forms\Components\Select::make('status')
+                                            ->label('Trạng thái')
+                                            ->options([
+                                                'active' => 'Hoạt động',
+                                                'inactive' => 'Tạm dừng',
+                                                'draft' => 'Bản nháp',
+                                            ])
+                                            ->required()
+                                            ->default('draft')
+                                            ->helperText('Trạng thái hiển thị của khóa học'),
+
+                                        Forms\Components\TextInput::make('order')
+                                            ->label('Thứ tự hiển thị')
+                                            ->numeric()
+                                            ->default(0)
+                                            ->minValue(0)
+                                            ->helperText('Số thứ tự để sắp xếp khóa học (số nhỏ hiển thị trước)'),
+
+                                        Forms\Components\Toggle::make('is_featured')
+                                            ->label('Khóa học nổi bật')
+                                            ->default(false)
+                                            ->helperText('Đánh dấu là khóa học nổi bật để hiển thị ưu tiên'),
+                                    ])->columns(3),
+                            ]),
+
+                        // Tab 2: Cài đặt nâng cao
+                        Forms\Components\Tabs\Tab::make('Cài đặt nâng cao')
+                            ->icon('heroicon-o-adjustments-horizontal')
                             ->schema([
-                                Forms\Components\TextInput::make('learning_outcome')
-                                    ->label('Kết quả học tập')
-                                    ->required(),
-                            ])
-                            ->defaultItems(1)
-                            ->addActionLabel('Thêm mục tiêu')
-                            ->collapsible()
-                            ->mutateDehydratedStateUsing(function ($state) {
-                                // Lọc bỏ các item rỗng trước khi lưu
-                                if (is_array($state)) {
-                                    return array_values(array_filter($state, function ($item) {
-                                        return !empty($item['learning_outcome'] ?? '');
-                                    }));
-                                }
-                                return $state;
-                            }),
+                                Forms\Components\Section::make('Tối ưu SEO')
+                                    ->description('Cấu hình SEO để tối ưu hóa công cụ tìm kiếm')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('seo_title')
+                                            ->label('Tiêu đề SEO')
+                                            ->maxLength(255)
+                                            ->helperText('Tiêu đề hiển thị trên Google (khuyến nghị: 50-60 ký tự)'),
+
+                                        Forms\Components\Textarea::make('seo_description')
+                                            ->label('Mô tả SEO')
+                                            ->rows(3)
+                                            ->maxLength(160)
+                                            ->helperText('Mô tả hiển thị trên Google (khuyến nghị: 150-160 ký tự)')
+                                            ->columnSpanFull(),
+
+                                        Forms\Components\FileUpload::make('og_image_link')
+                                            ->label('Hình ảnh Social Media (OG Image)')
+                                            ->image()
+                                            ->directory('courses/og-images')
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios([
+                                                '16:9',
+                                                '1.91:1', // Facebook recommended
+                                                '1:1',
+                                            ])
+                                            ->imageEditorEmptyFillColor('#000000')
+                                            ->imageEditorMode(2)
+                                            ->imageEditorViewportWidth('1920')
+                                            ->imageEditorViewportHeight('1080')
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->maxSize(5120)
+                                            ->saveUploadedFileUsing(function ($file, $get) {
+                                                $webpService = app(\App\Services\SimpleWebpService::class);
+                                                $title = $get('title') ?? 'course';
+
+                                                // Tạo tên file SEO-friendly
+                                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'og');
+
+                                                return $webpService->convertToWebP(
+                                                    $file,
+                                                    'courses/og-images',
+                                                    $seoFileName,
+                                                    1200, // width
+                                                    630   // height
+                                                );
+                                            })
+                                            ->helperText('Ảnh sẽ được tự động chuyển sang WebP và tối ưu cho social media. Kích thước: 1200x630px (1.91:1)')
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
+                            ]),
                     ])
-                    ->collapsible(),
-
-                // SEO
-                Section::make('🔍 SEO & Social Media')
-                    ->description('Tối ưu hóa công cụ tìm kiếm và mạng xã hội')
-                    ->schema([
-                        Forms\Components\TextInput::make('seo_title')
-                            ->label('Tiêu đề SEO')
-                            ->maxLength(60)
-                            ->helperText('Tối đa 60 ký tự. Để trống sẽ dùng tiêu đề khóa học'),
-
-                        Forms\Components\Textarea::make('seo_description')
-                            ->label('Mô tả SEO')
-                            ->maxLength(160)
-                            ->rows(3)
-                            ->helperText('Tối đa 160 ký tự. Để trống sẽ tự động tạo từ mô tả'),
-
-                        self::createImageUpload(
-                            'og_image_link',
-                            'Hình ảnh OG (Social Media)',
-                            'courses/og-images',
-                            1200,
-                            630,
-                            5120,
-                            'Kích thước khuyến nghị: 1200x630px. Để trống sẽ dùng hình đại diện',
-                            ['16:9'],
-                            false,
-                            false
-                        ),
-                    ])
-                    ->collapsible()
-                    ->collapsed(),
-
-                // Liên kết & Form
-                Section::make('🔗 Liên kết & Form')
-                    ->description('Google Form và nhóm học tập')
-                    ->schema([
-                        Forms\Components\TextInput::make('gg_form')
-                            ->label('Link Google Form')
-                            ->url()
-                            ->helperText('Link đăng ký khóa học qua Google Form'),
-
-                        Forms\Components\TextInput::make('group_link')
-                            ->label('Link nhóm học tập')
-                            ->url()
-                            ->helperText('Link tham gia nhóm học tập (Telegram, Zalo, etc.)'),
-
-                        Forms\Components\Toggle::make('show_form_link')
-                            ->label('Hiển thị nút đăng ký')
-                            ->helperText('Hiển thị nút đăng ký Google Form trên giao diện'),
-
-                        Forms\Components\Toggle::make('show_group_link')
-                            ->label('Hiển thị nút tham gia nhóm')
-                            ->helperText('Hiển thị nút tham gia nhóm học tập trên giao diện'),
-
-                        Forms\Components\Toggle::make('show_instructor')
-                            ->label('Hiển thị giảng viên')
-                            ->default(true)
-                            ->helperText('Ẩn/hiện thông tin giảng viên trong giao diện'),
-
-                        Forms\Components\Toggle::make('show_price')
-                            ->label('Hiển thị giá')
-                            ->default(true)
-                            ->helperText('Ẩn/hiện giá khóa học trong giao diện'),
-                    ])->columns(2)
-                    ->collapsible()
-                    ->collapsed(),
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -328,123 +415,108 @@ class CourseResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('order')
+                    ->label('Thứ tự')
+                    ->numeric()
+                    ->sortable()
+                    ->width(80)
+                    ->alignCenter()
+                    ->badge()
+                    ->color('gray'),
+
                 Tables\Columns\ImageColumn::make('thumbnail')
                     ->label('Ảnh')
                     ->circular()
                     ->size(50),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Khóa học')
+                    ->label('Tên khóa học')
                     ->searchable()
-                    ->sortable()
-                    ->weight(FontWeight::Bold)
-                    ->description(fn (Course $record): string =>
-                        ($record->courseCategory ? "📚 {$record->courseCategory->name}" : '❌ Chưa phân loại') .
-                        ($record->instructor && $record->show_instructor ? " • 👨‍🏫 {$record->instructor->name}" : '')
-                    ),
+                    ->limit(50)
+                    ->tooltip(function (Tables\Columns\TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (strlen($state) <= 50) {
+                            return null;
+                        }
+                        return $state;
+                    }),
 
                 Tables\Columns\TextColumn::make('courseCategory.name')
                     ->label('Danh mục')
                     ->badge()
-                    ->color(fn ($record) => $record->courseCategory ? 'success' : 'danger')
-                    ->formatStateUsing(fn ($state) => $state ?: 'Chưa phân loại')
+                    ->color('info')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('instructor.name')
+                    ->label('Giảng viên')
+                    ->badge()
+                    ->color('success')
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('price')
                     ->label('Giá')
                     ->money('VND')
-                    ->sortable()
-                    ->alignCenter()
-                    ->width(120),
-
-                Tables\Columns\TextColumn::make('students_count')
-                    ->label('Học viên')
-                    ->counts('students')
-                    ->getStateUsing(function (Course $record): string {
-                        $studentsCount = $record->students()->count();
-                        return $studentsCount . ($record->max_students ? '/' . $record->max_students : '');
-                    })
-                    ->badge()
-                    ->color(function (Course $record): string {
-                        $studentsCount = $record->students()->count();
-                        $maxStudents = $record->max_students;
-                        if ($maxStudents && $studentsCount >= $maxStudents) {
-                            return 'danger';
-                        }
-                        return $studentsCount > 0 ? 'success' : 'gray';
-                    })
-                    ->alignCenter()
-                    ->width(100),
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('level')
-                    ->label('Cấp độ')
+                    ->label('Trình độ')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'beginner' => 'success',
-                        'intermediate' => 'warning',
-                        'advanced' => 'danger',
-                        default => 'gray',
-                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'beginner' => 'Cơ bản',
                         'intermediate' => 'Trung cấp',
                         'advanced' => 'Nâng cao',
                         default => $state,
                     })
-                    ->width(100),
+                    ->color(fn (string $state): string => match ($state) {
+                        'beginner' => 'success',
+                        'intermediate' => 'warning',
+                        'advanced' => 'danger',
+                        default => 'gray',
+                    }),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Trạng thái')
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => 'Hoạt động',
+                        'inactive' => 'Tạm dừng',
+                        'draft' => 'Bản nháp',
+                        default => $state,
+                    })
                     ->color(fn (string $state): string => match ($state) {
                         'active' => 'success',
                         'inactive' => 'warning',
                         'draft' => 'gray',
                         default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'Hoạt động',
-                        'inactive' => 'Tạm dừng',
-                        'draft' => 'Nháp',
-                        default => $state,
-                    })
-                    ->width(120),
-
-                // Cột ẩn mặc định
-
-                Tables\Columns\TextColumn::make('instructor.name')
-                    ->label('Giảng viên')
-                    ->searchable()
-                    ->badge()
-                    ->color('info')
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('duration_hours')
-                    ->label('Thời lượng')
-                    ->suffix(' giờ')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
+                    }),
                 Tables\Columns\IconColumn::make('is_featured')
                     ->label('Nổi bật')
                     ->boolean()
-                    ->trueIcon('heroicon-o-star')
-                    ->falseIcon('heroicon-o-star')
-                    ->trueColor('warning')
-                    ->falseColor('gray')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Danh mục bài viết')
-                    ->badge()
-                    ->color('info')
+                Tables\Columns\TextColumn::make('duration_hours')
+                    ->label('Thời lượng (giờ)')
+                    ->numeric()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('max_students')
+                    ->label('Số học viên tối đa')
+                    ->numeric()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Ngày bắt đầu')
                     ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('courseGroup.name')
+                    ->label('Nhóm học tập')
+                    ->badge()
+                    ->color('info')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
@@ -466,7 +538,7 @@ class CourseResource extends Resource
                     ->preload(),
 
                 Tables\Filters\SelectFilter::make('level')
-                    ->label('Cấp độ')
+                    ->label('Trình độ')
                     ->options([
                         'beginner' => 'Cơ bản',
                         'intermediate' => 'Trung cấp',
@@ -476,45 +548,17 @@ class CourseResource extends Resource
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Trạng thái')
                     ->options([
-                        'draft' => 'Nháp',
                         'active' => 'Hoạt động',
                         'inactive' => 'Tạm dừng',
+                        'draft' => 'Bản nháp',
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Nổi bật'),
-
-                // Filters ẩn mặc định
-                Tables\Filters\SelectFilter::make('category_id')
-                    ->label('Danh mục bài viết')
-                    ->relationship('category', 'name')
-                    ->preload(),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_frontend')
-                    ->label('Xem trên website')
-                    ->icon('heroicon-o-eye')
-                    ->color('info')
-                    ->url(fn ($record) => route('courses.show', $record->slug))
-                    ->openUrlInNewTab(),
-                Tables\Actions\Action::make('edit_instructor')
-                    ->label('Sửa giảng viên')
-                    ->icon('heroicon-o-user')
-                    ->color('success')
-                    ->url(fn ($record) => $record->instructor ?
-                        InstructorResource::getUrl('edit', ['record' => $record->instructor->id]) : null)
-                    ->visible(fn ($record) => $record->instructor !== null),
-                Tables\Actions\Action::make('edit_category')
-                    ->label('Sửa danh mục')
-                    ->icon('heroicon-o-folder')
-                    ->color('warning')
-                    ->url(fn ($record) => $record->courseCategory ?
-                        CatCourseResource::getUrl('edit', ['record' => $record->courseCategory->id]) : null)
-                    ->visible(fn ($record) => $record->courseCategory !== null),
                 Tables\Actions\EditAction::make()
                     ->label('Sửa'),
-                Tables\Actions\DeleteAction::make()
-                    ->label('Xóa'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -522,16 +566,14 @@ class CourseResource extends Resource
                         ->label('Xóa đã chọn'),
                 ]),
             ])
-            ->reorderable('order')
-            ->defaultSort('order', 'asc');
+            ->defaultSort('order', 'asc')
+            ->reorderable('order');
     }
 
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ImagesRelationManager::class,
-            RelationManagers\MaterialsRelationManager::class,
-            // RelationManagers\StudentsRelationManager::class,
+            //
         ];
     }
 
@@ -542,69 +584,5 @@ class CourseResource extends Resource
             'create' => Pages\CreateCourse::route('/create'),
             'edit' => Pages\EditCourse::route('/{record}/edit'),
         ];
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return (string) static::getModel()::where('status', 'active')->count();
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'primary';
-    }
-
-    /**
-     * Lấy danh sách cột cần thiết cho table
-     */
-    protected static function getTableColumns(): array
-    {
-        return [
-            'id',
-            'title',
-            'slug',
-            'cat_course_id',
-            'instructor_id',
-            'category_id',
-            'price',
-            'level',
-            'status',
-            'is_featured',
-            'thumbnail',
-            'max_students',
-            'created_at'
-        ];
-    }
-
-    /**
-     * Lấy relationships cần thiết cho form
-     */
-    protected static function getFormRelationships(): array
-    {
-        return [
-            'courseCategory' => function($query) {
-                $query->select(['id', 'name', 'slug']);
-            },
-            'instructor' => function($query) {
-                $query->select(['id', 'name', 'email', 'specialization']);
-            },
-            'category' => function($query) {
-                $query->select(['id', 'name', 'slug']);
-            },
-            'images' => function($query) {
-                $query->where('status', 'active')
-                      ->orderBy('is_main', 'desc')
-                      ->orderBy('order')
-                      ->limit(10);
-            }
-        ];
-    }
-
-    /**
-     * Lấy các cột có thể search
-     */
-    protected static function getSearchableColumns(): array
-    {
-        return ['title', 'description'];
     }
 }

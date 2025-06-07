@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Product;
+
 use App\Models\Post;
 use App\Models\Setting;
 use App\Helpers\PlaceholderHelper;
@@ -11,24 +11,21 @@ use Illuminate\Support\Facades\Cache;
 class SeoService
 {
     /**
-     * Lấy OG image cho sản phẩm
+     * Lấy OG image cho khóa học
      *
-     * @param Product $product
+     * @param \App\Models\Course $course
      * @return string
      */
-    public static function getProductOgImage(Product $product): string
+    public static function getCourseOgImage($course): string
     {
-        // Ưu tiên ảnh đầu tiên từ relationship images
-        if ($product->images && $product->images->count() > 0) {
-            $firstImage = $product->images->first();
-            if ($firstImage && $firstImage->image_link) {
-                return asset('storage/' . $firstImage->image_link);
-            }
+        // Ưu tiên og_image_link của khóa học
+        if ($course->og_image_link) {
+            return asset('storage/' . $course->og_image_link);
         }
 
-        // Fallback về og_image_link của sản phẩm
-        if ($product->og_image_link) {
-            return asset('storage/' . $product->og_image_link);
+        // Fallback về thumbnail của khóa học
+        if ($course->thumbnail) {
+            return asset('storage/' . $course->thumbnail);
         }
 
         // Fallback về settings og_image
@@ -88,12 +85,12 @@ class SeoService
     }
 
     /**
-     * Tạo structured data cho sản phẩm
+     * Tạo structured data cho khóa học
      *
-     * @param Product $product
+     * @param \App\Models\Course $course
      * @return array
      */
-    public static function getProductStructuredData(Product $product): array
+    public static function getCourseStructuredData($course): array
     {
         $settings = Cache::remember('global_settings', 3600, function () {
             return Setting::first();
@@ -101,23 +98,26 @@ class SeoService
 
         return [
             '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => $product->seo_title ?: $product->name,
-            'description' => $product->seo_description ?: $product->description,
-            'image' => self::getProductOgImage($product),
-            'url' => route('products.show', $product->slug),
-            'sku' => $product->sku,
-            'brand' => [
-                '@type' => 'Brand',
-                'name' => $product->brand ?: ($settings->site_name ?? 'Vũ Phúc Baking')
+            '@type' => 'Course',
+            'name' => $course->seo_title ?: $course->title,
+            'description' => $course->seo_description ?: $course->description,
+            'image' => self::getCourseOgImage($course),
+            'url' => route('courses.show', $course->slug),
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => $settings->site_name ?? 'VBA Vũ Phúc'
             ],
             'offers' => [
                 '@type' => 'Offer',
-                'price' => $product->getCurrentPrice(),
+                'price' => $course->price,
                 'priceCurrency' => 'VND',
-                'availability' => $product->stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-                'url' => route('products.show', $product->slug)
-            ]
+                'availability' => 'https://schema.org/InStock',
+                'url' => route('courses.show', $course->slug)
+            ],
+            'instructor' => $course->instructor ? [
+                '@type' => 'Person',
+                'name' => $course->instructor->name
+            ] : null
         ];
     }
 

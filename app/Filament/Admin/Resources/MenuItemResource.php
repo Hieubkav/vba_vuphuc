@@ -5,9 +5,9 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\MenuItemResource\Pages;
 use App\Models\MenuItem;
 use App\Models\CatPost;
-use App\Models\CatProduct;
+
 use App\Models\Post;
-use App\Models\Product;
+
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
@@ -20,11 +20,10 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
-use App\Traits\SimpleFilamentOptimization;
+
 
 class MenuItemResource extends Resource
 {
-    use SimpleFilamentOptimization;
 
     protected static ?string $model = MenuItem::class;
 
@@ -66,9 +65,6 @@ class MenuItemResource extends Resource
                                 'cat_post' => 'Danh mục bài viết',
                                 'all_posts' => 'Tất cả bài viết',
                                 'post' => 'Bài viết',
-                                'cat_product' => 'Danh mục sản phẩm',
-                                'all_products' => 'Tất cả sản phẩm',
-                                'product' => 'Sản phẩm',
                                 'display_only' => 'Chỉ hiển thị (không dẫn đến đâu)',
                             ])
                             ->required()
@@ -99,19 +95,7 @@ class MenuItemResource extends Resource
                             ->visible(fn ($get) => $get('type') === 'post')
                             ->required(fn ($get) => $get('type') === 'post'),
 
-                        Select::make('cat_product_id')
-                            ->label('Danh mục sản phẩm')
-                            ->options(CatProduct::all()->pluck('name', 'id'))
-                            ->searchable()
-                            ->visible(fn ($get) => $get('type') === 'cat_product')
-                            ->required(fn ($get) => $get('type') === 'cat_product'),
 
-                        Select::make('product_id')
-                            ->label('Sản phẩm')
-                            ->options(Product::all()->pluck('name', 'id'))
-                            ->searchable()
-                            ->visible(fn ($get) => $get('type') === 'product')
-                            ->required(fn ($get) => $get('type') === 'product'),
                     ]),
 
                 Section::make('Cấu hình hiển thị')
@@ -178,9 +162,6 @@ class MenuItemResource extends Resource
                         'cat_post' => 'info',
                         'all_posts' => 'blue',
                         'post' => 'success',
-                        'cat_product' => 'warning',
-                        'all_products' => 'orange',
-                        'product' => 'danger',
                         'display_only' => 'purple',
                         default => 'gray',
                     })
@@ -189,9 +170,6 @@ class MenuItemResource extends Resource
                         'cat_post' => 'Danh mục bài viết',
                         'all_posts' => 'Tất cả bài viết',
                         'post' => 'Bài viết',
-                        'cat_product' => 'Danh mục sản phẩm',
-                        'all_products' => 'Tất cả sản phẩm',
-                        'product' => 'Sản phẩm',
                         'display_only' => 'Chỉ hiển thị',
                         default => $state,
                     }),
@@ -214,9 +192,6 @@ class MenuItemResource extends Resource
                         'cat_post' => 'Danh mục bài viết',
                         'all_posts' => 'Tất cả bài viết',
                         'post' => 'Bài viết',
-                        'cat_product' => 'Danh mục sản phẩm',
-                        'all_products' => 'Tất cả sản phẩm',
-                        'product' => 'Sản phẩm',
                         'display_only' => 'Chỉ hiển thị (không dẫn đến đâu)',
                     ]),
 

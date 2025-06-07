@@ -37,8 +37,6 @@ Component `course-categories` hiển thị giao diện danh mục khóa học th
 'og_image_link' => 'string|nullable', // Hình ảnh OG
 'image' => 'string|nullable',    // Hình ảnh danh mục
 'description' => 'text|nullable', // Mô tả danh mục
-'color' => 'string|default:#dc2626', // Màu sắc đại diện
-'icon' => 'string|nullable',     // Icon đại diện
 'parent_id' => 'foreignId|nullable', // Danh mục cha
 'order' => 'integer|default:0',  // Thứ tự hiển thị
 'status' => 'enum:active,inactive|default:active' // Trạng thái

@@ -2,51 +2,63 @@
 
 namespace App\Livewire;
 
-use App\Services\CoursesOverviewService;
+use App\Models\CatCourse;
+use App\Models\Course;
+use App\Models\Student;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class CoursesOverview extends Component
 {
     public $isLoaded = false;
     public $courseCategoriesData;
-    public $criticalImages = [];
-    public $structuredData = [];
     public $realStats = [];
-
-    protected $coursesService;
-
-    public function boot()
-    {
-        $this->coursesService = app(CoursesOverviewService::class);
-    }
 
     public function mount()
     {
-        // Lazy load data để tối ưu hiệu suất
         $this->loadCoursesData();
     }
 
     public function loadCoursesData()
     {
         try {
-            // Sử dụng service để lấy dữ liệu tối ưu
-            $this->courseCategoriesData = $this->coursesService->getCoursesOverviewData();
+            // Query đơn giản thay thế service phức tạp
+            $this->courseCategoriesData = Cache::remember('courses_overview_simple', 300, function () {
+                return CatCourse::where('status', 'active')
+                    ->whereHas('courses', function($query) {
+                        $query->where('status', 'active');
+                    })
+                    ->with(['courses' => function($query) {
+                        $query->where('status', 'active')
+                              ->with(['instructor:id,name'])
+                              ->select([
+                                  'id', 'title', 'slug', 'thumbnail', 'description',
+                                  'cat_course_id', 'instructor_id', 'price', 'level',
+                                  'duration_hours', 'start_date', 'created_at', 'order'
+                              ])
+                              ->orderBy('created_at', 'desc')
+                              ->take(1); // Chỉ lấy 1 khóa học mới nhất
+                    }])
+                    ->select(['id', 'name', 'slug', 'description', 'order'])
+                    ->orderBy('order')
+                    ->get();
+            });
 
-            // Preload critical images
-            $this->criticalImages = $this->coursesService->getCriticalImages();
-
-            // Get structured data for SEO
-            $this->structuredData = $this->coursesService->getStructuredData();
-
-            // Get real statistics from database
-            $this->realStats = $this->coursesService->getRealStats();
+            // Stats đơn giản
+            $this->realStats = Cache::remember('course_stats_simple', 300, function () {
+                return [
+                    'students' => Student::where('status', 'active')->count() ?: 28,
+                    'courses' => Course::where('status', 'active')->count() ?: 6,
+                    'satisfaction_rate' => 32,
+                    'experience_years' => 3
+                ];
+            });
 
             $this->isLoaded = true;
         } catch (\Exception $e) {
-            Log::error('CoursesOverview Livewire Error: ' . $e->getMessage());
+            Log::error('CoursesOverview Error: ' . $e->getMessage());
             $this->courseCategoriesData = collect();
-            // Fallback stats nếu có lỗi - Updated với dữ liệu thực
             $this->realStats = [
                 'students' => 28,
                 'courses' => 6,
@@ -60,10 +72,9 @@ class CoursesOverview extends Component
     public function refreshData()
     {
         $this->isLoaded = false;
-        $this->coursesService->clearCache();
+        Cache::forget('courses_overview_simple');
+        Cache::forget('course_stats_simple');
         $this->loadCoursesData();
-
-        // Emit event để refresh UI
         $this->dispatch('courses-refreshed');
     }
 

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\ClearsViewCache;
-use App\Traits\HandlesFileObserver;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Testimonial extends Model
 {
-    use HasFactory, ClearsViewCache, HandlesFileObserver;
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -45,24 +44,7 @@ class Testimonial extends Model
         return $query->orderBy('order')->orderBy('created_at', 'desc');
     }
 
-    /**
-     * Get avatar URL with fallback
-     */
-    public function getAvatarUrlAttribute()
-    {
-        if (empty($this->avatar)) {
-            // Fallback to random avatar based on gender or name
-            $gender = str_contains(strtolower($this->name), 'thị') ? 'women' : 'men';
-            $randomId = abs(crc32($this->name)) % 100;
-            return "https://randomuser.me/api/portraits/{$gender}/{$randomId}.jpg";
-        }
 
-        if (filter_var($this->avatar, FILTER_VALIDATE_URL)) {
-            return $this->avatar;
-        }
-
-        return asset('storage/' . ltrim($this->avatar, '/'));
-    }
 
     /**
      * Get rating stars as array

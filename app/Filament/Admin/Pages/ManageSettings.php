@@ -77,15 +77,18 @@ class ManageSettings extends Page implements HasForms
                             ->imageResizeTargetHeight(200)
                             ->imageEditor()
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
+                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $siteName = $get('site_name') ?? 'website';
-                                return $imageService->saveImageWithAspectRatio(
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($siteName, 'logo');
+
+                                return $webpService->convertToWebP(
                                     $file,
                                     'settings/logos',
-                                    400,   // max width
-                                    200,   // max height
-                                    100,   // quality
-                                    "logo-{$siteName}" // SEO-friendly name
+                                    $seoFileName,
+                                    400,   // width
+                                    200    // height
                                 );
                             })
                             ->columnSpan(1),
@@ -101,15 +104,18 @@ class ManageSettings extends Page implements HasForms
                             ->imageResizeTargetHeight(32)
                             ->imageEditor()
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
+                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $siteName = $get('site_name') ?? 'website';
-                                return $imageService->saveImageWithAspectRatio(
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($siteName, 'favicon');
+
+                                return $webpService->convertToWebP(
                                     $file,
                                     'settings/favicons',
-                                    32,    // max width
-                                    32,    // max height
-                                    100,   // quality
-                                    "favicon-{$siteName}" // SEO-friendly name
+                                    $seoFileName,
+                                    32,    // width
+                                    32     // height
                                 );
                             })
                             ->columnSpan(1),
@@ -160,15 +166,18 @@ class ManageSettings extends Page implements HasForms
                             ->imageResizeTargetHeight(630)
                             ->imageEditor()
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
+                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $siteName = $get('site_name') ?? 'website';
-                                return $imageService->saveImageWithAspectRatio(
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($siteName, 'og');
+
+                                return $webpService->convertToWebP(
                                     $file,
                                     'settings/og-images',
-                                    1200,  // max width
-                                    630,   // max height
-                                    85,    // quality
-                                    "og-image-{$siteName}" // SEO-friendly name
+                                    $seoFileName,
+                                    1200,  // width
+                                    630    // height
                                 );
                             }),
                         FileUpload::make('placeholder_image')
@@ -182,15 +191,18 @@ class ManageSettings extends Page implements HasForms
                             ->imageResizeTargetHeight(400)
                             ->imageEditor()
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
+                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $siteName = $get('site_name') ?? 'website';
-                                return $imageService->saveImageWithAspectRatio(
+
+                                // Tạo tên file SEO-friendly
+                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($siteName, 'placeholder');
+
+                                return $webpService->convertToWebP(
                                     $file,
                                     'settings/placeholders',
-                                    400,   // max width
-                                    400,   // max height
-                                    90,    // quality
-                                    "placeholder-{$siteName}" // SEO-friendly name
+                                    $seoFileName,
+                                    400,   // width
+                                    400    // height
                                 );
                             }),
                         Textarea::make('address')

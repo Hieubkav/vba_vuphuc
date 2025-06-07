@@ -95,13 +95,6 @@ return [
     |
     */
 
-    'optimization' => [
-        'enable_query_caching' => env('FILAMENT_QUERY_CACHE', true),
-        'cache_duration' => env('FILAMENT_CACHE_DURATION', 300), // 5 minutes
-        'enable_eager_loading' => env('FILAMENT_EAGER_LOADING', true),
-        'pagination_size' => env('FILAMENT_PAGINATION_SIZE', 25),
-        'enable_asset_optimization' => env('FILAMENT_ASSET_OPTIMIZATION', true),
-        'enable_memory_optimization' => env('FILAMENT_MEMORY_OPTIMIZATION', true),
-    ],
+
 
 ];

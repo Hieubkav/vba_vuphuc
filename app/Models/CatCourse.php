@@ -22,8 +22,6 @@ class CatCourse extends Model
         'og_image_link',
         'image',
         'description',
-        'color',
-        'icon',
         'parent_id',
         'order',
         'status',
@@ -92,9 +90,5 @@ class CatCourse extends Model
         return asset('storage/' . $this->image);
     }
 
-    // Accessor cho màu sắc mặc định
-    public function getDisplayColorAttribute()
-    {
-        return $this->color ?: '#dc2626';
-    }
+
 }

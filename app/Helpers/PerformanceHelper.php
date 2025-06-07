@@ -98,43 +98,44 @@ if (!function_exists('smartImageAttributes')) {
 
 if (!function_exists('generateBlurPlaceholder')) {
     /**
-     * Tạo blur placeholder cho image
+     * Tạo blur placeholder cho image - Đơn giản hóa
      */
     function generateBlurPlaceholder($imagePath, $width = 20, $height = 20)
     {
-        $imageOptimizationService = app(\App\Services\ImageOptimizationService::class);
-        return $imageOptimizationService->generateBlurPlaceholder($imagePath, $width, $height);
+        // Trả về placeholder SVG đơn giản
+        return 'data:image/svg+xml;base64,' . base64_encode(
+            '<svg width="' . $width . '" height="' . $height . '" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="#f3f4f6"/>
+                <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9ca3af" font-size="12">Loading...</text>
+            </svg>'
+        );
     }
 }
 
 if (!function_exists('generateResponsiveImages')) {
     /**
-     * Tạo responsive images
+     * Tạo responsive images - Đơn giản hóa
      */
     function generateResponsiveImages($imagePath, $sizes = null)
     {
-        $imageOptimizationService = app(\App\Services\ImageOptimizationService::class);
-        return $imageOptimizationService->generateResponsiveImages($imagePath, $sizes);
+        // Trả về array đơn giản
+        return [
+            'original' => asset('storage/' . $imagePath),
+            'webp' => asset('storage/' . $imagePath)
+        ];
     }
 }
 
 if (!function_exists('optimizeImageForWeb')) {
     /**
-     * Tối ưu ảnh cho web
+     * Tối ưu ảnh cho web - Đơn giản hóa
      */
     function optimizeImageForWeb($imagePath, $options = [])
     {
-        $imageOptimizationService = app(\App\Services\ImageOptimizationService::class);
-        return $imageOptimizationService->optimizeExistingImage($imagePath, $options);
+        // Chỉ trả về true vì không còn service phức tạp
+        return true;
     }
-
-        // Placeholder cho lazy loading
-        $attributes['src'] = 'data:image/svg+xml;base64,' . base64_encode(
-            '<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#f3f4f6"/></svg>'
-        );
-
-        return $attributes;
-    }
+}
 
 if (!function_exists('cacheKey')) {
     /**
@@ -321,7 +322,7 @@ if (!function_exists('simpleLazyImage')) {
                          ' . $heightAttr . '
                          loading="' . $loading . '"
                          decoding="async"
-                         onerror="handleSimpleImageError(this)"
+                         onerror="handleImageError(this)"
                          style="transition: opacity 0.3s ease;">
                     <div class="fallback-placeholder w-full h-full bg-gray-50 flex items-center justify-center absolute inset-0" style="display: none;">
                         <i class="' . $fallbackIcon . ' text-2xl text-gray-400"></i>

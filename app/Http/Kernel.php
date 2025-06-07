@@ -37,7 +37,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\TrackVisitor::class,
-            \App\Http\Middleware\MinifyHtml::class,
+            // \App\Http\Middleware\MinifyHtml::class, // Tạm tắt để debug
         ],
 
         'api' => [

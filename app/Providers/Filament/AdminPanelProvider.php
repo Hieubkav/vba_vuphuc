@@ -84,19 +84,17 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Admin\Widgets\StatsOverviewWidget::class,
                 \App\Filament\Admin\Widgets\QuickActionsWidget::class,
             ])
-            ->spa()
+            // ->spa() // Tạm tắt SPA mode để fix upload issue
             ->unsavedChangesAlerts()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
-                AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                // Removed complex optimization middleware
             ])
             ->authGuard('web')
             ->authMiddleware([

@@ -1,25 +1,17 @@
 <?php
 
-if (!function_exists('getProductImageUrl')) {
+if (!function_exists('getCourseImageUrl')) {
     /**
-     * Tạo URL ảnh WebP với tên SEO-friendly cho sản phẩm
+     * Tạo URL ảnh WebP với tên SEO-friendly cho khóa học
      *
-     * @param object $product
+     * @param object $course
      * @return string|null
      */
-    function getProductImageUrl($product): ?string
+    function getCourseImageUrl($course): ?string
     {
-        // Chỉ sử dụng ảnh từ relationship images (ProductImage)
-        if ($product && $product->images && $product->images->count() > 0) {
-            // Lấy ảnh chính hoặc ảnh đầu tiên
-            $mainImage = $product->images->where('is_main', true)->first()
-                ?? $product->images->where('status', 'active')->first()
-                ?? $product->images->first();
-
-            if ($mainImage && $mainImage->image_link) {
-                // Sử dụng hàm getProductImageUrlFromImage để xử lý WebP và SEO-friendly
-                return getProductImageUrlFromImage($mainImage, $product->name);
-            }
+        // Sử dụng thumbnail của khóa học
+        if ($course && $course->thumbnail) {
+            return asset('storage/' . $course->thumbnail);
         }
 
         // Fallback về placeholder (trả về null để component tự xử lý UI)
@@ -27,49 +19,22 @@ if (!function_exists('getProductImageUrl')) {
     }
 }
 
-if (!function_exists('getProductImageUrlFromImage')) {
+if (!function_exists('getCourseImageAlt')) {
     /**
-     * Tạo URL ảnh WebP với tên SEO-friendly cho ProductImage
+     * Lấy alt text cho ảnh khóa học
      *
-     * @param object $productImage
-     * @param string $productName
-     * @return string|null
-     */
-    function getProductImageUrlFromImage($productImage, string $productName): ?string
-    {
-        if (!$productImage || !$productImage->image_link) {
-            return null;
-        }
-
-        // Trực tiếp trả về ảnh gốc để debug
-        // TODO: Sau này sẽ thêm lại logic WebP và SEO-friendly
-        return asset('storage/' . $productImage->image_link);
-    }
-}
-
-if (!function_exists('getProductImageAlt')) {
-    /**
-     * Lấy alt text cho ảnh sản phẩm
-     *
-     * @param object $productImage
-     * @param string $productName
-     * @param string|null $seoTitle
+     * @param object $course
      * @return string
      */
-    function getProductImageAlt($productImage, string $productName, ?string $seoTitle = null): string
+    function getCourseImageAlt($course): string
     {
-        // Ưu tiên alt_text của ảnh
-        if ($productImage && !empty($productImage->alt_text)) {
-            return $productImage->alt_text;
+        // Ưu tiên seo_title của khóa học
+        if ($course && !empty($course->seo_title)) {
+            return $course->seo_title;
         }
 
-        // Sau đó là seo_title của sản phẩm
-        if (!empty($seoTitle)) {
-            return $seoTitle;
-        }
-
-        // Cuối cùng là tên sản phẩm
-        return $productName;
+        // Cuối cùng là tên khóa học
+        return $course->title ?? 'Khóa học VBA';
     }
 }
 

@@ -224,16 +224,15 @@ class ManageWebDesign extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('🎨 Quản lý giao diện trang chủ')
+                Section::make('Quản lý giao diện trang chủ')
                     ->description('Kéo thả để sắp xếp thứ tự các section, bật/tắt hiển thị và tùy chỉnh nội dung')
                     ->schema([
                         Builder::make('sections')
-                            ->label('Các section trang chủ')
+                            ->label('Các phần trang chủ')
                             ->blocks([
                                 // Hero Banner Block
                                 Builder\Block::make('hero_banner')
-                                    ->label('🎯 Hero Banner')
-                                    ->icon('heroicon-o-photo')
+                                    ->label('Banner chính')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -242,19 +241,15 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->inline(false),
                                             Placeholder::make('order_display')
                                                 ->label('Thứ tự')
-                                                ->content(fn($get) => '📍 Vị trí: ' . ($get('order') ?? 1))
+                                                ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? 1))
                                                 ->helperText('Kéo thả để thay đổi thứ tự'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('🖼️ Banner chính với slider hình ảnh')
                                     ])
                                     ->columns(1),
 
                                 // Courses Overview Block
                                 Builder\Block::make('courses_overview')
-                                    ->label('📚 Giới thiệu khóa học')
-                                    ->icon('heroicon-o-academic-cap')
+                                    ->label('Giới thiệu khóa học')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -263,25 +258,23 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->inline(false),
                                             Placeholder::make('order_display')
                                                 ->label('Thứ tự')
-                                                ->content(fn($get) => '📍 Vị trí: ' . ($get('order') ?? 2))
+                                                ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? 2))
                                                 ->helperText('Kéo thả để thay đổi thứ tự'),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Khóa học VBA Excel chuyên nghiệp')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-white')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-white'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -291,24 +284,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('📚 Grid hiển thị các khóa học theo chuyên mục')
                                     ])
                                     ->columns(1),
 
                                 // Album Timeline Block
                                 Builder\Block::make('album_timeline')
-                                    ->label('📸 Thư viện tài liệu')
-                                    ->icon('heroicon-o-photo')
+                                    ->label('Thư viện tài liệu')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -317,25 +305,23 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->inline(false),
                                             Placeholder::make('order_display')
                                                 ->label('Thứ tự')
-                                                ->content(fn($get) => '📍 Vị trí: ' . ($get('order') ?? 3))
+                                                ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? 3))
                                                 ->helperText('Kéo thả để thay đổi thứ tự'),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Thư viện tài liệu')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-gray-25')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-gray-25'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -345,24 +331,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('📸 Timeline hiển thị album và tài liệu khóa học')
                                     ])
                                     ->columns(1),
 
                                 // Course Groups Block
                                 Builder\Block::make('course_groups')
-                                    ->label('👥 Nhóm học tập')
-                                    ->icon('heroicon-o-user-group')
+                                    ->label('Nhóm học tập')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -374,25 +355,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(4)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Nhóm học tập')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-white')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-white'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -402,24 +380,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('👥 Cards hiển thị các nhóm Facebook/Zalo học tập')
                                     ])
                                     ->columns(1),
 
                                 // Course Categories Block
                                 Builder\Block::make('course_categories')
-                                    ->label('📋 Khóa học theo chuyên mục')
-                                    ->icon('heroicon-o-rectangle-stack')
+                                    ->label('Khóa học theo chuyên mục')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -431,25 +404,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(5)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Khóa học theo chuyên mục')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-gray-25')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-gray-25'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -459,24 +429,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('📋 Sections hiển thị khóa học theo từng danh mục')
                                     ])
                                     ->columns(1),
 
                                 // Testimonials Block
                                 Builder\Block::make('testimonials')
-                                    ->label('⭐ Đánh giá từ học viên')
-                                    ->icon('heroicon-o-star')
+                                    ->label('Đánh giá từ học viên')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -488,25 +453,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(6)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Đánh giá từ học viên')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-white')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-white'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -516,24 +478,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('⭐ Slider hiển thị đánh giá và phản hồi của học viên')
                                     ])
                                     ->columns(1),
 
                                 // FAQ Block
                                 Builder\Block::make('faq')
-                                    ->label('❓ Câu hỏi thường gặp')
-                                    ->icon('heroicon-o-question-mark-circle')
+                                    ->label('Câu hỏi thường gặp')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -545,25 +502,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(7)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Câu hỏi thường gặp')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-gray-25')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-gray-25'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -573,24 +527,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('❓ Accordion hiển thị câu hỏi và trả lời')
                                     ])
                                     ->columns(1),
 
                                 // Partners Block
                                 Builder\Block::make('partners')
-                                    ->label('🤝 Đối tác tin cậy')
-                                    ->icon('heroicon-o-building-office')
+                                    ->label('Đối tác tin cậy')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -602,25 +551,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(8)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Đối tác tin cậy')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-white')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-white'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -630,24 +576,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('🤝 Grid hiển thị logo và thông tin đối tác')
                                     ])
                                     ->columns(1),
 
                                 // Blog Posts Block
                                 Builder\Block::make('blog_posts')
-                                    ->label('📰 Bài viết mới nhất')
-                                    ->icon('heroicon-o-newspaper')
+                                    ->label('Bài viết mới nhất')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -659,25 +600,22 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(9)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
                                         Grid::make(2)->schema([
                                             TextInput::make('title')
                                                 ->label('Tiêu đề')
                                                 ->default('Bài viết mới nhất')
-                                                ->maxLength(255)
-                                                ->prefixIcon('heroicon-m-pencil'),
+                                                ->maxLength(255),
                                             Select::make('bg_color')
                                                 ->label('Màu nền')
                                                 ->options([
-                                                    'bg-white' => '🤍 Trắng',
-                                                    'bg-gray-25' => '🩶 Xám nhạt',
-                                                    'bg-red-25' => '❤️ Đỏ nhạt',
-                                                    'bg-red-50' => '💗 Đỏ rất nhạt',
+                                                    'bg-white' => 'Trắng',
+                                                    'bg-gray-25' => 'Xám nhạt',
+                                                    'bg-red-25' => 'Đỏ nhạt',
+                                                    'bg-red-50' => 'Đỏ rất nhạt',
                                                 ])
-                                                ->default('bg-gray-25')
-                                                ->prefixIcon('heroicon-m-paint-brush'),
+                                                ->default('bg-gray-25'),
                                         ]),
                                         Grid::make(2)->schema([
                                             Textarea::make('description')
@@ -687,24 +625,19 @@ class ManageWebDesign extends Page implements HasForms
                                             Select::make('animation_class')
                                                 ->label('Hiệu ứng')
                                                 ->options([
-                                                    'animate-fade-in-optimized' => '🌟 Fade In',
-                                                    'animate-slide-up' => '⬆️ Slide Up',
-                                                    'animate-bounce-in' => '🎾 Bounce In',
-                                                    '' => '🚫 Không có hiệu ứng',
+                                                    'animate-fade-in-optimized' => 'Fade In',
+                                                    'animate-slide-up' => 'Slide Up',
+                                                    'animate-bounce-in' => 'Bounce In',
+                                                    '' => 'Không có hiệu ứng',
                                                 ])
-                                                ->default('animate-fade-in-optimized')
-                                                ->prefixIcon('heroicon-m-sparkles'),
+                                                ->default('animate-fade-in-optimized'),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('📰 Grid hiển thị các bài viết blog mới nhất')
                                     ])
                                     ->columns(1),
 
                                 // Homepage CTA Block
                                 Builder\Block::make('homepage_cta')
-                                    ->label('🎯 Call to Action')
-                                    ->icon('heroicon-o-megaphone')
+                                    ->label('Kêu gọi hành động')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -716,12 +649,8 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->numeric()
                                                 ->default(10)
                                                 ->minValue(1)
-                                                ->maxValue(10)
-                                                ->suffixIcon('heroicon-m-arrows-up-down'),
+                                                ->maxValue(10),
                                         ]),
-                                        Placeholder::make('preview')
-                                            ->label('Xem trước')
-                                            ->content('🎯 Section call to action với gradient background')
                                     ])
                                     ->columns(1),
                             ])
@@ -745,8 +674,8 @@ class ManageWebDesign extends Page implements HasForms
     {
         return Placeholder::make('order_display')
             ->label('Thứ tự')
-            ->content(fn($get) => '📍 Vị trí: ' . ($get('order') ?? $defaultOrder))
-            ->helperText('🔄 Kéo thả để thay đổi thứ tự');
+            ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? $defaultOrder))
+            ->helperText('Kéo thả để thay đổi thứ tự');
     }
 
     /**
@@ -917,20 +846,19 @@ class ManageWebDesign extends Page implements HasForms
 
             $schema[] = Grid::make(2)->schema([
                 Textarea::make($key . '_description')
-                    ->label('📄 Mô tả')
+                    ->label('Mô tả')
                     ->default($defaultDescription)
                     ->rows(2),
 
                 Select::make($key . '_animation_class')
-                    ->label('✨ Hiệu ứng')
+                    ->label('Hiệu ứng')
                     ->options([
-                        'animate-fade-in-optimized' => '🌟 Fade In',
-                        'animate-slide-up' => '⬆️ Slide Up',
-                        'animate-bounce-in' => '🎾 Bounce In',
-                        '' => '🚫 Không có hiệu ứng',
+                        'animate-fade-in-optimized' => 'Fade In',
+                        'animate-slide-up' => 'Slide Up',
+                        'animate-bounce-in' => 'Bounce In',
+                        '' => 'Không có hiệu ứng',
                     ])
-                    ->default('animate-fade-in-optimized')
-                    ->prefixIcon('heroicon-m-sparkles'),
+                    ->default('animate-fade-in-optimized'),
             ]);
         }
 
@@ -947,19 +875,19 @@ class ManageWebDesign extends Page implements HasForms
     private function getSectionPreview(string $key): string
     {
         $previews = [
-            'hero_banner' => '🖼️ Banner với slider',
-            'courses_overview' => '📚 Grid khóa học',
-            'album_timeline' => '📸 Timeline album',
-            'course_groups' => '👥 Cards nhóm học',
-            'course_categories' => '📋 Danh mục khóa học',
-            'testimonials' => '⭐ Slider đánh giá',
-            'faq' => '❓ Accordion FAQ',
-            'partners' => '🤝 Logo đối tác',
-            'blog_posts' => '📰 Grid bài viết',
-            'homepage_cta' => '🎯 Button CTA',
+            'hero_banner' => 'Banner với slider',
+            'courses_overview' => 'Grid khóa học',
+            'album_timeline' => 'Timeline album',
+            'course_groups' => 'Cards nhóm học',
+            'course_categories' => 'Danh mục khóa học',
+            'testimonials' => 'Slider đánh giá',
+            'faq' => 'Accordion FAQ',
+            'partners' => 'Logo đối tác',
+            'blog_posts' => 'Grid bài viết',
+            'homepage_cta' => 'Button CTA',
         ];
 
-        return $previews[$key] ?? '📦 Section content';
+        return $previews[$key] ?? 'Nội dung phần';
     }
 
 
@@ -1013,8 +941,8 @@ class ManageWebDesign extends Page implements HasForms
         $enabledCount = count(array_filter($sections, fn($section) => $section['data']['enabled'] ?? true));
 
         Notification::make()
-            ->title('🎨 Giao diện đã được cập nhật thành công!')
-            ->body("✅ {$enabledCount} sections đang hiển thị trên trang chủ. Thứ tự đã được sắp xếp theo vị trí kéo thả.")
+            ->title('Giao diện đã được cập nhật thành công!')
+            ->body("{$enabledCount} phần đang hiển thị trên trang chủ. Thứ tự đã được sắp xếp theo vị trí kéo thả.")
             ->success()
             ->duration(5000)
             ->send();

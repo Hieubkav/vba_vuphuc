@@ -58,15 +58,10 @@
                             <img
                                 data-src="{{ asset('storage/' . $featuredCourse->thumbnail) }}"
                                 alt="{{ $featuredCourse->title ?? 'Khóa học VBA Vũ Phúc' }}"
-                                class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                class="w-full h-full object-cover course-thumbnail lazy-loading"
                                 loading="lazy"
-                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
-                            >
-                            <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex-col items-center justify-center course-placeholder" style="display: none;">
-                                <i class="fas fa-graduation-cap text-3xl text-gray-400 mb-2"></i>
-                                <span class="text-gray-500 text-sm font-light">Khóa học</span>
-                            </div>
+                                onerror="handleImageError(this)"
+                                style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;">
                             <div class="absolute top-4 right-4">
                                 <span class="bg-white/90 backdrop-blur-sm text-gray-700 text-xs px-3 py-1.5 rounded-full font-medium shadow-sm">
                                     Nổi bật
@@ -74,8 +69,8 @@
                             </div>
                         </div>
                         @else
-                        <div class="bg-gradient-to-br from-gray-100 to-gray-200 h-64 md:h-80 flex items-center justify-center course-placeholder rounded-2xl md:rounded-none md:rounded-l-3xl">
-                            <i class="fas fa-graduation-cap text-4xl text-gray-400"></i>
+                        <div class="bg-gradient-to-br from-red-50 to-red-100 h-64 md:h-80 flex items-center justify-center rounded-2xl md:rounded-none md:rounded-l-3xl">
+                            <i class="fas fa-graduation-cap text-4xl text-red-300"></i>
                         </div>
                         @endif
                     </div>
@@ -150,19 +145,19 @@
                                             <img
                                                 data-src="{{ asset('storage/' . $course->thumbnail) }}"
                                                 alt="{{ $course->title ?? 'Khóa học VBA Vũ Phúc' }}"
-                                                class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                                class="w-full h-full object-cover course-thumbnail lazy-loading"
                                                 loading="lazy"
-                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                                onerror="handleImageError(this)"
                                                 style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
                                             >
-                                            <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex-col items-center justify-center course-placeholder" style="display: none;">
-                                                <i class="fas fa-graduation-cap text-2xl text-gray-400 mb-1"></i>
-                                                <span class="text-gray-500 text-xs font-light">Khóa học</span>
+                                            <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center image-fallback" style="display: none;">
+                                                <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                                <span class="text-red-400 text-xs font-light">Khóa học</span>
                                             </div>
                                         @else
-                                            <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center">
-                                                <i class="fas fa-graduation-cap text-2xl text-gray-400 mb-1"></i>
-                                                <span class="text-gray-500 text-xs font-light">Khóa học</span>
+                                            <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center">
+                                                <i class="fas fa-graduation-cap text-2xl text-red-300 mb-1"></i>
+                                                <span class="text-red-400 text-xs font-light">Khóa học</span>
                                             </div>
                                         @endif
                                     </div>
@@ -229,13 +224,13 @@
                                 <img
                                     data-src="{{ asset('storage/' . $featuredCourse->thumbnail) }}"
                                     alt="{{ $featuredCourse->title ?? 'Khóa học VBA Vũ Phúc' }}"
-                                    class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                    class="w-full h-full object-cover course-thumbnail lazy-loading"
                                     loading="lazy"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                    onerror="handleImageError(this)"
                                     style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
                                 >
-                                <div class="w-full h-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center course-placeholder" style="display: none;">
-                                    <i class="fas fa-graduation-cap text-4xl text-white/70"></i>
+                                <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center image-fallback" style="display: none;">
+                                    <i class="fas fa-graduation-cap text-4xl text-red-300"></i>
                                 </div>
                                 <div class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full font-medium">
                                     Nổi bật
@@ -315,16 +310,16 @@
                                         <img
                                             data-src="{{ asset('storage/' . $course->thumbnail) }}"
                                             alt="{{ $course->title ?? 'Khóa học VBA Vũ Phúc' }}"
-                                            class="w-full h-full object-cover course-image course-thumbnail lazy-loading"
+                                            class="w-full h-full object-cover course-thumbnail lazy-loading"
                                             loading="lazy"
-                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                            onerror="handleImageError(this)"
                                             style="opacity: 0; transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;"
                                         >
-                                        <div class="w-full h-full bg-red-50 flex items-center justify-center course-placeholder" style="display: none;">
+                                        <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center image-fallback" style="display: none;">
                                             <i class="fas fa-graduation-cap text-3xl text-red-300"></i>
                                         </div>
                                     @else
-                                        <div class="w-full h-full bg-red-50 flex items-center justify-center">
+                                        <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
                                             <i class="fas fa-graduation-cap text-3xl text-red-300"></i>
                                         </div>
                                     @endif
@@ -570,43 +565,4 @@
 </style>
 @endpush
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Enhanced image error handling - Global function
-        window.handleImageError = function(img) {
-            console.log('Course image error detected:', img.src);
-
-            // Hide the broken image
-            img.style.display = 'none';
-
-            // Show the fallback placeholder
-            const fallback = img.nextElementSibling;
-            if (fallback && fallback.classList.contains('course-placeholder')) {
-                fallback.style.display = 'flex';
-
-                // Add a subtle fade-in animation
-                fallback.style.opacity = '0';
-                setTimeout(() => {
-                    fallback.style.transition = 'opacity 0.3s ease';
-                    fallback.style.opacity = '1';
-                }, 50);
-
-                console.log('Course fallback UI activated for:', img.alt || 'Unnamed course');
-            }
-        };
-
-        // Apply error handling to all course images
-        document.querySelectorAll('img[src*="storage"], .course-image').forEach(img => {
-            img.addEventListener('error', function() {
-                window.handleImageError(this);
-            });
-
-            // Also check if image is already broken
-            if (img.complete && img.naturalHeight === 0) {
-                window.handleImageError(img);
-            }
-        });
-    });
-</script>
-@endpush
+{{-- Global handler sẽ tự động xử lý .course-image --}}

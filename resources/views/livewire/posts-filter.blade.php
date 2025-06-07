@@ -23,25 +23,34 @@
                     </div>
                 </div>
 
-                <!-- Type Filter -->
+                <!-- Category Filter -->
                 <div class="filter-card rounded-xl p-5">
-                    <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Loại nội dung</h3>
+                    <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Danh mục</h3>
                     <div class="space-y-1.5">
-                        <button wire:click="$set('type', '')"
-                               class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ !$type ? 'active' : '' }}">
-                            Tất cả
+                        <button wire:click="$set('category_id', '')"
+                               class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ !$category_id ? 'active' : '' }}">
+                            Tất cả danh mục
                         </button>
-                        @foreach($typeNames as $typeKey => $typeName)
-                            <button wire:click="$set('type', '{{ $typeKey }}')"
-                                   class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ $type === $typeKey ? 'active' : '' }}">
-                                {{ $typeName }}
+                        @php
+                            $categories = \App\Models\CatPost::where('status', 'active')
+                                ->withCount(['posts' => function($query) {
+                                    $query->where('status', 'active');
+                                }])
+                                ->orderBy('order')
+                                ->get();
+                        @endphp
+                        @foreach($categories as $category)
+                            <button wire:click="$set('category_id', '{{ $category->id }}')"
+                                   class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ $category_id == $category->id ? 'active' : '' }}">
+                                {{ $category->name }}
+                                <span class="text-xs text-gray-500 ml-1">({{ $category->posts_count }})</span>
                             </button>
                         @endforeach
                     </div>
                 </div>
 
                 <!-- Clear Filters -->
-                @if($search || $type || $sort !== 'newest')
+                @if($search || $category_id || $sort !== 'newest')
                 <div class="filter-card rounded-xl p-5">
                     <button wire:click="clearFilters"
                            class="block w-full text-center px-3 py-2.5 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors font-medium font-open-sans text-sm">
@@ -68,8 +77,7 @@
                         @php
                             $sortOptions = [
                                 'newest' => 'Mới nhất',
-                                'oldest' => 'Cũ nhất',
-                                'featured' => 'Nổi bật'
+                                'oldest' => 'Cũ nhất'
                             ];
                         @endphp
                         <div class="flex items-center gap-2">
@@ -85,7 +93,7 @@
 
                     <!-- Right: Active filters and clear button -->
                     <div class="flex flex-wrap items-center gap-3">
-                        @if($search || $type || $sort !== 'newest')
+                        @if($search || $category_id || $sort !== 'newest')
                             <!-- Active filters -->
                             @if($search)
                                 <span class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-800 rounded-full text-xs font-medium font-open-sans">
@@ -94,11 +102,16 @@
                                 </span>
                             @endif
 
-                            @if($type)
+                            @if($category_id)
+                                @php
+                                    $selectedCategory = \App\Models\CatPost::find($category_id);
+                                @endphp
+                                @if($selectedCategory)
                                 <span class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium font-open-sans">
-                                    <i class="fas fa-tag mr-1.5"></i>
-                                    {{ $typeNames[$type] }}
+                                    <i class="fas fa-folder mr-1.5"></i>
+                                    {{ $selectedCategory->name }}
                                 </span>
+                                @endif
                             @endif
 
                             <!-- Clear filters button -->
@@ -151,19 +164,15 @@
 
                                         <!-- Post Content -->
                                         <div class="p-6 flex-grow flex flex-col">
-                                            <!-- Type Badge -->
-                                            <div class="flex items-center justify-between mb-4">
+                                            <!-- Category Badge -->
+                                            @if($post->category)
+                                            <div class="flex items-center mb-4">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 font-open-sans">
-                                                    {{ $typeNames[$post->type] ?? 'Bài viết' }}
+                                                    <i class="fas fa-folder mr-1"></i>
+                                                    {{ $post->category->name }}
                                                 </span>
-
-                                                @if($post->is_featured)
-                                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 font-open-sans">
-                                                        <i class="fas fa-star mr-1"></i>
-                                                        Nổi bật
-                                                    </span>
-                                                @endif
                                             </div>
+                                            @endif
 
                                             <!-- Title -->
                                             <h3 class="text-lg lg:text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors font-montserrat line-clamp-2 flex-shrink-0">
@@ -236,7 +245,7 @@
 
                             <h3 class="text-2xl font-bold text-gray-900 mb-4 font-montserrat">Không tìm thấy bài viết</h3>
                             <p class="text-gray-600 mb-8 font-open-sans leading-relaxed">
-                                @if($search || $type)
+                                @if($search || $category_id)
                                     Không có bài viết nào phù hợp với tiêu chí tìm kiếm của bạn.<br>
                                     Thử thay đổi bộ lọc hoặc từ khóa để xem thêm kết quả.
                                 @else
@@ -245,7 +254,7 @@
                                 @endif
                             </p>
 
-                            @if($search || $type || $sort !== 'newest')
+                            @if($search || $category_id || $sort !== 'newest')
                                 <button wire:click="clearFilters"
                                        class="inline-flex items-center px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 hover:shadow-lg transition-all duration-300 font-medium font-open-sans">
                                     <i class="fas fa-redo mr-3"></i>
