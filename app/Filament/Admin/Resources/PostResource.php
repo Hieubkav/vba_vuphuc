@@ -113,18 +113,15 @@ class PostResource extends Resource
                                     ])
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->saveUploadedFileUsing(function ($file, $get) {
-                                        $webpService = app(\App\Services\SimpleWebpService::class);
                                         $title = $get('title') ?? 'post';
+                                        $customName = 'post-' . $title;
 
-                                        // Tạo tên file SEO-friendly
-                                        $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'post');
-
-                                        return $webpService->convertToWebP(
+                                        return \App\Actions\ConvertImageToWebp::run(
                                             $file,
                                             'posts/thumbnails',
-                                            $seoFileName,
-                                            1200, // width
-                                            630   // height
+                                            $customName,
+                                            1200,
+                                            630
                                         );
                                     })
                                     ->helperText('Ảnh sẽ được tự động chuyển sang WebP với tên SEO-friendly. Kích thước tối ưu: 1200x630px')

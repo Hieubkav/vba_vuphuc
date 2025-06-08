@@ -4,12 +4,12 @@
     <div class="absolute -top-16 -left-16 w-48 h-48 bg-red-50 rounded-full opacity-60 -z-10 hidden lg:block"></div>
     <div class="absolute -bottom-16 -right-16 w-48 h-48 bg-red-50 rounded-full opacity-60 -z-10 hidden lg:block"></div>
 
-    <!-- Testimonial Header -->
+    {{-- <!-- Testimonial Header -->
     <div class="text-center max-w-3xl mx-auto mb-12 relative z-10">
         <span class="inline-block py-1 px-3 text-xs font-semibold bg-red-100 text-red-800 rounded-full tracking-wider uppercase">Học viên nói gì</span>
         <h2 class="mt-3 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Niềm tin từ <span class="text-red-700">học viên</span></h2>
         <p class="mt-4 text-base md:text-lg text-gray-600">Những chia sẻ chân thực từ học viên đã tham gia khóa học tại VBA Vũ Phúc</p>
-    </div>
+    </div> --}}
     
     <!-- Testimonial Cards Slider -->
     <div class="testimonials-slider" x-data="testimonialsSlider({{ $testimonials->count() }})">

@@ -3,10 +3,14 @@
 namespace App\Observers;
 
 use App\Models\CatCourse;
+use App\Traits\HandlesFileObserver;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CatCourseObserver
 {
+    use HandlesFileObserver;
+
     /**
      * Handle the CatCourse "creating" event.
      */
@@ -20,7 +24,58 @@ class CatCourseObserver
      */
     public function updating(CatCourse $catCourse): void
     {
+        // Lưu image cũ để xóa sau khi update
+        if ($catCourse->isDirty('image')) {
+            $this->storeOldFile(
+                get_class($catCourse),
+                $catCourse->id,
+                'image',
+                $catCourse->getOriginal('image')
+            );
+        }
+
         $this->generateSeoData($catCourse);
+    }
+
+    /**
+     * Handle the CatCourse "updated" event.
+     */
+    public function updated(CatCourse $catCourse): void
+    {
+        // Xóa image cũ nếu có
+        if ($catCourse->wasChanged('image')) {
+            $oldFile = $this->getAndDeleteOldFile(
+                get_class($catCourse),
+                $catCourse->id,
+                'image'
+            );
+
+            if ($oldFile && Storage::disk('public')->exists($oldFile)) {
+                Storage::disk('public')->delete($oldFile);
+            }
+        }
+    }
+
+    /**
+     * Handle the CatCourse "deleted" event.
+     */
+    public function deleted(CatCourse $catCourse): void
+    {
+        // Xóa image khi xóa record
+        if ($catCourse->image && Storage::disk('public')->exists($catCourse->image)) {
+            Storage::disk('public')->delete($catCourse->image);
+        }
+    }
+
+    /**
+     * Handle the CatCourse "force deleted" event.
+     */
+    public function forceDeleted(CatCourse $catCourse): void
+    {
+        // Xóa image khi force delete
+        if ($catCourse->image && Storage::disk('public')->exists($catCourse->image)) {
+            Storage::disk('public')->delete($catCourse->image);
+        }
     }
 
     /**

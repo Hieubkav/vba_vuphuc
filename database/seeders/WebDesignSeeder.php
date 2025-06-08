@@ -87,6 +87,12 @@ class WebDesignSeeder extends Seeder
                 // Homepage CTA Settings
                 'homepage_cta_enabled' => true,
                 'homepage_cta_order' => 10,
+                'homepage_cta_title' => 'Bắt đầu hành trình với VBA Vũ Phúc',
+                'homepage_cta_description' => 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.',
+                'homepage_cta_primary_button_text' => 'Xem khóa học',
+                'homepage_cta_primary_button_url' => '/courses',
+                'homepage_cta_secondary_button_text' => 'Đăng ký học',
+                'homepage_cta_secondary_button_url' => '/students/register',
             ]);
 
             echo "✅ WebDesign record đã được tạo thành công!\n";

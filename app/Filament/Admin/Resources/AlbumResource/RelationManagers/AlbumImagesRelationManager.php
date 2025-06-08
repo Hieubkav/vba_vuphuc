@@ -34,6 +34,18 @@ class AlbumImagesRelationManager extends RelationManager
                             ->imageEditor()
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->helperText('Ảnh sẽ được tự động tối ưu và chuyển sang WebP')
+                            ->saveUploadedFileUsing(function ($file, $get, $livewire) {
+                                $albumTitle = $livewire->ownerRecord->title ?? 'album';
+                                $customName = 'album-image-' . $albumTitle;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'albums/images',
+                                    $customName,
+                                    1200,
+                                    800
+                                );
+                            })
                             ->required(),
                     ])
                     ->columns(1),

@@ -4,18 +4,23 @@
     <div class="hidden lg:block absolute -top-8 -right-12 w-20 h-20 bg-red-25 rounded-full opacity-40"></div>
     <div class="hidden lg:block absolute -bottom-8 -left-12 w-16 h-16 bg-red-25 rounded-full opacity-40"></div>
 
-    {{-- <!-- FAQ Section Header -->
-    <div class="text-center max-w-3xl mx-auto mb-12 relative z-10">
-        <span class="inline-block py-1 px-3 text-xs font-semibold bg-red-100 text-red-800 rounded-full tracking-wider uppercase">Hỏi đáp</span>
-        <h2 class="mt-3 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Câu hỏi <span class="text-red-700">thường gặp</span></h2>
-        <p class="mt-4 text-base md:text-lg text-gray-600">Các thông tin quan trọng giúp bạn hiểu rõ hơn về khóa học và dịch vụ của VBA Vũ Phúc</p>
-    </div> --}}
+
     
     <!-- FAQ Accordion -->
-    <div class="max-w-3xl mx-auto" x-data="{ activeAccordion: null }">
-        @foreach($faqs as $faq)
+    <div class="max-w-3xl mx-auto" x-data="{
+        activeAccordion: null,
+        showAll: false,
+        get visibleFaqs() {
+            return this.showAll ? {{ $faqs->count() }} : Math.min(5, {{ $faqs->count() }});
+        }
+    }">
+        @foreach($faqs as $index => $faq)
         <!-- FAQ Item {{ $loop->iteration }} -->
-        <div class="mb-2 border border-gray-100 rounded-lg overflow-hidden hover:border-red-100 transition-colors duration-200">
+        <div class="mb-2 border border-gray-100 rounded-lg overflow-hidden hover:border-red-100 transition-colors duration-200"
+             x-show="{{ $index }} < visibleFaqs"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0">
             <button
                 @click="activeAccordion = activeAccordion === {{ $faq->id }} ? null : {{ $faq->id }}"
                 class="flex items-center justify-between w-full p-4 text-left bg-white hover:bg-gray-25 transition-colors duration-200"
@@ -32,6 +37,20 @@
             </div>
         </div>
         @endforeach
+
+        <!-- Show More/Less Button -->
+        @if($faqs->count() > 5)
+        <div class="text-center mt-6">
+            <button
+                @click="showAll = !showAll; if(!showAll) activeAccordion = null"
+                class="inline-flex items-center px-6 py-3 bg-white border-2 border-red-600 text-red-600 font-medium rounded-lg hover:bg-red-600 hover:text-white transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+                <span x-text="showAll ? 'Thu gọn' : 'Xem thêm {{ $faqs->count() - 5 }} câu hỏi'"></span>
+                <i class="fas fa-chevron-down ml-2 transform transition-transform duration-200"
+                   :class="{ 'rotate-180': showAll }"></i>
+            </button>
+        </div>
+        @endif
     </div>
 
     <!-- Extra Support Section -->

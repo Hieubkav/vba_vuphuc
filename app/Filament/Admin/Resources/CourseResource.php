@@ -97,18 +97,15 @@ class CourseResource extends Resource
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                             ->maxSize(5120)
                                             ->saveUploadedFileUsing(function ($file, $get) {
-                                                $webpService = app(\App\Services\SimpleWebpService::class);
                                                 $title = $get('title') ?? 'course';
+                                                $customName = 'course-' . $title;
 
-                                                // Tạo tên file SEO-friendly
-                                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'course');
-
-                                                return $webpService->convertToWebP(
+                                                return \App\Actions\ConvertImageToWebp::run(
                                                     $file,
                                                     'courses/thumbnails',
-                                                    $seoFileName,
-                                                    800, // width
-                                                    450  // height
+                                                    $customName,
+                                                    800,
+                                                    450
                                                 );
                                             })
                                             ->helperText('Ảnh sẽ được tự động chuyển sang WebP và tối ưu kích thước. Khuyến nghị: 800x450px (16:9)')
@@ -388,18 +385,15 @@ class CourseResource extends Resource
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                             ->maxSize(5120)
                                             ->saveUploadedFileUsing(function ($file, $get) {
-                                                $webpService = app(\App\Services\SimpleWebpService::class);
                                                 $title = $get('title') ?? 'course';
+                                                $customName = 'og-' . $title;
 
-                                                // Tạo tên file SEO-friendly
-                                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($title, 'og');
-
-                                                return $webpService->convertToWebP(
+                                                return \App\Actions\ConvertImageToWebp::run(
                                                     $file,
                                                     'courses/og-images',
-                                                    $seoFileName,
-                                                    1200, // width
-                                                    630   // height
+                                                    $customName,
+                                                    1200,
+                                                    630
                                                 );
                                             })
                                             ->helperText('Ảnh sẽ được tự động chuyển sang WebP và tối ưu cho social media. Kích thước: 1200x630px (1.91:1)')

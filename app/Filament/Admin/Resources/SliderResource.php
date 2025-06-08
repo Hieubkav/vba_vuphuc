@@ -10,6 +10,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -44,13 +45,30 @@ class SliderResource extends Resource
             ->schema([
                 Section::make('Thông tin slider')
                     ->schema([
-                        self::createBannerUpload(
-                            'image_link',
-                            'Hình ảnh Hero Banner',
-                            'sliders/banners',
-                            1920,
-                            1080
-                        )->columnSpanFull(),
+                        FileUpload::make('image_link')
+                            ->label('Hình ảnh Hero Banner')
+                            ->image()
+                            ->directory('sliders/banners')
+                            ->visibility('public')
+                            ->maxSize(8192) // 8MB
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['16:9'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Kích thước tối ưu: 1920x1080px (16:9). Ảnh sẽ được tự động chuyển sang WebP với chất lượng 95%')
+                            ->required()
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $title = $get('title') ?? 'slider';
+                                $customName = 'banner-' . $title;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'sliders/banners',
+                                    $customName,
+                                    1920,
+                                    1080
+                                );
+                            })
+                            ->columnSpanFull(),
 
                         TextInput::make('title')
                             ->label('Tiêu đề')

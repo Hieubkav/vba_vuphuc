@@ -85,6 +85,12 @@ return new class extends Migration
             // Homepage CTA Settings
             $table->boolean('homepage_cta_enabled')->default(true);
             $table->integer('homepage_cta_order')->default(10);
+            $table->string('homepage_cta_title')->default('Bắt đầu hành trình với VBA Vũ Phúc');
+            $table->text('homepage_cta_description')->default('Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.');
+            $table->string('homepage_cta_primary_button_text')->default('Xem khóa học');
+            $table->string('homepage_cta_primary_button_url')->default('/courses');
+            $table->string('homepage_cta_secondary_button_text')->default('Đăng ký học');
+            $table->string('homepage_cta_secondary_button_url')->default('/students/register');
             
             $table->timestamps();
         });

@@ -118,6 +118,8 @@ trait HasImageUpload
         );
     }
 
+
+
     /**
      * Tạo FileUpload cho logo với kích thước vuông
      */
@@ -160,22 +162,20 @@ trait HasImageUpload
             ->imageEditor()
             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
             ->saveUploadedFileUsing(function ($file, $get, $livewire) use ($directory, $width, $height) {
-                $webpService = app(SimpleWebpService::class);
-
                 // Lấy tên từ owner record
-                $customName = null;
+                $customName = 'gallery';
                 if (isset($livewire->ownerRecord)) {
                     if ($livewire->ownerRecord->title) {
-                        $customName = $livewire->ownerRecord->title;
+                        $customName = 'gallery-' . $livewire->ownerRecord->title;
                     } elseif ($livewire->ownerRecord->name) {
-                        $customName = $livewire->ownerRecord->name;
+                        $customName = 'gallery-' . $livewire->ownerRecord->name;
                     }
                 }
 
-                return $webpService->convertToWebP(
+                return \App\Actions\ConvertImageToWebp::run(
                     $file,
                     $directory,
-                    $customName ? "gallery-{$customName}" : null,
+                    $customName,
                     $width,
                     $height
                 );

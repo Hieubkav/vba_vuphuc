@@ -97,33 +97,12 @@
 
 <!-- KISS: Main Content đơn giản -->
 <div class="container mx-auto px-4">
-    <!-- Header Section với Typography tối ưu và Glassmorphism -->
-    <div class="flex flex-col items-center text-center mb-12 animate-fade-in">
-        <!-- Badge với Micro-interactions và Font Awesome -->
-        <div class="group inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-50 to-red-100 backdrop-blur-sm border border-red-200/50 text-red-700 rounded-full text-sm font-semibold tracking-wide uppercase mb-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-default">
-            <i class="fas fa-graduation-cap mr-3"></i>
-            <span class="bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent font-bold">Khóa học làm bánh</span>
-        </div>
 
-        <!-- Main Heading với Advanced Typography -->
-        <h2 class="text-4xl md:text-6xl lg:text-7xl font-black mb-8 text-gray-900 leading-[0.9] tracking-tight">
-            <span class="block">Khám Phá Thế Giới</span>
-            <span class="block text-red-600 relative mt-2">
-                <span class="relative z-10">Làm Bánh</span>
-                <!-- Animated Underline với Gradient -->
-                <div class="absolute -bottom-3 left-0 w-full h-2 bg-gradient-to-r from-red-400 via-red-500 to-red-600 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out"></div>
-                <!-- Glow Effect -->
-                <div class="absolute -bottom-3 left-0 w-full h-2 bg-gradient-to-r from-red-400 via-red-500 to-red-600 rounded-full blur-sm opacity-50"></div>
-            </span>
-        </h2>
-
-
-    </div>
 
     <!-- Course Categories - Dynamic Layout (Grid hoặc Swiper) -->
     @if($useSwiper)
         <!-- Swiper Layout cho nhiều danh mục -->
-        <div class="courses-swiper-container relative">
+        <div class="courses-swiper-container relative mb-12">
             <div class="swiper courses-swiper">
                 <div class="swiper-wrapper">
                     @foreach($courseCategoriesData as $index => $category)
@@ -143,7 +122,7 @@
         </div> <!-- End swiper-container -->
     @else
         <!-- Grid Layout cho ít danh mục -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             @foreach($courseCategoriesData as $index => $category)
                 @include('components.storefront.course-card', ['category' => $category, 'useSwiper' => false])
             @endforeach
@@ -151,10 +130,10 @@
     @endif
 
 
-    <!-- CTA Section - Gọn gàng -->
-    <div class="text-center mt-12">
+    <!-- CTA Section - Minimalist -->
+    <div class="text-center">
         <a href="{{ route('courses.index') }}"
-           class="inline-flex items-center px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-lg rounded-2xl transition-colors duration-300 shadow-lg hover:shadow-xl"
+           class="inline-flex items-center px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-lg rounded-2xl transition-colors duration-300 shadow-lg hover:shadow-xl"
            aria-label="Xem tất cả khóa học làm bánh">
             <span>Xem tất cả khóa học làm bánh</span>
             <i class="fas fa-arrow-right ml-3"></i>

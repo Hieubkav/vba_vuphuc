@@ -82,6 +82,12 @@ class WebDesign extends Model
         // Homepage CTA
         'homepage_cta_enabled',
         'homepage_cta_order',
+        'homepage_cta_title',
+        'homepage_cta_description',
+        'homepage_cta_primary_button_text',
+        'homepage_cta_primary_button_url',
+        'homepage_cta_secondary_button_text',
+        'homepage_cta_secondary_button_url',
     ];
 
     protected $casts = [

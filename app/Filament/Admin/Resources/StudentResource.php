@@ -119,12 +119,28 @@ class StudentResource extends Resource
                             ->schema([
                                 Section::make('Hình đại diện')
                                     ->schema([
-                                        self::createLogoUpload(
-                                            'avatar',
-                                            'Ảnh đại diện',
-                                            'students/avatars',
-                                            300
-                                        ),
+                                        Forms\Components\FileUpload::make('avatar')
+                                            ->label('Ảnh đại diện')
+                                            ->image()
+                                            ->directory('students/avatars')
+                                            ->visibility('public')
+                                            ->maxSize(2048) // 2MB
+                                            ->imageEditor()
+                                            ->imageEditorAspectRatios(['1:1'])
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->helperText('Khuyến nghị kích thước: 300x300px (hình vuông)')
+                                            ->saveUploadedFileUsing(function ($file, $get) {
+                                                $name = $get('name') ?? 'student';
+                                                $customName = 'student-' . $name;
+
+                                                return \App\Actions\ConvertImageToWebp::run(
+                                                    $file,
+                                                    'students/avatars',
+                                                    $customName,
+                                                    300,
+                                                    300
+                                                );
+                                            }),
                                     ]),
 
                                 Section::make('Trạng thái tài khoản')

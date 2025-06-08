@@ -91,7 +91,19 @@ class AlbumResource extends Resource
                                             ->maxSize(5120)
                                             ->imageEditor()
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->helperText('Ảnh đại diện cho album. Kích thước tối đa: 5MB'),
+                                            ->helperText('Ảnh đại diện cho album. Kích thước tối đa: 5MB')
+                                            ->saveUploadedFileUsing(function ($file, $get) {
+                                                $title = $get('title') ?? 'album';
+                                                $customName = 'album-' . $title;
+
+                                                return \App\Actions\ConvertImageToWebp::run(
+                                                    $file,
+                                                    'albums/thumbnails',
+                                                    $customName,
+                                                    800,
+                                                    600
+                                                );
+                                            }),
 
                                         Forms\Components\FileUpload::make('pdf_file')
                                             ->label('File PDF')
@@ -160,7 +172,19 @@ class AlbumResource extends Resource
                                             ->maxSize(5120)
                                             ->imageEditor()
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->helperText('Ảnh hiển thị khi chia sẻ trên mạng xã hội. Kích thước khuyến nghị: 1200x630px'),
+                                            ->helperText('Ảnh hiển thị khi chia sẻ trên mạng xã hội. Kích thước khuyến nghị: 1200x630px')
+                                            ->saveUploadedFileUsing(function ($file, $get) {
+                                                $title = $get('title') ?? 'album';
+                                                $customName = 'og-album-' . $title;
+
+                                                return \App\Actions\ConvertImageToWebp::run(
+                                                    $file,
+                                                    'albums/og-images',
+                                                    $customName,
+                                                    1200,
+                                                    630
+                                                );
+                                            }),
                                     ])
                                     ->columns(2),
 

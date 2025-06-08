@@ -44,9 +44,9 @@
                    class="text-red-600 hover:text-red-700 underline">
                     Khóa học
                 </a>
-                <a href="{{ route('posts.courses') }}"
+                <a href="{{ route('posts.index') }}"
                    class="text-red-600 hover:text-red-700 underline">
-                    Khóa học
+                    Bài viết
                 </a>
                 <a href="{{ route('posts.news') }}"
                    class="text-red-600 hover:text-red-700 underline">

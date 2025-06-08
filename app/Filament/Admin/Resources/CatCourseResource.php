@@ -80,6 +80,18 @@ class CatCourseResource extends Resource
                             ->imageEditor()
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->helperText('Chọn ảnh định dạng JPG, PNG hoặc WebP. Kích thước tối đa: 5MB')
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $name = $get('name') ?? 'category';
+                                $customName = 'cat-course-' . $name;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'cat-courses',
+                                    $customName,
+                                    600,
+                                    400
+                                );
+                            })
                             ->columnSpanFull(),
                     ]),
 
@@ -120,7 +132,19 @@ class CatCourseResource extends Resource
                             ->label('Hình ảnh OG')
                             ->image()
                             ->directory('cat-courses/og-images')
-                            ->helperText('Để trống sẽ tự động sử dụng hình ảnh danh mục. Hình ảnh hiển thị khi chia sẻ trên mạng xã hội.'),
+                            ->helperText('Để trống sẽ tự động sử dụng hình ảnh danh mục. Hình ảnh hiển thị khi chia sẻ trên mạng xã hội.')
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $name = $get('name') ?? 'category';
+                                $customName = 'og-cat-course-' . $name;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'cat-courses/og-images',
+                                    $customName,
+                                    1200,
+                                    630
+                                );
+                            }),
                     ])->columns(2)->collapsible(),
             ]);
     }

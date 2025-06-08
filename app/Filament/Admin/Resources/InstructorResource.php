@@ -72,12 +72,28 @@ class InstructorResource extends Resource
                             ->maxLength(255)
                             ->helperText('Website cá nhân của giảng viên'),
 
-                        self::createLogoUpload(
-                            'avatar',
-                            'Ảnh đại diện',
-                            'instructors/avatars',
-                            400
-                        ),
+                        Forms\Components\FileUpload::make('avatar')
+                            ->label('Ảnh đại diện')
+                            ->image()
+                            ->directory('instructors/avatars')
+                            ->visibility('public')
+                            ->maxSize(2048) // 2MB
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['1:1'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Khuyến nghị kích thước: 400x400px (hình vuông)')
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $name = $get('name') ?? 'instructor';
+                                $customName = 'instructor-' . $name;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'instructors/avatars',
+                                    $customName,
+                                    400,
+                                    400
+                                );
+                            }),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Thông tin chuyên môn')

@@ -59,13 +59,16 @@ class TestimonialResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->helperText('Ảnh sẽ được tự động tối ưu thành WebP với tên SEO-friendly')
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $customerName = $get('name') ?: 'khach-hang';
+                                $customName = 'avatar-' . $customerName;
 
-                                // Tạo tên file SEO-friendly
-                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($customerName, 'avatar', 'webp');
-
-                                return $webpService->convertToWebP($file, 'testimonials/avatars', $seoFileName);
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'testimonials/avatars',
+                                    $customName,
+                                    400,
+                                    400
+                                );
                             }),
                     ])
                     ->columns(2),

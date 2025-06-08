@@ -56,18 +56,15 @@ class PartnerResource extends Resource
                             ])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $webpService = app(\App\Services\SimpleWebpService::class);
                                 $partnerName = $get('name') ?? 'partner';
+                                $customName = 'partner-' . $partnerName;
 
-                                // Tạo tên file SEO-friendly
-                                $seoFileName = \App\Services\SeoImageService::createSeoFriendlyImageName($partnerName, 'partner');
-
-                                return $webpService->convertToWebP(
+                                return \App\Actions\ConvertImageToWebp::run(
                                     $file,
                                     'partners/logos',
-                                    $seoFileName,
-                                    400, // width
-                                    300  // height
+                                    $customName,
+                                    400,
+                                    300
                                 );
                             })
                             ->helperText('Logo sẽ được tự động chuyển sang WebP với tên SEO-friendly. Kích thước tối ưu: 400x300px'),

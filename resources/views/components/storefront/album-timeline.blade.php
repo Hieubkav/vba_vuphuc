@@ -1,10 +1,3 @@
-{{--
-    Album Timeline Component - Giao diện timeline album
-    - Hiển thị các album PDF theo thứ tự thời gian
-    - Mỗi album có thể lật trang và xem ảnh phụ
-    - Responsive design với Tailwind CSS
-    - Tích hợp dữ liệu thực từ ViewServiceProvider
---}}
 
 @php
     // Lấy dữ liệu albums từ ViewServiceProvider hoặc tạo collection rỗng
@@ -13,30 +6,17 @@
 @endphp
 
 @if($albums->isNotEmpty())
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-    <!-- Header Section - Minimalist -->
-    <div class="text-center mb-12 sm:mb-20">
-        <div class="w-12 sm:w-16 h-1 bg-red-500 mx-auto mb-6 sm:mb-8"></div>
-
-        <h2 class="text-2xl sm:text-3xl md:text-4xl font-light text-gray-900 mb-3 sm:mb-4 tracking-wide">
-            Timeline
-        </h2>
-
-        <p class="text-gray-500 max-w-lg mx-auto font-light text-sm sm:text-base">
-            Hành trình học tập qua thời gian
-        </p>
-    </div>
-
+<div class="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6">
     <!-- Timeline Container -->
-    <div class="relative max-w-6xl mx-auto">
+    <div class="relative max-w-5xl mx-auto">
         <!-- Timeline Line - Desktop -->
         <div class="absolute left-1/2 transform -translate-x-1/2 w-px bg-red-200 h-full hidden lg:block"></div>
 
         <!-- Timeline Line - Mobile -->
-        <div class="absolute left-6 top-0 w-px bg-red-200 h-full lg:hidden"></div>
+        <div class="absolute left-4 top-0 w-px bg-red-200 h-full lg:hidden"></div>
 
         <!-- Timeline Items -->
-        <div class="space-y-12 sm:space-y-24 lg:space-y-32">
+        <div class="space-y-8 sm:space-y-12 lg:space-y-16">
             @foreach($albums as $index => $album)
             @php
                 $isEven = $index % 2 === 0;
@@ -44,54 +24,53 @@
             @endphp
 
             <!-- Timeline Item - Responsive Layout -->
-            <div class="relative grid lg:grid-cols-2 gap-6 sm:gap-12 items-center timeline-item pl-12 sm:pl-16 lg:pl-0"
-                 style="animation-delay: {{ $animationDelay }}s;">
+            <div class="relative grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center timeline-item pl-8 sm:pl-10 lg:pl-0">
 
                 <!-- Timeline Dot - Desktop -->
-                <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 bg-red-500 rounded-full z-20 hidden lg:block timeline-dot"></div>
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-red-500 rounded-full z-20 hidden lg:block timeline-dot"></div>
 
                 <!-- Timeline Dot - Mobile -->
-                <div class="absolute left-4 sm:left-6 transform -translate-x-1/2 w-2 sm:w-3 h-2 sm:h-3 bg-red-500 rounded-full z-20 lg:hidden timeline-dot"></div>
+                <div class="absolute left-3 transform -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full z-20 lg:hidden timeline-dot"></div>
 
                 <!-- Album Content Side -->
                 <div class="{{ $isEven ? 'lg:order-1' : 'lg:order-2' }}">
-                    <div class="bg-white border border-red-100 hover:border-red-200 hover:shadow-lg transition-all duration-500 group transform hover:-translate-y-1 p-4 sm:p-6 lg:p-8 rounded-lg">
+                    <div class="bg-white border border-red-100 hover:border-red-200 hover:shadow-md transition-all duration-300 group p-3 sm:p-4 lg:p-5 rounded-lg">
 
                         <!-- Date Badge & Order - Responsive -->
-                        <div class="mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3 flex-wrap">
-                            <span class="inline-block px-2 sm:px-3 py-1 bg-red-50 text-red-600 text-xs sm:text-sm font-medium rounded-md">
+                        <div class="mb-3 flex items-center gap-2 flex-wrap">
+                            <span class="inline-block px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded">
                                 {{ $album->published_date ? $album->published_date->format('M Y') : 'Chưa xuất bản' }}
                             </span>
-                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-md">
+                            <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
                                 #{{ $album->order ?? 0 }}
                             </span>
                         </div>
 
                         <!-- Album Title -->
-                        <h3 class="text-lg sm:text-xl lg:text-2xl font-light text-gray-900 mb-3 sm:mb-4 leading-relaxed">
+                        <h3 class="text-base sm:text-lg lg:text-xl font-light text-gray-900 mb-2 sm:mb-3 leading-snug">
                             {{ $album->title }}
                         </h3>
 
                         <!-- Description -->
-                        <p class="text-gray-600 mb-4 sm:mb-6 leading-relaxed font-light text-sm sm:text-base">
-                            {{ Str::limit($album->description, 120) }}
+                        <p class="text-gray-600 mb-3 sm:mb-4 leading-relaxed font-light text-sm">
+                            {{ Str::limit($album->description, 100) }}
                         </p>
 
                         <!-- PDF Info - Responsive -->
                         @if($album->pdf_file)
-                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-red-50 border-l-4 border-red-500 mb-4 sm:mb-6 gap-3 sm:gap-0">
-                                <div class="flex items-center space-x-2 sm:space-x-3">
-                                    <div class="w-6 sm:w-8 h-6 sm:h-8 bg-red-500 rounded flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-file-pdf text-white text-xs sm:text-sm"></i>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-2.5 bg-red-50 border-l-3 border-red-500 gap-2">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 bg-red-500 rounded flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-file-pdf text-white text-xs"></i>
                                     </div>
                                     <div>
-                                        <div class="text-xs sm:text-sm font-medium text-gray-900">Tài liệu PDF</div>
+                                        <div class="text-xs font-medium text-gray-900">Tài liệu PDF</div>
                                         @if($album->total_pages)
                                             <div class="text-xs text-gray-500">{{ $album->total_pages }} trang</div>
                                         @endif
                                     </div>
                                 </div>
-                                <div class="flex space-x-2 text-xs sm:text-sm">
+                                <div class="flex space-x-2 text-xs">
                                     <button onclick="openPDFViewer('{{ $album->pdf_url }}', '{{ $album->title }}', {{ $album->id }})"
                                             class="text-red-600 hover:text-red-700 font-medium transition-colors">
                                         Xem
@@ -118,7 +97,7 @@
                             @php $featuredImage = $album->images->where('is_featured', true)->first() ?? $album->images->first(); @endphp
                             <!-- KISS: Click để mở ảnh trong tab mới -->
                             <div class="relative group cursor-pointer" onclick="window.open('{{ $featuredImage->image_url }}', '_blank')" data-album="{{ $album->id }}">
-                                <div class="aspect-[5/4] overflow-hidden bg-gray-50 border border-red-100 group-hover:border-red-200 group-hover:shadow-lg transition-all duration-500 rounded-lg">
+                                <div class="aspect-[4/3] overflow-hidden bg-gray-50 border border-red-100 group-hover:border-red-200 group-hover:shadow-md transition-all duration-300 rounded-lg">
                                     <!-- KISS: Ảnh đơn giản -->
                                     <img src="{{ $featuredImage->image_url }}"
                                          alt="{{ $featuredImage->alt_text ?? $album->title }}"
@@ -130,19 +109,19 @@
                                 <div class="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/5 transition-colors duration-300 rounded-lg"></div>
                                 <!-- Hover icon -->
                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <div class="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
-                                        <i class="fas fa-search-plus text-red-500 text-lg"></i>
+                                    <div class="w-10 h-10 bg-white/90 rounded-full flex items-center justify-center shadow-md">
+                                        <i class="fas fa-search-plus text-red-500 text-sm"></i>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Small Images Grid - Responsive -->
                             @if($album->images->count() > 1)
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-3 sm:mt-4">
+                                <div class="grid grid-cols-3 sm:grid-cols-4 gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                                     @foreach($album->images->skip(1)->take(4) as $image)
                                         <!-- KISS: Click để mở ảnh trong tab mới -->
                                         <div class="relative group cursor-pointer aspect-square" onclick="window.open('{{ $image->image_url }}', '_blank')" data-album="{{ $album->id }}">
-                                            <div class="w-full h-full overflow-hidden bg-gray-50 border border-red-100 rounded-md group-hover:border-red-200 transition-all duration-300">
+                                            <div class="w-full h-full overflow-hidden bg-gray-50 border border-red-100 rounded group-hover:border-red-200 transition-all duration-300">
                                                 @if($image && $image->image_url)
                                                     <!-- KISS: Ảnh đơn giản -->
                                                     <img src="{{ $image->image_url }}"
@@ -153,14 +132,14 @@
                                                 @else
                                                     <!-- No image placeholder -->
                                                     <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-                                                        <i class="fas fa-image text-red-300 text-sm sm:text-lg"></i>
+                                                        <i class="fas fa-image text-red-300 text-sm"></i>
                                                     </div>
                                                 @endif
                                             </div>
                                             <!-- More indicator -->
                                             @if($loop->last && $album->images->count() > 5)
-                                                <div class="absolute inset-0 bg-red-500/80 flex items-center justify-center rounded-md">
-                                                    <span class="text-white font-medium text-sm">+{{ $album->images->count() - 5 }}</span>
+                                                <div class="absolute inset-0 bg-red-500/80 flex items-center justify-center rounded">
+                                                    <span class="text-white font-medium text-xs">+{{ $album->images->count() - 5 }}</span>
                                                 </div>
                                             @endif
                                         </div>
@@ -169,16 +148,16 @@
                             @endif
 
                             <!-- Image count badge -->
-                            <div class="absolute top-2 sm:top-3 right-2 sm:right-3 bg-white/90 backdrop-blur-sm px-2 sm:px-3 py-1 text-xs text-gray-600 font-medium rounded-full">
+                            <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 text-xs text-gray-600 font-medium rounded-full">
                                 {{ $album->images->count() }} ảnh
                             </div>
                         </div>
                     @else
                         <!-- Fallback when no images -->
-                        <div class="aspect-[5/4] bg-red-50 border border-red-100 flex items-center justify-center rounded-lg">
+                        <div class="aspect-[4/3] bg-red-50 border border-red-100 flex items-center justify-center rounded-lg">
                             <div class="text-center">
-                                <i class="fas fa-images text-red-300 text-5xl mb-4"></i>
-                                <p class="text-red-400 font-light">Chưa có hình ảnh</p>
+                                <i class="fas fa-images text-red-300 text-3xl mb-2"></i>
+                                <p class="text-red-400 font-light text-sm">Chưa có hình ảnh</p>
                             </div>
                         </div>
                     @endif
@@ -193,19 +172,19 @@
 
 <!-- PDF Viewer Modal - Tối ưu z-index và responsive -->
 <div id="pdfModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] hidden overflow-hidden">
-    <div class="flex items-center justify-center min-h-screen p-2 sm:p-4">
-        <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-7xl h-[95vh] sm:h-[90vh] flex flex-col animate-modal-in">
+    <div class="flex items-center justify-center min-h-screen p-2 sm:p-3">
+        <div class="bg-white rounded-lg sm:rounded-xl shadow-2xl w-full max-w-6xl h-[95vh] sm:h-[90vh] flex flex-col">
             <!-- Header -->
-            <div class="flex items-center justify-between p-3 sm:p-6 border-b border-gray-200 flex-shrink-0">
-                <h3 id="pdfTitle" class="text-lg sm:text-xl font-bold text-gray-900 truncate pr-4"></h3>
+            <div class="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 flex-shrink-0">
+                <h3 id="pdfTitle" class="text-base sm:text-lg font-bold text-gray-900 truncate pr-4"></h3>
                 <button onclick="closePDFViewer()"
-                        class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 transition-all duration-200 flex-shrink-0">
-                    <i class="fas fa-times text-xl sm:text-2xl"></i>
+                        class="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1.5 transition-all duration-200 flex-shrink-0">
+                    <i class="fas fa-times text-lg"></i>
                 </button>
             </div>
             <!-- Content -->
-            <div class="flex-1 p-3 sm:p-6 overflow-hidden">
-                <iframe id="pdfFrame" class="w-full h-full rounded-lg border border-gray-200 bg-gray-50"></iframe>
+            <div class="flex-1 p-3 sm:p-4 overflow-hidden">
+                <iframe id="pdfFrame" class="w-full h-full rounded border border-gray-200 bg-gray-50"></iframe>
             </div>
         </div>
     </div>
@@ -215,50 +194,48 @@
 
 @else
 <!-- Empty State - Minimalist -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6">
     <!-- Header Section - Minimalist -->
-    <div class="text-center mb-20">
-        <div class="w-16 h-1 bg-gray-300 mx-auto mb-8"></div>
-
-        <h2 class="text-3xl md:text-4xl font-light text-gray-900 mb-4 tracking-wide">
+    <div class="text-center mb-12">
+        <div class="w-12 h-1 bg-gray-300 mx-auto mb-6"></div>
+        <h2 class="text-2xl md:text-3xl font-light text-gray-900 mb-3 tracking-wide">
             Timeline
         </h2>
-
-        <p class="text-gray-500 max-w-lg mx-auto font-light">
+        <p class="text-gray-500 max-w-md mx-auto font-light text-sm">
             Hành trình học tập qua thời gian
         </p>
     </div>
 
     <!-- Empty Timeline -->
-    <div class="relative max-w-6xl mx-auto">
+    <div class="relative max-w-4xl mx-auto">
         <!-- Timeline Line - Desktop -->
-        <div class="absolute left-1/2 transform -translate-x-1/2 w-px bg-gray-200 h-96 hidden lg:block"></div>
+        <div class="absolute left-1/2 transform -translate-x-1/2 w-px bg-gray-200 h-64 hidden lg:block"></div>
 
         <!-- Timeline Line - Mobile -->
-        <div class="absolute left-6 top-0 w-px bg-gray-200 h-96 lg:hidden"></div>
+        <div class="absolute left-4 top-0 w-px bg-gray-200 h-64 lg:hidden"></div>
 
         <!-- Empty State Content -->
-        <div class="relative grid lg:grid-cols-2 gap-12 items-center pl-16 lg:pl-0">
+        <div class="relative grid lg:grid-cols-2 gap-8 items-center pl-10 lg:pl-0">
             <!-- Timeline Dot - Desktop -->
-            <div class="absolute left-1/2 transform -translate-x-1/2 w-3 h-3 bg-gray-300 rounded-full z-20 hidden lg:block"></div>
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-300 rounded-full z-20 hidden lg:block"></div>
 
             <!-- Timeline Dot - Mobile -->
-            <div class="absolute left-6 transform -translate-x-1/2 w-3 h-3 bg-gray-300 rounded-full z-20 lg:hidden"></div>
+            <div class="absolute left-3 transform -translate-x-1/2 w-2.5 h-2.5 bg-gray-300 rounded-full z-20 lg:hidden"></div>
 
             <!-- Empty Content -->
             <div class="lg:order-1">
-                <div class="bg-white border border-gray-100 p-8 rounded-lg">
-                    <div class="mb-6">
-                        <span class="inline-block px-3 py-1 bg-gray-50 text-gray-500 text-sm font-medium rounded-md">
+                <div class="bg-white border border-gray-100 p-5 rounded-lg">
+                    <div class="mb-4">
+                        <span class="inline-block px-2 py-1 bg-gray-50 text-gray-500 text-xs font-medium rounded">
                             Chưa có dữ liệu
                         </span>
                     </div>
 
-                    <h3 class="text-2xl font-light text-gray-900 mb-4 leading-relaxed">
+                    <h3 class="text-lg font-light text-gray-900 mb-3 leading-snug">
                         Timeline trống
                     </h3>
 
-                    <p class="text-gray-600 mb-6 leading-relaxed font-light">
+                    <p class="text-gray-600 mb-4 leading-relaxed font-light text-sm">
                         Các album khóa học sẽ sớm được thêm vào timeline này.
                     </p>
                 </div>
@@ -266,18 +243,18 @@
 
             <!-- Empty Image -->
             <div class="lg:order-2">
-                <div class="aspect-[5/4] bg-gray-50 border border-gray-100 flex items-center justify-center rounded-lg">
+                <div class="aspect-[4/3] bg-gray-50 border border-gray-100 flex items-center justify-center rounded-lg">
                     <div class="text-center">
-                        <i class="fas fa-images text-gray-300 text-6xl mb-4"></i>
-                        <p class="text-gray-400 font-light">Chưa có hình ảnh</p>
+                        <i class="fas fa-images text-gray-300 text-4xl mb-3"></i>
+                        <p class="text-gray-400 font-light text-sm">Chưa có hình ảnh</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Call to action - Minimalist -->
-        <div class="text-center mt-16">
-            <div class="flex justify-center space-x-8">
+        <div class="text-center mt-12">
+            <div class="flex justify-center space-x-6 text-sm">
                 <a href="{{ route('courses.index') }}"
                    class="text-red-500 hover:text-red-600 font-medium transition-colors">
                     Khám phá khóa học
@@ -339,26 +316,31 @@ document.addEventListener('keydown', function(e) {
 /* KISS: Responsive cải thiện cho mobile */
 @media (max-width: 640px) {
     .timeline-item {
-        padding-left: 2.5rem; /* 40px */
-    }
-
-    .timeline-dot {
-        left: 0.75rem; /* 12px */
-    }
-
-    /* Giảm khoảng cách giữa các timeline item */
-    .space-y-12 > * + * {
-        margin-top: 2rem; /* 32px */
-    }
-}
-
-@media (max-width: 480px) {
-    .timeline-item {
         padding-left: 2rem; /* 32px */
     }
 
     .timeline-dot {
         left: 0.5rem; /* 8px */
+    }
+
+    /* Giảm khoảng cách giữa các timeline item */
+    .space-y-8 > * + * {
+        margin-top: 1.5rem; /* 24px */
+    }
+}
+
+@media (max-width: 480px) {
+    .timeline-item {
+        padding-left: 1.75rem; /* 28px */
+    }
+
+    .timeline-dot {
+        left: 0.375rem; /* 6px */
+    }
+
+    /* Giảm thêm khoảng cách cho mobile nhỏ */
+    .space-y-8 > * + * {
+        margin-top: 1.25rem; /* 20px */
     }
 }
 </style>
