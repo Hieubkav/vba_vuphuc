@@ -159,7 +159,7 @@ class OptimizeStorefront extends Command
             return \App\Models\Course::where('status', 'active')
                 ->where('is_featured', true)
                 ->with(['category:id,name', 'instructor:id,name'])
-                ->select(['id', 'title', 'slug', 'price', 'thumbnail', 'cat_course_id', 'instructor_id', 'level', 'order'])
+                ->select(['id', 'title', 'slug', 'thumbnail', 'cat_course_id', 'instructor_id', 'level', 'order'])
                 ->orderBy('order')
                 ->take(8)
                 ->get();

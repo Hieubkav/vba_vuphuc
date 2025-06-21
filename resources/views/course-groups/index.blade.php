@@ -3,121 +3,91 @@
 @section('title', 'Nhóm học tập - VBA Vũ Phúc')
 @section('description', 'Tham gia các nhóm học tập VBA Excel để kết nối với cộng đồng, chia sẻ kinh nghiệm và nhận hỗ trợ từ giảng viên.')
 
+@push('styles')
+<style>
+    .filter-card {
+        @apply bg-white border border-gray-100 shadow-sm;
+    }
+
+    .mobile-sidebar {
+        display: none;
+    }
+
+    .mobile-sidebar.active {
+        display: block;
+    }
+
+    .mobile-sidebar.active .mobile-sidebar-content {
+        transform: translateX(0);
+    }
+
+    @media (min-width: 1024px) {
+        .mobile-sidebar {
+            display: none !important;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-red-50 to-white py-12">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-                    Nhóm học tập VBA Excel
-                </h1>
-
-                <!-- Stats - Chỉ hiển thị số nhóm -->
-                <div class="inline-flex items-center bg-white rounded-lg px-6 py-3 shadow-sm">
-                    <div class="text-xl font-bold text-red-600 mr-2">{{ $courseGroups->total() }}</div>
-                    <div class="text-sm text-gray-600">nhóm học tập</div>
-                </div>
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-red-600 to-red-700">
+    <div class="container mx-auto px-4 py-4">
+        <nav class="mb-1">
+            <div class="flex items-center space-x-2 text-white/80 text-xs font-open-sans">
+                <a href="{{ route('storeFront') }}" class="hover:text-white transition-colors">Trang chủ</a>
+                <i class="fas fa-chevron-right text-xs"></i>
+                <span class="text-white">Nhóm học tập</span>
             </div>
-        </div>
-    </section>
+        </nav>
+        <h1 class="text-xl md:text-2xl font-bold text-white font-montserrat">
+            Nhóm học tập VBA Excel
+        </h1>
+    </div>
+</section>
 
-    <!-- Course Groups Grid -->
-    <section class="py-12">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            @if($courseGroups->count() > 0)
-                <!-- Groups Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                    @foreach($courseGroups as $group)
-                        <div class="group bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100">
-                            <div class="p-6">
-                                <!-- Group Type Badge -->
-                                <div class="flex items-center justify-between mb-4">
-                                    <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
-                                        {{ $group->formatted_group_type ?? ucfirst($group->group_type ?? 'Nhóm') }}
-                                    </span>
-                                </div>
-
-                                <!-- Group Name -->
-                                <h3 class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-red-600 transition-colors duration-300">
-                                    {{ $group->name }}
-                                </h3>
-
-                                <!-- Group Description -->
-                                @if($group->description)
-                                    <p class="text-gray-600 text-sm leading-relaxed mb-4">
-                                        {{ Str::limit($group->description, 120) }}
-                                    </p>
-                                @endif
-
-                                <!-- Members Count - Đơn giản -->
-                                @if(isset($group->current_members) && $group->current_members > 0)
-                                    <div class="flex items-center text-sm mb-4 text-gray-600">
-                                        <i class="fas fa-users mr-2 text-xs"></i>
-                                        <span>{{ $group->current_members }}</span>
-                                        @if($group->max_members)
-                                            <span class="text-gray-400">/{{ $group->max_members }}</span>
-                                        @endif
-                                        <span class="ml-1">thành viên</span>
-                                    </div>
-                                @endif
-
-                                <!-- Action Button -->
-                                @if($group->group_link)
-                                    <a href="{{ $group->group_link }}"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors duration-300">
-                                        <i class="{{ $group->group_type_icon ?? 'fas fa-external-link-alt' }} mr-2 text-xs"></i>
-                                        @if(isset($group->max_members) && $group->current_members >= $group->max_members)
-                                            <span>Nhóm đã đầy</span>
-                                        @else
-                                            <span>Tham gia nhóm</span>
-                                        @endif
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <!-- Pagination -->
-                <div class="flex justify-center">
-                    {{ $courseGroups->links() }}
-                </div>
-            @else
-                <!-- Empty State -->
-                <div class="text-center py-16">
-                    <div class="w-16 h-16 mx-auto mb-4 bg-red-50 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-users text-xl text-red-600 opacity-60"></i>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Chưa có nhóm học tập</h3>
-                    <p class="text-gray-600 text-sm mb-6">Các nhóm học tập sẽ sớm được cập nhật</p>
-                    <a href="{{ route('courses.index') }}"
-                       class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-300">
-                        <i class="fas fa-graduation-cap mr-2"></i>
-                        Xem khóa học
-                    </a>
-                </div>
-            @endif
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="bg-white py-12">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">
-                Bạn muốn tìm hiểu thêm về khóa học?
-            </h2>
-            <p class="text-gray-600 mb-6">
-                Khám phá các khóa học VBA Excel chuyên nghiệp và nâng cao kỹ năng của bạn
-            </p>
-            <a href="{{ route('courses.index') }}"
-               class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors duration-300">
-                <i class="fas fa-graduation-cap mr-2"></i>
-                Xem tất cả khóa học
-            </a>
-        </div>
-    </section>
-</div>
+<!-- Main Content -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <livewire:course-group-list />
+    </div>
+</section>
 @endsection
+
+@push('scripts')
+<script>
+function toggleSidebar() {
+    const mobileSidebar = document.querySelector('.mobile-sidebar');
+    mobileSidebar.classList.toggle('active');
+
+    // Prevent body scroll when sidebar is open
+    if (mobileSidebar.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+}
+
+// Copy filter content to mobile sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    const desktopContent = document.getElementById('desktop-filter-content');
+    const mobileContent = document.getElementById('mobile-filter-content');
+
+    if (desktopContent && mobileContent) {
+        mobileContent.innerHTML = desktopContent.innerHTML;
+    }
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function(e) {
+        const mobileSidebar = document.querySelector('.mobile-sidebar');
+        const sidebarContent = document.querySelector('.mobile-sidebar-content');
+
+        if (mobileSidebar && mobileSidebar.classList.contains('active')) {
+            if (!sidebarContent.contains(e.target) && !e.target.closest('[onclick*="toggleSidebar"]')) {
+                toggleSidebar();
+            }
+        }
+    });
+});
+</script>
+@endpush

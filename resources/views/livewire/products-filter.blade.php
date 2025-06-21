@@ -17,88 +17,61 @@
             <aside class="hidden lg:block w-80 flex-shrink-0">
                 <div class="space-y-6" id="desktop-filter-content">
                     <!-- Search -->
-                    <div class="filter-card rounded-xl p-5">
-                        <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Tìm kiếm</h3>
+                    <x-filter-card title="Tìm kiếm">
                         <div class="relative">
-                            <input type="text"
-                                   wire:model.live.debounce.300ms="search"
-                                   placeholder="Nhập tên sản phẩm..."
-                                   class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 font-open-sans text-sm">
+                            <input type="text" wire:model.live.debounce.300ms="search" placeholder="Nhập tên sản phẩm..." class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 font-open-sans text-sm">
                             <i class="fas fa-search absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                         </div>
-                    </div>
+                    </x-filter-card>
 
                     <!-- Category Filter -->
-                    <div class="filter-card rounded-xl p-5">
-                        <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Danh mục</h3>
+                    <x-filter-card title="Danh mục">
                         <div class="space-y-1.5">
-                            <button wire:click="$set('category', '')"
-                                   class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ !$category ? 'active' : '' }}">
-                                Tất cả danh mục
-                            </button>
+                            <button wire:click="$set('category', '')" class="block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm transition-all duration-200 {{ !$category ? 'bg-red-600 text-white' : 'hover:bg-red-50 hover:text-red-600' }}">Tất cả danh mục</button>
                             @foreach($this->categories as $cat)
-                                <button wire:click="$set('category', '{{ $cat->id }}')"
-                                       class="filter-btn block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm {{ $category == $cat->id ? 'active' : '' }}">
-                                    {{ $cat->name }}
-                                    <span class="text-gray-400 text-xs">({{ $cat->products_count }})</span>
-                                </button>
+                                <button wire:click="$set('category', '{{ $cat->id }}')" class="block w-full text-left px-3 py-2 rounded-lg font-open-sans text-sm transition-all duration-200 {{ $category == $cat->id ? 'bg-red-600 text-white' : 'hover:bg-red-50 hover:text-red-600' }}">{{ $cat->name }} <span class="text-gray-400 text-xs">({{ $cat->products_count }})</span></button>
                             @endforeach
                         </div>
-                    </div>
+                    </x-filter-card>
 
                     <!-- Price Range -->
                     @if($this->priceRange && $this->priceRange->min_price && $this->priceRange->max_price)
-                    <div class="filter-card rounded-xl p-5">
-                        <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Khoảng giá</h3>
+                    <x-filter-card title="Khoảng giá">
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="number"
-                                   wire:model.live.debounce.500ms="minPrice"
-                                   placeholder="Từ {{ number_format($this->priceRange->min_price, 0, ',', '.') }}"
-                                   class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm">
-                            <input type="number"
-                                   wire:model.live.debounce.500ms="maxPrice"
-                                   placeholder="Đến {{ number_format($this->priceRange->max_price, 0, ',', '.') }}"
-                                   class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm">
+                            <input type="number" wire:model.live.debounce.500ms="minPrice" placeholder="Từ {{ number_format($this->priceRange->min_price, 0, ',', '.') }}" class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm">
+                            <input type="number" wire:model.live.debounce.500ms="maxPrice" placeholder="Đến {{ number_format($this->priceRange->max_price, 0, ',', '.') }}" class="px-3 py-2 border border-gray-200 rounded-lg focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm">
                         </div>
-                    </div>
+                    </x-filter-card>
                     @endif
 
                     <!-- Special Filters -->
-                    <div class="filter-card rounded-xl p-5">
-                        <h3 class="text-base font-semibold text-gray-900 mb-3 font-montserrat">Đặc biệt</h3>
+                    <x-filter-card title="Đặc biệt">
                         <div class="space-y-2">
+                            @php
+                                $specialFilters = [
+                                    ['model' => 'isHot', 'label' => 'Sản phẩm nổi bật'],
+                                    ['model' => 'hasDiscount', 'label' => 'Đang giảm giá']
+                                ];
+                            @endphp
+                            @foreach($specialFilters as $filter)
                             <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" wire:model.live="isHot" class="sr-only">
-                                <div class="relative">
-                                    <div class="w-4 h-4 border-2 border-gray-300 rounded {{ $isHot ? 'bg-red-500 border-red-500' : '' }}"></div>
-                                    @if($isHot)
-                                        <i class="fas fa-check absolute top-0 left-0 w-4 h-4 text-white text-xs flex items-center justify-center"></i>
-                                    @endif
+                                <input type="checkbox" wire:model.live="{{ $filter['model'] }}" class="sr-only">
+                                <div class="w-4 h-4 border-2 border-gray-300 rounded {{ ${$filter['model']} ? 'bg-red-500 border-red-500' : '' }} relative">
+                                    @if(${$filter['model']})<i class="fas fa-check absolute inset-0 text-white text-xs flex items-center justify-center"></i>@endif
                                 </div>
-                                <span class="ml-3 text-sm text-gray-700 font-open-sans">Sản phẩm nổi bật</span>
+                                <span class="ml-3 text-sm text-gray-700 font-open-sans">{{ $filter['label'] }}</span>
                             </label>
-                            <label class="flex items-center cursor-pointer">
-                                <input type="checkbox" wire:model.live="hasDiscount" class="sr-only">
-                                <div class="relative">
-                                    <div class="w-4 h-4 border-2 border-gray-300 rounded {{ $hasDiscount ? 'bg-red-500 border-red-500' : '' }}"></div>
-                                    @if($hasDiscount)
-                                        <i class="fas fa-check absolute top-0 left-0 w-4 h-4 text-white text-xs flex items-center justify-center"></i>
-                                    @endif
-                                </div>
-                                <span class="ml-3 text-sm text-gray-700 font-open-sans">Đang giảm giá</span>
-                            </label>
+                            @endforeach
                         </div>
-                    </div>
+                    </x-filter-card>
 
                     <!-- Clear Filters -->
                     @if($search || $category || $sort !== 'newest' || $minPrice || $maxPrice || $isHot || $hasDiscount)
-                    <div class="filter-card rounded-xl p-5">
-                        <button wire:click="clearFilters"
-                               class="block w-full text-center px-3 py-2.5 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors font-medium font-open-sans text-sm">
-                            <i class="fas fa-redo mr-2"></i>
-                            Xóa bộ lọc
+                    <x-filter-card title="">
+                        <button wire:click="clearFilters" class="block w-full text-center px-3 py-2.5 bg-gray-50 text-gray-600 rounded-lg hover:bg-gray-100 transition-colors font-medium font-open-sans text-sm">
+                            <i class="fas fa-redo mr-2"></i>Xóa bộ lọc
                         </button>
-                    </div>
+                    </x-filter-card>
                     @endif
                 </div>
             </aside>
@@ -175,71 +148,7 @@
                 <div wire:loading.remove>
                     @if($this->products->count() > 0)
                         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-16">
-                            @foreach($this->products as $product)
-                                <article class="group">
-                                    <a href="{{ route('products.show', $product->slug) }}" class="block">
-                                        <div class="product-card bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300">
-                                            <!-- Product Image -->
-                                            <div class="aspect-square overflow-hidden relative">
-                                                @php
-                                                    $image = collect($product->product_images ?? [])->where('status', 'active')->sortBy('order')->first();
-                                                @endphp
-                                                @if($image && isset($image['image_link']))
-                                                    <img src="{{ asset('storage/' . $image['image_link']) }}"
-                                                         alt="{{ $product->name }}"
-                                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                                @else
-                                                    <!-- Custom placeholder - chỉ icon -->
-                                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center relative overflow-hidden">
-                                                        <i class="fas fa-birthday-cake text-4xl text-red-300"></i>
-                                                    </div>
-                                                @endif
-
-                                                <!-- Badges -->
-                                                <div class="absolute top-2 left-2 flex flex-col gap-1">
-                                                    @if($product->is_hot)
-                                                        <span class="bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold shadow-lg">HOT</span>
-                                                    @endif
-                                                </div>
-                                                @if(isset($product->compare_price) && $product->compare_price > $product->price)
-                                                    <div class="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-                                                        -{{ round((($product->compare_price - $product->price) / $product->compare_price) * 100) }}%
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            <!-- Product Info -->
-                                            <div class="p-4">
-                                                @if(isset($product->category) && $product->category)
-                                                    <span class="text-xs text-red-500 font-medium uppercase tracking-wide mb-1 block">
-                                                        {{ is_object($product->category) ? $product->category->name : $product->category['name'] }}
-                                                    </span>
-                                                @endif
-                                                <h3 class="text-sm md:text-base font-semibold text-gray-900 group-hover:text-red-700 transition-colors line-clamp-2 mb-3 font-montserrat">
-                                                    {{ $product->name }}
-                                                </h3>
-
-                                                <div class="flex items-center justify-between">
-                                                    <div>
-                                                        @if(isset($product->compare_price) && $product->compare_price > $product->price)
-                                                            <div class="flex flex-col">
-                                                                <span class="text-red-600 font-bold text-sm md:text-base">{{ number_format($product->price, 0, ',', '.') }}đ</span>
-                                                                <span class="text-gray-400 line-through text-xs">{{ number_format($product->compare_price, 0, ',', '.') }}đ</span>
-                                                            </div>
-                                                        @else
-                                                            <span class="text-red-600 font-bold text-sm md:text-base">{{ number_format($product->price, 0, ',', '.') }}đ</span>
-                                                        @endif
-                                                    </div>
-                                                    <span class="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-red-50 to-red-100 px-3 py-1.5 text-xs font-medium text-red-700 group-hover:from-red-100 group-hover:to-red-200 transition-all">
-                                                        Chi tiết
-                                                        <i class="fas fa-arrow-right ml-1"></i>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </article>
-                            @endforeach
+                            @foreach($this->products as $product)<x-product-card :product="$product" />@endforeach
                         </div>
 
                         <!-- Load More Button -->
@@ -291,40 +200,5 @@
 </div>
 
 @push('styles')
-<style>
-    .filter-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .filter-btn {
-        transition: all 0.2s ease;
-    }
-
-    .filter-btn:hover {
-        background-color: #fef2f2;
-        color: #dc2626;
-    }
-
-    .filter-btn.active {
-        background-color: #dc2626;
-        color: white;
-    }
-
-    .product-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .product-card:hover {
-        transform: translateY(-4px);
-    }
-
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/products-filter.css') }}">
 @endpush

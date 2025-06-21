@@ -11,6 +11,7 @@
 */
 
 use App\Http\Controllers\AlbumController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseGroupController;
 use App\Http\Controllers\FaviconController;
@@ -32,6 +33,8 @@ Route::controller(MainController::class)->group(function () {
     Route::get('/', 'storeFront')->name('storeFront');
 });
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Routes Khóa học
@@ -52,6 +55,20 @@ Route::controller(CourseController::class)->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Routes Authentication
+|--------------------------------------------------------------------------
+| Quản lý đăng nhập, đăng ký, đăng xuất cho học viên
+*/
+Route::controller(AuthController::class)->group(function () {
+    Route::get('/dang-nhap', 'showLoginForm')->name('auth.login');
+    Route::post('/dang-nhap', 'login');
+    Route::get('/dang-ky', 'showRegisterForm')->name('auth.register');
+    Route::post('/dang-ky', 'register');
+    Route::post('/dang-xuat', 'logout')->name('auth.logout');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Routes Học viên
 |--------------------------------------------------------------------------
 | Quản lý đăng ký học viên và thông tin cá nhân:
@@ -64,7 +81,7 @@ Route::controller(StudentController::class)->group(function () {
     Route::post('/dang-ky-hoc-vien', 'store')->name('students.store');
     Route::get('/dang-ky-thanh-cong', 'success')->name('students.success');
     Route::post('/api/enroll-course', 'enrollCourse')->name('students.enroll');
-    Route::get('/hoc-vien/profile', 'profile')->name('students.profile');
+    Route::get('/hoc-vien/profile', 'profile')->name('students.profile')->middleware('student.auth');
 });
 
 /*
@@ -125,11 +142,13 @@ Route::controller(PostController::class)->group(function () {
 |--------------------------------------------------------------------------
 | Download tài liệu với kiểm tra quyền truy cập
 */
+
 Route::get('/course-material/{id}/download', function ($id) {
     $material = \App\Models\CourseMaterial::findOrFail($id);
+    $user = auth('student')->user();
 
-    if (!$material->canDownload()) {
-        abort(403, 'Không có quyền tải tài liệu này');
+    if (!$material->canViewAndDownloadIfEnrolled($user, $material->course)) {
+        abort(403, 'Bạn cần đăng nhập và đăng ký khóa học để tải tài liệu này');
     }
 
     return response()->download(

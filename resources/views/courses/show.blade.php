@@ -1,494 +1,152 @@
 @extends('layouts.shop')
 
-@section('title', $course->seo_title ?: $course->title . ' - VBA Vũ Phúc')
-@section('description', $course->seo_description ?: Str::limit(strip_tags($course->description), 160))
-
-@if($course->og_image_link)
-@section('og_image', asset('storage/' . $course->og_image_link))
-@elseif($course->thumbnail)
-@section('og_image', asset('storage/' . $course->thumbnail))
-@endif
+@section('title', $course->title)
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
     <!-- Course Header -->
     <div class="bg-white shadow-sm">
         <div class="container mx-auto px-4 py-8">
-            <!-- Breadcrumb -->
-            <nav class="text-sm mb-6">
-                <ol class="flex items-center space-x-2 text-gray-500">
-                    <li><a href="{{ route('storeFront') }}" class="hover:text-blue-600">Trang chủ</a></li>
-                    <li><span class="mx-2">/</span></li>
-                    <li><a href="{{ route('courses.index') }}" class="hover:text-blue-600">Khóa học</a></li>
-                    @if($course->category)
-                    <li><span class="mx-2">/</span></li>
-                    <li><a href="{{ route('courses.category', $course->category->slug) }}" class="hover:text-blue-600">{{ $course->category->name }}</a></li>
-                    @endif
-                    <li><span class="mx-2">/</span></li>
-                    <li class="text-gray-900">{{ $course->title }}</li>
-                </ol>
-            </nav>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Course Info -->
-                <div class="lg:col-span-2">
-                    <div class="flex flex-wrap items-center gap-3 mb-4">
-                        @if($course->category)
-                        <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {{ $course->category->name }}
-                        </span>
-                        @endif
-                        
-                        <span class="px-3 py-1 {{ $course->level === 'beginner' ? 'bg-green-100 text-green-800' : ($course->level === 'intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }} text-sm font-medium rounded-full">
-                            {{ $course->level_display }}
-                        </span>
-                        
-                        @if($course->is_featured)
-                        <span class="px-3 py-1 bg-orange-100 text-orange-800 text-sm font-medium rounded-full">
-                            <i class="fas fa-star mr-1"></i>Nổi bật
-                        </span>
-                        @endif
-                    </div>
-
-                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        {{ $course->title }}
-                    </h1>
-
-                    <div class="flex flex-wrap items-center gap-6 text-gray-600 mb-6">
-                        @if($course->instructor && $course->show_instructor)
-                        <div class="flex items-center">
-                            <i class="fas fa-user-tie mr-2"></i>
-                            @if($course->instructor->slug)
-                                <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                                   class="hover:text-red-600 transition-colors duration-300">
-                                    {{ $course->instructor->name }}
-                                </a>
-                            @else
-                                <span>{{ $course->instructor->name }}</span>
-                            @endif
-                            @if($course->instructor->specialization)
-                                <span class="text-sm text-gray-500 ml-1">({{ $course->instructor->specialization }})</span>
-                            @endif
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Course Image -->
+                <div class="lg:w-1/3">
+                    <div class="relative overflow-hidden rounded-lg shadow-lg">
+                        @if($course->featured_image && $course->featured_image->exists())
+                        <img src="{{ $course->featured_image->full_image_url }}"
+                             alt="{{ $course->featured_image->alt_text }}"
+                             class="w-full h-64 lg:h-80 object-cover">
+                        @else
+                        <div class="w-full h-64 lg:h-80 bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
+                            <div class="text-center text-blue-600">
+                                <i class="fas fa-graduation-cap text-6xl opacity-60 mb-4"></i>
+                                <p class="text-lg font-medium">{{ $course->title }}</p>
+                            </div>
                         </div>
                         @endif
-                        
-                        <div class="flex items-center">
-                            <i class="fas fa-clock mr-2"></i>
-                            <span>{{ $course->duration_hours }} giờ</span>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <i class="fas fa-users mr-2"></i>
-                            <span>{{ $course->enrolled_students_count }} học viên</span>
-                        </div>
-                        
-                        <div class="flex items-center">
-                            <i class="fas fa-calendar mr-2"></i>
-                            <span>{{ $course->created_at->format('d/m/Y') }}</span>
-                        </div>
-                    </div>
-
-                    <!-- Course Description -->
-                    <div class="prose max-w-none mb-8">
-                        {!! $course->description !!}
                     </div>
                 </div>
 
-                <!-- Course Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg shadow-lg p-6 sticky top-6">
-                        <!-- Course Image với Fallback UI -->
-                        <div class="mb-6">
-                            @if($course->getMainImage() && $course->getMainImage() !== asset('images/placeholder-course.jpg'))
-                                <img src="{{ $course->getMainImage() }}"
-                                     alt="{{ $course->title }}"
-                                     class="w-full h-48 object-cover rounded-lg"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            @endif
+                <!-- Course Info -->
+                <div class="lg:w-2/3">
+                    <div class="mb-4">
+                        @if($course->category)
+                        <span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                            {{ $course->category->name }}
+                        </span>
+                        @endif
+                    </div>
 
-                            <!-- Fallback UI khi không có ảnh hoặc ảnh lỗi -->
-                            <div class="w-full h-48 bg-gradient-to-br from-red-50 to-red-100 rounded-lg flex flex-col items-center justify-center text-red-600 relative {{ ($course->getMainImage() && $course->getMainImage() !== asset('images/placeholder-course.jpg')) ? 'hidden' : 'flex' }}">
-                                <div class="text-center space-y-4">
-                                    <i class="fas fa-graduation-cap text-5xl opacity-60"></i>
-                                    <div class="space-y-2">
-                                        <span class="block text-lg font-semibold opacity-80 line-clamp-2 px-4">{{ $course->title }}</span>
-                                        <span class="block text-sm opacity-60">Khóa học VBA Vũ Phúc</span>
-                                        @if($course->level)
-                                        <span class="inline-block px-3 py-1 bg-red-200 text-red-800 text-xs font-medium rounded-full">
-                                            {{ $course->level_display }}
-                                        </span>
-                                        @endif
-                                        @if($course->instructor && $course->show_instructor)
-                                        <span class="block text-xs opacity-50">{{ $course->instructor->name }}</span>
-                                        @endif
-                                    </div>
-                                </div>
+                    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{{ $course->title }}</h1>
 
-                                <!-- Decorative elements -->
-                                <div class="absolute top-4 right-4 w-12 h-12 bg-red-200 rounded-full opacity-30"></div>
-                                <div class="absolute bottom-4 left-4 w-8 h-8 bg-red-300 rounded-full opacity-20"></div>
-                                <div class="absolute top-1/2 left-4 w-6 h-6 bg-red-400 rounded-full opacity-15"></div>
-                            </div>
-                        </div>
+                    @if($course->short_description)
+                    <p class="text-lg text-gray-600 mb-6">{{ $course->short_description }}</p>
+                    @endif
 
-                        <!-- Price -->
-                        @if($course->show_price)
-                        <div class="mb-6">
-                            <div class="flex items-center gap-3">
-                                @if($course->compare_price && $course->compare_price > $course->price)
-                                <span class="text-2xl font-bold text-gray-900">{{ number_format($course->price, 0, ',', '.') }} VNĐ</span>
-                                <span class="text-lg text-gray-500 line-through">{{ number_format($course->compare_price, 0, ',', '.') }} VNĐ</span>
-                                <span class="px-2 py-1 bg-red-100 text-red-800 text-sm font-medium rounded">
-                                    -{{ $course->discount_percentage }}%
-                                </span>
-                                @else
-                                <span class="text-2xl font-bold text-gray-900">{{ number_format($course->price, 0, ',', '.') }} VNĐ</span>
-                                @endif
-                            </div>
+                    <!-- Course Meta -->
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        @if($course->duration)
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-clock text-blue-500 text-xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Thời lượng</p>
+                            <p class="font-semibold">{{ $course->duration }}</p>
                         </div>
                         @endif
 
-                        <!-- Enrollment Form -->
-                        <livewire:enrollment-form :course="$course" />
-
-                        <!-- Google Form và Group Links -->
-                        @if(($course->gg_form && $course->show_form_link) || ($course->courseGroup?->group_link && $course->show_group_link))
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <h3 class="font-semibold text-gray-900 mb-4">Liên kết khóa học:</h3>
-                            <div class="space-y-3">
-                                @if($course->gg_form && $course->show_form_link)
-                                <a href="{{ $course->gg_form }}"
-                                   target="_blank"
-                                   class="flex items-center justify-center w-full px-4 py-3 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors duration-300">
-                                    <i class="fas fa-file-alt mr-2"></i>
-                                    Đăng ký qua Google Form
-                                </a>
-                                @endif
-
-                                @if($course->courseGroup?->group_link && $course->show_group_link)
-                                <a href="{{ $course->courseGroup->group_link }}"
-                                   target="_blank"
-                                   class="flex items-center justify-center w-full px-4 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300">
-                                    <i class="fas fa-users mr-2"></i>
-                                    Tham gia nhóm học tập
-                                </a>
-                                @endif
-                            </div>
+                        @if($course->level)
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-signal text-green-500 text-xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Cấp độ</p>
+                            <p class="font-semibold">{{ $course->level }}</p>
                         </div>
                         @endif
 
-                        <!-- Course Features -->
-                        <div class="mt-6 pt-6 border-t border-gray-200">
-                            <h3 class="font-semibold text-gray-900 mb-4">Khóa học bao gồm:</h3>
-                            <ul class="space-y-3 text-sm text-gray-600">
-                                <li class="flex items-center">
-                                    <i class="fas fa-check text-green-500 mr-3"></i>
-                                    {{ $course->duration_hours }} giờ học
-                                </li>
-                                <li class="flex items-center">
-                                    <i class="fas fa-check text-green-500 mr-3"></i>
-                                    Tài liệu học tập đầy đủ
-                                </li>
-                                <li class="flex items-center">
-                                    <i class="fas fa-check text-green-500 mr-3"></i>
-                                    Hỗ trợ từ giảng viên
-                                </li>
-                                <li class="flex items-center">
-                                    <i class="fas fa-check text-green-500 mr-3"></i>
-                                    Chứng chỉ hoàn thành
-                                </li>
-                                @if($course->max_students)
-                                <li class="flex items-center">
-                                    <i class="fas fa-users text-blue-500 mr-3"></i>
-                                    Tối đa {{ $course->max_students }} học viên
-                                </li>
-                                @endif
-                            </ul>
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-users text-purple-500 text-xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Học viên</p>
+                            <p class="font-semibold">{{ $course->students_count ?? 0 }}</p>
                         </div>
+
+                        <div class="text-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-calendar text-orange-500 text-xl mb-2"></i>
+                            <p class="text-sm text-gray-600">Cập nhật</p>
+                            <p class="font-semibold">{{ $course->updated_at->format('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- CTA Button -->
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-play mr-2"></i>
+                            Đăng ký khóa học
+                        </button>
+                        <button class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-heart mr-2"></i>
+                            Yêu thích
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Course Content Tabs -->
+    <!-- Course Content -->
     <div class="container mx-auto px-4 py-12">
-        <div class="bg-white rounded-lg shadow-lg">
-            <!-- Tab Navigation -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Tabs Navigation -->
             <div class="border-b border-gray-200">
-                <nav class="flex space-x-8 px-6">
-                    <button class="tab-button active py-4 px-2 border-b-2 border-blue-500 text-blue-600 font-medium" data-tab="overview">
-                        Tổng quan
+                <nav class="flex space-x-8 px-8">
+                    <button class="tab-button py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium" data-tab="overview">
+                        Thông tin khóa học
                     </button>
-                    @if($course->requirements && is_array($course->requirements) && count($course->requirements) > 0)
-                    <button class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="requirements">
-                        Yêu cầu
-                    </button>
-                    @endif
-                    @if($course->what_you_learn && is_array($course->what_you_learn) && count($course->what_you_learn) > 0)
-                    <button class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="outcomes">
-                        Kết quả học tập
-                    </button>
-                    @endif
-                    @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
-                    <button class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="materials">
-                        Tài liệu khóa học
-                    </button>
-                    @endif
-
                     @if($course->images && $course->images->where('status', 'active')->count() > 0)
-                    <button class="tab-button py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="gallery">
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium" data-tab="gallery">
                         Thư viện ảnh
                     </button>
                     @endif
                 </nav>
             </div>
 
-            <!-- Tab Content -->
-            <div class="p-6">
+            <!-- Tab Contents -->
+            <div class="p-8">
                 <!-- Overview Tab -->
                 <div id="overview" class="tab-content">
-                    <div class="prose max-w-none">
-                        {!! $course->description !!}
-                    </div>
-                    
-                    @if($course->instructor && $course->show_instructor)
-                    <div class="mt-8 pt-8 border-t border-gray-200">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-semibold">Về giảng viên</h3>
-                            @if($course->instructor->slug)
-                            <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                               class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-300 flex items-center">
-                                <i class="fas fa-user-tie mr-2"></i>
-                                Xem trang giảng viên
-                            </a>
-                            @endif
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-6">
-                            <div class="flex items-start space-x-4">
-                                @if($course->instructor->hasAvatar())
-                                    <img src="{{ $course->instructor->avatar_url }}"
-                                         alt="{{ $course->instructor->name }}"
-                                         class="w-16 h-16 rounded-full object-cover"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                @endif
-
-                                <!-- Fallback UI cho avatar giảng viên -->
-                                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center {{ $course->instructor->hasAvatar() ? 'hidden' : 'flex' }}">
-                                    <i class="fas fa-user-tie text-red-600 text-xl opacity-70"></i>
-                                </div>
-
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <h4 class="font-semibold text-lg">
-                                            @if($course->instructor->slug)
-                                                <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                                                   class="hover:text-red-600 transition-colors duration-300">
-                                                    {{ $course->instructor->name }}
-                                                </a>
-                                            @else
-                                                <span>{{ $course->instructor->name }}</span>
-                                            @endif
-                                        </h4>
-
-                                        @if($course->instructor->slug)
-                                        <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                                           class="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-lg hover:bg-red-200 transition-colors duration-300 flex items-center">
-                                            <i class="fas fa-arrow-right mr-1"></i>
-                                            Chi tiết
-                                        </a>
-                                        @endif
-                                    </div>
-
-                                    @if($course->instructor->specialization)
-                                        <p class="text-red-600 font-medium mb-2">{{ $course->instructor->specialization }}</p>
-                                    @endif
-
-                                    @if($course->instructor->experience_years > 0)
-                                        <p class="text-sm text-gray-600 mb-2">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            {{ $course->instructor->experience_years }} năm kinh nghiệm
-                                        </p>
-                                    @endif
-
-                                    @if($course->instructor->bio)
-                                        <div class="text-gray-600 prose prose-sm max-w-none">
-                                            {!! Str::limit($course->instructor->bio, 300) !!}
-                                            @if(strlen($course->instructor->bio) > 300 && $course->instructor->slug)
-                                                <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                                                   class="text-red-600 hover:text-red-800 ml-2">
-                                                    Xem thêm →
-                                                </a>
-                                            @endif
-                                        </div>
-                                    @endif
-
-                                    @if($course->instructor->education)
-                                        <div class="mt-3 text-sm text-gray-600">
-                                            <strong>Học vấn:</strong> {{ $course->instructor->education }}
-                                        </div>
-                                    @endif
-
-                                    @if($course->instructor->certifications && is_array($course->instructor->certifications) && count($course->instructor->certifications) > 0)
-                                        <div class="mt-3">
-                                            <strong class="text-sm text-gray-700">Chứng chỉ:</strong>
-                                            <div class="flex flex-wrap gap-2 mt-1">
-                                                @foreach(array_slice($course->instructor->certifications, 0, 3) as $cert)
-                                                    <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded">
-                                                        {{ $cert['name'] }}
-                                                        @if(isset($cert['issuer']))
-                                                            - {{ $cert['issuer'] }}
-                                                        @endif
-                                                    </span>
-                                                @endforeach
-                                                @if(count($course->instructor->certifications) > 3 && $course->instructor->slug)
-                                                    <a href="{{ route('instructors.show', $course->instructor->slug) }}"
-                                                       class="text-red-600 hover:text-red-800 text-xs">
-                                                        +{{ count($course->instructor->certifications) - 3 }} khác
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
+                    @if($course->description)
+                    <div class="prose max-w-none mb-8">
+                        <h3 class="text-xl font-semibold mb-4">Mô tả khóa học</h3>
+                        <div class="text-gray-700 leading-relaxed">
+                            {!! nl2br(e($course->description)) !!}
                         </div>
                     </div>
                     @endif
-                </div>
 
-                <!-- Requirements Tab -->
-                @if($course->requirements && is_array($course->requirements) && count($course->requirements) > 0)
-                <div id="requirements" class="tab-content hidden">
-                    <h3 class="text-xl font-semibold mb-4">Yêu cầu đầu vào</h3>
-                    <ul class="space-y-2">
-                        @foreach($course->requirements as $requirement)
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
-                            <span>{{ $requirement['requirement'] ?? $requirement }}</span>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-
-                <!-- Learning Outcomes Tab -->
-                @if($course->what_you_learn && is_array($course->what_you_learn) && count($course->what_you_learn) > 0)
-                <div id="outcomes" class="tab-content hidden">
-                    <h3 class="text-xl font-semibold mb-4">Những gì bạn sẽ học được</h3>
-                    <ul class="space-y-2">
-                        @foreach($course->what_you_learn as $outcome)
-                        <li class="flex items-start">
-                            <i class="fas fa-graduation-cap text-blue-500 mr-3 mt-1"></i>
-                            <span>{{ $outcome['learning_outcome'] ?? $outcome }}</span>
-                        </li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-
-                <!-- Materials Tab -->
-                @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
-                <div id="materials" class="tab-content hidden">
-                    <h3 class="text-xl font-semibold mb-6">Tài liệu khóa học</h3>
-
-                    <!-- Tài liệu mở (Open Materials) -->
-                    @if($openMaterials && $openMaterials->count() > 0)
+                    @if($course->objectives && count($course->objectives) > 0)
                     <div class="mb-8">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-unlock text-green-600 mr-2"></i>
-                            <h4 class="text-lg font-semibold text-green-700">Mở</h4>
-                        </div>
-                        <div class="grid gap-4">
-                            @foreach($openMaterials as $material)
-                            <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="{{ $material->file_icon }} text-green-600 mr-3"></i>
-                                    <div>
-                                        <h5 class="font-medium text-gray-900">{{ $material->title }}</h5>
-                                        @if($material->description)
-                                        <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
-                                        @endif
-                                        <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                            <span>{{ $material->formatted_file_size }}</span>
-                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded">
-                                                Mở
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <a href="{{ $material->download_url }}"
-                                       class="px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center">
-                                        <i class="fas fa-eye mr-2"></i>Xem
-                                    </a>
-                                    <a href="{{ $material->download_url }}" download
-                                       class="px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors duration-300 flex items-center">
-                                        <i class="fas fa-download mr-2"></i>Tải về
-                                    </a>
-                                </div>
-                            </div>
+                        <h3 class="text-xl font-semibold mb-4">Mục tiêu khóa học</h3>
+                        <ul class="space-y-2">
+                            @foreach($course->objectives as $objective)
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                                <span class="text-gray-700">{{ $objective }}</span>
+                            </li>
                             @endforeach
-                        </div>
+                        </ul>
                     </div>
                     @endif
 
-                    <!-- Tài liệu dành cho học viên (Enrolled Materials) -->
-                    @if($enrolledMaterials && $enrolledMaterials->count() > 0)
+                    @if($course->requirements && count($course->requirements) > 0)
                     <div class="mb-8">
-                        <div class="flex items-center mb-4">
-                            <i class="fas fa-key text-blue-600 mr-2"></i>
-                            <h4 class="text-lg font-semibold text-blue-700">Dành cho học viên</h4>
-                        </div>
-
-                        <!-- Hiển thị danh sách tài liệu với icon khóa và tooltip -->
-                        <div class="grid gap-4">
-                            @foreach($enrolledMaterials as $material)
-                            <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <i class="fas fa-key text-blue-600 mr-3 text-lg"></i>
-                                    <div>
-                                        <h5 class="font-medium text-gray-900">{{ $material->title }}</h5>
-                                        @if($material->description)
-                                        <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
-                                        @endif
-                                        <div class="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                            <span>{{ $material->formatted_file_size }}</span>
-                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                                                Dành cho học viên
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Hiển thị icon khóa với tooltip -->
-                                <div class="relative group">
-                                    <div class="px-4 py-2 bg-gray-100 text-gray-500 text-sm rounded-lg flex items-center cursor-help">
-                                        <i class="fas fa-key mr-2"></i>Khóa
-                                    </div>
-                                    <!-- Tooltip -->
-                                    <div class="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10">
-                                        Dành cho học viên đã đăng ký
-                                        <div class="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <h3 class="text-xl font-semibold mb-4">Yêu cầu</h3>
+                        <ul class="space-y-2">
+                            @foreach($course->requirements as $requirement)
+                            <li class="flex items-start">
+                                <i class="fas fa-exclamation-circle text-orange-500 mt-1 mr-3"></i>
+                                <span class="text-gray-700">{{ $requirement }}</span>
+                            </li>
                             @endforeach
-                        </div>
-
-                        <!-- Thông báo về tài liệu dành cho học viên -->
-                        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
-                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                            <span class="text-blue-700 text-sm">
-                                {{ $enrolledMaterials->count() }} tài liệu dành cho học viên đã đăng ký khóa học
-                            </span>
-                        </div>
+                        </ul>
                     </div>
                     @endif
-
-
                 </div>
-                @endif
 
                 <!-- Course Gallery -->
                 @if($course->images && $course->images->where('status', 'active')->count() > 0)
@@ -536,92 +194,180 @@
         </div>
     </div>
 
-    <!-- Related Courses -->
-    @if($relatedCourses && $relatedCourses->count() > 0)
-    <div class="container mx-auto px-4 pb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-8">Khóa học liên quan</h2>
+    <!-- Course Materials Section -->
+    @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
+    <div class="container mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8">Tài liệu khóa học</h2>
 
-        @if($relatedCourses->count() == 3)
-        <!-- Carousel cho đúng 3 khóa học -->
-        <div class="relative">
-            <div class="overflow-hidden">
-                <div id="relatedCoursesCarousel" class="flex transition-transform duration-500 ease-in-out">
-                    @foreach($relatedCourses as $relatedCourse)
-                    <div class="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-3">
-                        <livewire:course-card :course="$relatedCourse" card-size="small" :key="'related-'.$relatedCourse->id" />
+            <!-- Auth Status Alert -->
+            @if(!auth('student')->check())
+                <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 text-blue-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <p class="text-blue-800 font-medium">Đăng nhập để xem tài liệu khóa học</p>
+                            <p class="text-blue-700 text-sm mt-1">
+                                <a href="{{ route('auth.login') }}" class="underline hover:no-underline">Đăng nhập</a>
+                                hoặc
+                                <a href="{{ route('auth.register') }}" class="underline hover:no-underline">đăng ký</a>
+                                để truy cập tài liệu dành cho học viên.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @elseif(auth('student')->check() && !$course->students()->where('student_id', auth('student')->id())->exists())
+                <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="h-5 w-5 text-yellow-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <p class="text-yellow-800 font-medium">Bạn chưa đăng ký khóa học này</p>
+                            <p class="text-yellow-700 text-sm mt-1">
+                                Vui lòng đăng ký khóa học để truy cập tài liệu dành cho học viên.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Tài liệu mở (Open Materials) -->
+            @if($openMaterials && $openMaterials->count() > 0)
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-green-700">Tài liệu mở</h3>
+                    <span class="ml-2 text-sm text-gray-500">(Miễn phí cho tất cả)</span>
+                </div>
+                <div class="space-y-4">
+                    @foreach($openMaterials as $material)
+                    <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="{{ $material->file_icon }} text-2xl text-green-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">{{ $material->title }}</h4>
+                                @if($material->description)
+                                <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
+                                @endif
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                    <span>{{ $material->file_size_formatted }}</span>
+                                    <span>{{ $material->file_type }}</span>
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">Miễn phí</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            @if($material->canPreview())
+                                <button class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                    Xem trước
+                                </button>
+                            @endif
+                            <a href="{{ route('course.material.download', $material->id) }}"
+                               class="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                                Tải về
+                            </a>
+                        </div>
                     </div>
                     @endforeach
                 </div>
             </div>
+            @endif
 
-            <!-- Navigation buttons -->
-            <button id="prevRelated" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 text-gray-600 hover:text-red-600 transition-colors duration-300 z-10">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button id="nextRelated" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 text-gray-600 hover:text-red-600 transition-colors duration-300 z-10">
-                <i class="fas fa-chevron-right"></i>
-            </button>
+            <!-- Tài liệu dành cho học viên (Enrolled Materials) -->
+            @if($enrolledMaterials && $enrolledMaterials->count() > 0)
+            <div class="mb-8">
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-blue-700">Tài liệu dành cho học viên</h3>
+                    <span class="ml-2 text-sm text-gray-500">(Cần đăng ký khóa học)</span>
+                </div>
 
-            <!-- Dots indicator -->
-            <div class="flex justify-center mt-6 space-x-2">
-                @for($i = 0; $i < $relatedCourses->count(); $i++)
-                <button class="carousel-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-red-500 transition-colors duration-300 {{ $i == 0 ? 'bg-red-500' : '' }}" data-slide="{{ $i }}"></button>
-                @endfor
+                @php
+                    $user = auth('student')->user();
+                    $isEnrolled = $user ? $course->students()->where('student_id', $user->id)->exists() : false;
+                @endphp
+
+                <div class="space-y-4">
+                    @foreach($enrolledMaterials as $material)
+                    <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg {{ $isEnrolled ? 'hover:bg-blue-100' : 'opacity-60' }} transition-colors">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="{{ $material->file_icon }} text-2xl {{ $isEnrolled ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">{{ $material->title }}</h4>
+                                @if($material->description)
+                                <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
+                                @endif
+                                <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                    <span>{{ $material->file_size_formatted }}</span>
+                                    <span>{{ $material->file_type }}</span>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Học viên</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            @if($isEnrolled)
+                                @if($material->canPreview())
+                                    <button class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                        Xem trước
+                                    </button>
+                                @endif
+                                <a href="{{ route('course.material.download', $material->id) }}"
+                                   class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                                    Tải về
+                                </a>
+                            @else
+                                <div class="px-3 py-2 text-sm bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed">
+                                    <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    Khóa
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
+            @endif
         </div>
-        @else
-        <!-- Grid thông thường cho ít hơn hoặc nhiều hơn 3 khóa học -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($relatedCourses as $relatedCourse)
-            <livewire:course-card :course="$relatedCourse" card-size="small" :key="'related-'.$relatedCourse->id" />
-            @endforeach
-        </div>
-        @endif
     </div>
     @endif
 </div>
-@endsection
 
-@push('scripts')
-<!-- Gallery Popup Modal -->
-<div id="galleryModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center">
-    <div class="relative max-w-4xl max-h-full p-4">
-        <!-- Close button -->
-        <button id="closeModal" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10">
-            <i class="fas fa-times"></i>
-        </button>
+<!-- Gallery Modal -->
+<div id="galleryModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative max-w-4xl w-full">
+            <!-- Close button -->
+            <button id="closeModal" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
 
-        <!-- Previous button -->
-        <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl hover:text-gray-300 z-10">
-            <i class="fas fa-chevron-left"></i>
-        </button>
+            <!-- Navigation buttons -->
+            <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10">
+                <i class="fas fa-chevron-left text-3xl"></i>
+            </button>
+            <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10">
+                <i class="fas fa-chevron-right text-3xl"></i>
+            </button>
 
-        <!-- Next button -->
-        <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl hover:text-gray-300 z-10">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-
-        <!-- Image container -->
-        <div class="text-center">
-            <img id="modalImage" src="" alt="" class="max-w-full max-h-[80vh] object-contain"
-                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-
-            <!-- Fallback UI cho popup ảnh lỗi -->
-            <div id="modalImageFallback" class="hidden max-w-md mx-auto bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-8 items-center justify-center text-red-600" style="display: none; flex-direction: column;">
-                <i class="fas fa-image text-6xl opacity-60 mb-4"></i>
-                <h3 class="text-xl font-semibold mb-2 text-red-700">Ảnh không thể tải</h3>
-                <p class="text-sm opacity-70 text-center">Ảnh này có thể đã bị xóa hoặc không tồn tại trong hệ thống</p>
-                <!-- Decorative elements -->
-                <div class="absolute top-4 right-4 w-8 h-8 bg-red-200 rounded-full opacity-30"></div>
-                <div class="absolute bottom-4 left-4 w-6 h-6 bg-red-300 rounded-full opacity-20"></div>
-                <div class="absolute top-1/2 left-4 w-4 h-4 bg-red-400 rounded-full opacity-15"></div>
-            </div>
-
-            <div class="mt-4 text-white">
-                <h3 id="modalTitle" class="text-xl font-semibold mb-2"></h3>
-                <p id="modalDescription" class="text-gray-300"></p>
-                <div class="mt-2 text-sm text-gray-400">
-                    <span id="imageCounter"></span>
+            <!-- Image container -->
+            <div class="text-center">
+                <img id="modalImage" src="" alt="" class="max-w-full max-h-[80vh] object-contain mx-auto">
+                <div id="modalInfo" class="mt-4 text-white">
+                    <h3 id="modalTitle" class="text-xl font-semibold mb-2"></h3>
+                    <p id="modalDescription" class="text-gray-300"></p>
                 </div>
             </div>
         </div>
@@ -630,107 +376,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    const modal = document.getElementById('galleryModal');
-    const modalImage = document.getElementById('modalImage');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDescription = document.getElementById('modalDescription');
-    const imageCounter = document.getElementById('imageCounter');
-    const closeModal = document.getElementById('closeModal');
-    const prevImage = document.getElementById('prevImage');
-    const nextImage = document.getElementById('nextImage');
-
-    let currentImageIndex = 0;
-    let images = [];
-
-    // Collect all images data
-    galleryItems.forEach((item, index) => {
-        images.push({
-            src: item.dataset.src,
-            title: item.dataset.title,
-            description: item.dataset.description || ''
-        });
-
-        // Add click event to open modal
-        item.addEventListener('click', function() {
-            currentImageIndex = index;
-            openModal();
-        });
-    });
-
-    function openModal() {
-        if (images.length === 0) return;
-
-        const image = images[currentImageIndex];
-        const modalImageFallback = document.getElementById('modalImageFallback');
-
-        // Reset image display
-        modalImage.style.display = 'block';
-        modalImageFallback.style.display = 'none';
-
-        modalImage.src = image.src;
-        modalImage.alt = image.title;
-        modalTitle.textContent = image.title;
-        modalDescription.textContent = image.description;
-        imageCounter.textContent = `${currentImageIndex + 1} / ${images.length}`;
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModalFunc() {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        document.body.style.overflow = 'auto';
-    }
-
-    function showPrevImage() {
-        currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
-        openModal();
-    }
-
-    function showNextImage() {
-        currentImageIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
-        openModal();
-    }
-
-    // Event listeners
-    closeModal.addEventListener('click', closeModalFunc);
-    prevImage.addEventListener('click', showPrevImage);
-    nextImage.addEventListener('click', showNextImage);
-
-    // Close modal when clicking outside image
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            closeModalFunc();
-        }
-    });
-
-    // Keyboard navigation
-    document.addEventListener('keydown', function(e) {
-        if (!modal.classList.contains('hidden')) {
-            switch(e.key) {
-                case 'Escape':
-                    closeModalFunc();
-                    break;
-                case 'ArrowLeft':
-                    showPrevImage();
-                    break;
-                case 'ArrowRight':
-                    showNextImage();
-                    break;
-            }
-        }
-    });
-});
-</script>
-@endpush
-
-@push('scripts')
-<script>
-// Tab functionality
-document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -738,71 +384,88 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', () => {
             const targetTab = button.getAttribute('data-tab');
 
-            // Remove active class from all buttons and contents
+            // Remove active classes
             tabButtons.forEach(btn => {
-                btn.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                btn.classList.remove('border-blue-500', 'text-blue-600');
                 btn.classList.add('border-transparent', 'text-gray-500');
             });
-            tabContents.forEach(content => content.classList.add('hidden'));
 
-            // Add active class to clicked button and show content
-            button.classList.add('active', 'border-blue-500', 'text-blue-600');
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // Add active classes
             button.classList.remove('border-transparent', 'text-gray-500');
-            document.getElementById(targetTab).classList.remove('hidden');
+            button.classList.add('border-blue-500', 'text-blue-600');
+
+            // Show target content
+            const targetContent = document.getElementById(targetTab);
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+            }
         });
     });
 
-    // Related Courses Carousel functionality
-    const carousel = document.getElementById('relatedCoursesCarousel');
-    const prevBtn = document.getElementById('prevRelated');
-    const nextBtn = document.getElementById('nextRelated');
-    const dots = document.querySelectorAll('.carousel-dot');
+    // Gallery functionality
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const modal = document.getElementById('galleryModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const closeModal = document.getElementById('closeModal');
+    const prevImage = document.getElementById('prevImage');
+    const nextImage = document.getElementById('nextImage');
 
-    if (carousel && prevBtn && nextBtn) {
-        let currentSlide = 0;
-        const totalSlides = dots.length;
+    let currentImageIndex = 0;
+    const images = Array.from(galleryItems).map(item => ({
+        src: item.getAttribute('data-src'),
+        title: item.getAttribute('data-title'),
+        description: item.getAttribute('data-description')
+    }));
 
-        function updateCarousel() {
-            const translateX = -currentSlide * (100 / totalSlides);
-            carousel.style.transform = `translateX(${translateX}%)`;
-
-            // Update dots
-            dots.forEach((dot, index) => {
-                if (index === currentSlide) {
-                    dot.classList.add('bg-red-500');
-                    dot.classList.remove('bg-gray-300');
-                } else {
-                    dot.classList.remove('bg-red-500');
-                    dot.classList.add('bg-gray-300');
-                }
-            });
+    function showImage(index) {
+        if (images[index]) {
+            modalImage.src = images[index].src;
+            modalTitle.textContent = images[index].title || '';
+            modalDescription.textContent = images[index].description || '';
+            currentImageIndex = index;
         }
-
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateCarousel();
-        }
-
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateCarousel();
-        }
-
-        // Event listeners
-        nextBtn.addEventListener('click', nextSlide);
-        prevBtn.addEventListener('click', prevSlide);
-
-        // Dot navigation
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentSlide = index;
-                updateCarousel();
-            });
-        });
-
-        // Auto-play carousel (optional)
-        setInterval(nextSlide, 5000);
     }
+
+    galleryItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            showImage(index);
+        });
+    });
+
+    closeModal.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    prevImage.addEventListener('click', () => {
+        const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+        showImage(newIndex);
+    });
+
+    nextImage.addEventListener('click', () => {
+        const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+        showImage(newIndex);
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            modal.classList.add('hidden');
+        }
+    });
+
+    // Close modal on backdrop click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
 });
 </script>
-@endpush
+@endsection

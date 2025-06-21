@@ -80,7 +80,6 @@ class SearchBar extends Component
                         'title' => $course->title,
                         'url' => route('courses.show', $course->slug),
                         'image' => $image,
-                        'price' => $course->price ? number_format($course->price, 0, ',', '.') . 'đ' : null,
                         'level' => $course->level,
                         'duration' => $course->duration_hours ? $course->duration_hours . ' giờ' : null
                     ];

@@ -80,11 +80,7 @@
                                     @endif
                                 </div>
                                 
-                                @if($course->price)
-                                    <span class="text-red-600 dark:text-red-400 font-semibold">
-                                        {{ number_format($course->price, 0, ',', '.') }}đ
-                                    </span>
-                                @endif
+
                             </div>
                             
                             <div class="flex items-center justify-between">

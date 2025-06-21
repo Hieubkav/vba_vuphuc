@@ -3,7 +3,7 @@
     $latestCourse = null;
     if (isset($category->latest_course)) {
         $latestCourse = $category->latest_course;
-    } elseif ($category->relationLoaded('courses') && $category->courses->isNotEmpty()) {
+    } elseif (is_object($category) && method_exists($category, 'relationLoaded') && $category->relationLoaded('courses') && $category->courses->isNotEmpty()) {
         $latestCourse = $category->courses->first();
     }
 @endphp
@@ -17,9 +17,9 @@
     <!-- Category Header - Clean & Modern -->
     <header class="relative bg-gradient-to-r from-red-100 to-white p-8 shadow-lg">
         <div class="space-y-2">
-            <h3 class="text-3xl font-bold text-gray-900 tracking-tight">{{ $category->name }}</h3>
-            @if($category->description)
-                <p class="text-gray-600 text-base leading-relaxed">{{ Str::limit($category->description, 60) }}</p>
+            <h3 class="section-title">{{ is_object($category) && isset($category->name) ? $category->name : 'Danh mục khóa học' }}</h3>
+            @if(is_object($category) && isset($category->description) && $category->description)
+                <p class="body-text text-gray-600">{{ Str::limit($category->description, 60) }}</p>
             @endif
         </div>
     </header>
@@ -38,13 +38,13 @@
                     <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
                         <i class="fas fa-graduation-cap text-2xl text-red-500"></i>
                     </div>
-                    <p class="text-sm text-gray-600 font-medium px-4">{{ Str::limit($latestCourse->title, 30) }}</p>
+                    <p class="caption-text text-gray-600 px-4">{{ Str::limit($latestCourse->title, 30) }}</p>
                 </div>
             </div>
         @endif
 
         <!-- Badge "Mới nhất" - Elegant Design -->
-        <div class="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full">
+        <div class="absolute top-4 right-4 bg-red-600 text-white badge-text px-4 py-2 rounded-full">
             MỚI NHẤT
         </div>
     </div>
@@ -53,19 +53,19 @@
     <div class="p-8 space-y-6 shadow-lg">
         <!-- Course Title -->
         <h4 id="course-{{ $latestCourse->id }}-title"
-           class="text-xl font-bold text-gray-900 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors duration-300">
+           class="card-title line-clamp-2 group-hover:text-red-600 transition-colors duration-300">
             {{ $latestCourse->title }}
         </h4>
 
         <!-- Course Description -->
-        <p class="text-gray-600 text-base leading-relaxed line-clamp-3">
+        <p class="body-text text-gray-600 line-clamp-3">
             {{ $latestCourse->seo_description ?? Str::limit(strip_tags($latestCourse->description ?? ''), 120) }}
         </p>
 
         <!-- Action Buttons - Clean Design -->
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <a href="{{ route('courses.show', $latestCourse->slug) }}"
-               class="flex-1 inline-flex items-center justify-center px-6 py-4 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-md"
+               class="flex-1 inline-flex items-center justify-center px-6 py-4 bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 btn-text rounded-2xl transition-all duration-300 hover:shadow-md"
                aria-label="Xem chi tiết khóa học {{ $latestCourse->title }}">
                 <span>Xem chi tiết</span>
             </a>
@@ -74,7 +74,7 @@
                 <a href="{{ $latestCourse->gg_form }}"
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="flex-1 inline-flex items-center justify-center px-6 py-4 bg-red-600 hover:bg-red-700 text-white text-base font-semibold rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-red-200"
+                   class="flex-1 inline-flex items-center justify-center px-6 py-4 bg-red-600 hover:bg-red-700 text-white btn-text rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-red-200"
                    aria-label="Đăng ký khóa học {{ $latestCourse->title }}">
                     <span>Đăng ký ngay</span>
                 </a>
@@ -82,13 +82,15 @@
         </div>
 
         <!-- Category Link - Elegant -->
+        @if(is_object($category) && isset($category->slug) && isset($category->name))
         <div class="pt-6 border-t border-gray-100">
             <a href="{{ route('courses.cat-category', $category->slug) }}"
-               class="inline-flex items-center justify-center w-full px-6 py-4 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 text-base font-semibold rounded-2xl transition-all duration-300 border-2 border-red-100 hover:border-red-200"
+               class="inline-flex items-center justify-center w-full px-6 py-4 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 btn-text rounded-2xl transition-all duration-300 border-2 border-red-100 hover:border-red-200"
                aria-label="Xem tất cả khóa học trong danh mục {{ $category->name }}">
                 <span>Xem tất cả {{ $category->name }}</span>
             </a>
         </div>
+        @endif
     </div>
 </article>
 

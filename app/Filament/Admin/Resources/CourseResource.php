@@ -202,26 +202,7 @@ class CourseResource extends Resource
                                             ->helperText('Ngày dự kiến kết thúc khóa học'),
                                     ])->columns(3),
 
-                                Forms\Components\Section::make('Giá cả')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('price')
-                                            ->label('Giá khóa học')
-                                            ->numeric()
-                                            ->default(0.00)
-                                            ->prefix('VND')
-                                            ->helperText('Giá chính của khóa học'),
 
-                                        Forms\Components\TextInput::make('compare_price')
-                                            ->label('Giá so sánh')
-                                            ->numeric()
-                                            ->prefix('VND')
-                                            ->helperText('Giá gốc để hiển thị khuyến mãi (để trống nếu không có)'),
-
-                                        Forms\Components\Toggle::make('show_price')
-                                            ->label('Hiển thị giá')
-                                            ->default(true)
-                                            ->helperText('Bật/tắt hiển thị giá trên website'),
-                                    ])->columns(3),
 
                                 Forms\Components\Section::make('Liên kết & Nhóm học tập')
                                     ->schema([
@@ -448,10 +429,7 @@ class CourseResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('price')
-                    ->label('Giá')
-                    ->money('VND')
-                    ->sortable(),
+
 
                 Tables\Columns\TextColumn::make('level')
                     ->label('Trình độ')

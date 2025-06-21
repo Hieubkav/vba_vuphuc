@@ -225,9 +225,6 @@
 
                                         @if(isset($result['type']) && $result['type'] === 'course')
                                             <div class="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                                                @if(isset($result['price']))
-                                                    <span class="text-red-600 dark:text-red-400 font-semibold">{{ $result['price'] }}</span>
-                                                @endif
                                                 @if(isset($result['duration']))
                                                     <span>{{ $result['duration'] }}</span>
                                                 @endif

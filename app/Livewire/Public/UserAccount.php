@@ -16,10 +16,8 @@ class UserAccount extends Component
 
     public function checkAuthStatus()
     {
-        // TODO: Implement authentication logic
-        // Hiện tại để mặc định là chưa đăng nhập
-        $this->isLoggedIn = false;
-        $this->user = null;
+        $this->isLoggedIn = auth('student')->check();
+        $this->user = auth('student')->user();
     }
 
     public function render()

@@ -3,22 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\CourseGroup;
-use Illuminate\Http\Request;
 
 class CourseGroupController extends Controller
 {
     /**
-     * Hiển thị danh sách tất cả nhóm khóa học
+     * Hiển thị danh sách tất cả nhóm khóa học với filter
      */
     public function index()
     {
-        $courseGroups = CourseGroup::where('status', 'active')
-            ->whereNotNull('group_link')
-            ->orderBy('order', 'asc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
-
-        return view('course-groups.index', compact('courseGroups'));
+        return view('course-groups.index');
     }
 
     /**

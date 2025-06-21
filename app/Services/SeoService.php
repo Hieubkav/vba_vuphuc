@@ -107,13 +107,7 @@ class SeoService
                 '@type' => 'Organization',
                 'name' => $settings->site_name ?? 'VBA Vũ Phúc'
             ],
-            'offers' => [
-                '@type' => 'Offer',
-                'price' => $course->price,
-                'priceCurrency' => 'VND',
-                'availability' => 'https://schema.org/InStock',
-                'url' => route('courses.show', $course->slug)
-            ],
+
             'instructor' => $course->instructor ? [
                 '@type' => 'Person',
                 'name' => $course->instructor->name

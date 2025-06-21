@@ -115,7 +115,7 @@ class ViewServiceProvider extends ServiceProvider
                         ->where('status', 'active')
                         ->with(['instructor:id,name', 'courseGroup:id,group_link'])
                         ->select([
-                            'id', 'title', 'slug', 'description', 'price', 'compare_price',
+                            'id', 'title', 'slug', 'description',
                             'duration_hours', 'level', 'start_date', 'end_date', 'thumbnail',
                             'instructor_id', 'gg_form', 'show_form_link',
                             'show_group_link', 'cat_course_id', 'course_group_id', 'created_at', 'seo_title', 'seo_description'
@@ -139,7 +139,7 @@ class ViewServiceProvider extends ServiceProvider
                     ->where('is_featured', true)
                     ->with(['courseCategory:id,name,slug', 'instructor:id,name'])
                     ->select([
-                        'id', 'title', 'slug', 'price', 'compare_price', 'duration_hours',
+                        'id', 'title', 'slug', 'duration_hours',
                         'level', 'is_featured', 'cat_course_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail',
                         'order', 'max_students'
                     ])
@@ -153,7 +153,7 @@ class ViewServiceProvider extends ServiceProvider
                 return Course::where('status', 'active')
                     ->with(['courseCategory:id,name,slug', 'instructor:id,name'])
                     ->select([
-                        'id', 'title', 'slug', 'price', 'compare_price', 'duration_hours',
+                        'id', 'title', 'slug', 'duration_hours',
                         'level', 'cat_course_id', 'instructor_id', 'seo_title', 'seo_description', 'thumbnail', 'created_at'
                     ])
                     ->orderBy('created_at', 'desc')
@@ -352,7 +352,7 @@ class ViewServiceProvider extends ServiceProvider
 
                 // Recent Courses cho footer
                 'recentCourses' => Course::where('status', 'active')
-                    ->select(['id', 'title', 'slug', 'price', 'level', 'created_at'])
+                    ->select(['id', 'title', 'slug', 'level', 'created_at'])
                     ->orderBy('created_at', 'desc')
                     ->take(3)
                     ->get(),

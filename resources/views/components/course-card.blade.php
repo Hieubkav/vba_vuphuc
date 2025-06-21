@@ -33,11 +33,7 @@
         default => 'Không xác định'
     };
     
-    // Get discount percentage
-    $discountPercentage = 0;
-    if ($course->compare_price && $course->compare_price > $course->price) {
-        $discountPercentage = round((($course->compare_price - $course->price) / $course->compare_price) * 100);
-    }
+
 @endphp
 
 <!-- Course Card Component với Fallback UI đẹp mắt -->
@@ -134,28 +130,11 @@
             @endif
         </div>
 
-        <!-- Price and Action -->
+        <!-- Action -->
         <div class="flex items-center justify-between">
-            <!-- Price -->
-            @if($course->show_price)
-            <div class="flex items-center gap-2">
-                @if($course->compare_price && $course->compare_price > $course->price)
-                <span class="text-lg font-bold text-red-600">{{ number_format($course->price, 0, ',', '.') }}đ</span>
-                <span class="text-sm text-gray-500 line-through">{{ number_format($course->compare_price, 0, ',', '.') }}đ</span>
-                @if($discountPercentage > 0)
-                <span class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded">
-                    -{{ $discountPercentage }}%
-                </span>
-                @endif
-                @else
-                <span class="text-lg font-bold text-red-600">{{ number_format($course->price, 0, ',', '.') }}đ</span>
-                @endif
-            </div>
-            @else
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Liên hệ để biết giá</span>
             </div>
-            @endif
 
             <!-- View Details Button -->
             <a href="{{ route('courses.show', $course->slug) }}"

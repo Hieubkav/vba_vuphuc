@@ -17,7 +17,7 @@
                     }
                 ])
                 ->select([
-                    'id', 'title', 'slug', 'description', 'price', 'compare_price',
+                    'id', 'title', 'slug', 'description',
                     'level', 'thumbnail', 'cat_course_id', 'instructor_id', 'is_featured',
                     'order', 'created_at'
                 ])
@@ -114,14 +114,7 @@
                                 <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
                             </a>
                             @endif
-                            @if(isset($featuredCourse->price) && $featuredCourse->price > 0)
-                            <div class="text-right">
-                                <span class="text-lg md:text-xl font-light text-gray-900">{{ number_format($featuredCourse->price) }}đ</span>
-                                @if(isset($featuredCourse->compare_price) && $featuredCourse->compare_price > $featuredCourse->price)
-                                <span class="text-sm text-gray-400 line-through ml-2">{{ number_format($featuredCourse->compare_price) }}đ</span>
-                                @endif
-                            </div>
-                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -200,9 +193,7 @@
                                             <i class="fas fa-arrow-right ml-2 transition-transform group-hover:translate-x-1"></i>
                                         </a>
                                         @endif
-                                        @if(isset($course->price) && $course->price > 0)
-                                        <span class="text-sm font-light text-gray-900">{{ number_format($course->price) }}đ</span>
-                                        @endif
+
                                     </div>
                                 </div>
                             </div>
@@ -285,11 +276,7 @@
                                 <i class="fas fa-arrow-right ml-2"></i>
                             </a>
                             @endif
-                            @if(isset($featuredCourse->price) && $featuredCourse->price > 0)
-                            <div class="text-right">
-                                <span class="text-base font-bold text-red-600">{{ number_format($featuredCourse->price) }}đ</span>
-                            </div>
-                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -354,9 +341,7 @@
                                         <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                     @endif
-                                    @if(isset($course->price) && $course->price > 0)
-                                    <span class="text-xs font-bold text-red-600">{{ number_format($course->price) }}đ</span>
-                                    @endif
+
                                 </div>
                             </div>
                         </div>

@@ -50,12 +50,12 @@
                 <!-- Category & Date -->
                 <div class="flex items-center gap-3 mb-4">
                     @if($mainPost->category)
-                    <span class="category-badge bg-gradient-to-r from-red-500 to-red-600 text-white text-sm px-4 py-2 rounded-full font-semibold shadow-sm">
+                    <span class="category-badge bg-gradient-to-r from-red-500 to-red-600 text-white badge-text px-4 py-2 rounded-full shadow-sm">
                         {{ $mainPost->category->name }}
                     </span>
                     @endif
                     @if($mainPost->created_at)
-                    <span class="text-sm text-gray-500">
+                    <span class="caption-text text-gray-500">
                         {{ $mainPost->created_at->format('d/m/Y') }}
                     </span>
                     @endif
@@ -64,17 +64,17 @@
                 <!-- Title lớn -->
                 @if($mainPost->slug)
                 <a href="{{ route('posts.show', $mainPost->slug) }}">
-                    <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 hover:text-red-600 transition-colors line-clamp-3">
+                    <h2 class="section-title mb-4 hover:text-red-600 transition-colors line-clamp-3">
                         {{ $mainPost->title }}
                     </h2>
                 </a>
                 @else
-                <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 line-clamp-3">{{ $mainPost->title }}</h2>
+                <h2 class="section-title mb-4 line-clamp-3">{{ $mainPost->title }}</h2>
                 @endif
 
                 <!-- Excerpt lớn -->
                 @if($mainPost->content)
-                <p class="text-gray-600 mb-6 line-clamp-4 text-lg leading-relaxed">
+                <p class="subtitle text-gray-600 mb-6 line-clamp-4">
                     {{ Str::limit(strip_tags($mainPost->content), 200) }}
                 </p>
                 @endif
@@ -82,7 +82,7 @@
                 <!-- Read more button lớn -->
                 @if($mainPost->slug)
                 <a href="{{ route('posts.show', $mainPost->slug) }}"
-                   class="inline-flex items-center bg-red-600 text-white px-6 py-3 rounded-lg font-semibold text-lg hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg group">
+                   class="inline-flex items-center bg-red-600 text-white px-6 py-3 rounded-lg btn-text-lg hover:bg-red-700 transition-all duration-300 shadow-md hover:shadow-lg group">
                     Đọc tiếp
                     <i class="fas fa-arrow-right ml-3 text-sm transform group-hover:translate-x-1 transition-transform"></i>
                 </a>
@@ -117,12 +117,12 @@
                 <!-- Category & Date -->
                 <div class="flex items-center gap-2 mb-3">
                     @if($post->category)
-                    <span class="category-badge bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full font-medium hover:bg-red-50 hover:text-red-700">
+                    <span class="category-badge bg-gray-100 text-gray-700 caption-text px-2 py-1 rounded-full hover:bg-red-50 hover:text-red-700">
                         {{ $post->category->name }}
                     </span>
                     @endif
                     @if($post->created_at)
-                    <span class="text-xs text-gray-500">
+                    <span class="caption-text text-gray-500">
                         {{ $post->created_at->format('d/m/Y') }}
                     </span>
                     @endif
@@ -131,17 +131,17 @@
                 <!-- Title nhỏ -->
                 @if($post->slug)
                 <a href="{{ route('posts.show', $post->slug) }}">
-                    <h3 class="font-semibold text-gray-900 mb-2 hover:text-red-600 transition-colors line-clamp-2">
+                    <h3 class="card-title mb-2 hover:text-red-600 transition-colors line-clamp-2">
                         {{ $post->title }}
                     </h3>
                 </a>
                 @else
-                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ $post->title }}</h3>
+                <h3 class="card-title mb-2 line-clamp-2">{{ $post->title }}</h3>
                 @endif
 
                 <!-- Excerpt nhỏ -->
                 @if($post->content)
-                <p class="text-sm text-gray-600 mb-3 line-clamp-3">
+                <p class="body-text text-gray-600 mb-3 line-clamp-3">
                     {{ Str::limit(strip_tags($post->content), 100) }}
                 </p>
                 @endif
@@ -149,7 +149,7 @@
                 <!-- Read more link nhỏ -->
                 @if($post->slug)
                 <a href="{{ route('posts.show', $post->slug) }}"
-                   class="text-red-600 text-sm font-medium hover:text-red-700 transition-colors">
+                   class="text-red-600 caption-text hover:text-red-700 transition-colors">
                     Đọc tiếp →
                 </a>
                 @endif
@@ -163,10 +163,10 @@
 <!-- Nút xem tất cả với hiệu ứng đẹp - Layout 2 dòng -->
 <div class="text-center mt-12 pt-8 border-t border-gray-100">
     <div class="max-w-md mx-auto">
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">Khám phá thêm nhiều bài viết</h3>
-        <p class="text-gray-600 text-sm mb-6">Cập nhật kiến thức Excel, VBA và kỹ năng văn phòng mới nhất</p>
+        <h3 class="card-title mb-3">Khám phá thêm nhiều bài viết</h3>
+        <p class="body-text text-gray-600 mb-6">Cập nhật kiến thức Excel, VBA và kỹ năng văn phòng mới nhất</p>
         <a href="{{ route('posts.index') }}"
-           class="cta-button inline-flex items-center text-white px-8 py-4 rounded-xl font-semibold text-lg relative overflow-hidden group shadow-lg">
+           class="cta-button inline-flex items-center text-white px-8 py-4 rounded-xl btn-text-lg relative overflow-hidden group shadow-lg">
             <i class="fas fa-newspaper mr-3 transform group-hover:scale-110 transition-transform duration-300"></i>
             <span class="relative z-10">Xem tất cả bài viết</span>
             <i class="fas fa-arrow-right ml-3 transform group-hover:translate-x-1 transition-transform duration-300"></i>
@@ -182,20 +182,20 @@
     </div>
 
     <!-- Tiêu đề -->
-    <h3 class="text-xl font-semibold text-gray-900 mb-3">Chưa có bài viết nào</h3>
-    <p class="text-gray-600 mb-8 max-w-md mx-auto">
+    <h3 class="card-title mb-3">Chưa có bài viết nào</h3>
+    <p class="body-text text-gray-600 mb-8 max-w-md mx-auto">
         Hiện tại chưa có bài viết nào được xuất bản. Hãy quay lại sau hoặc khám phá các nội dung khác.
     </p>
 
     <!-- Action buttons -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
         <a href="{{ route('posts.index') }}"
-           class="inline-flex items-center bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-md">
+           class="inline-flex items-center bg-red-600 text-white px-6 py-3 rounded-lg btn-text hover:bg-red-700 transition-colors shadow-md">
             <i class="fas fa-search mr-2"></i>
             Khám phá bài viết
         </a>
         <a href="{{ route('courses.index') }}"
-           class="inline-flex items-center border-2 border-red-600 text-red-600 px-6 py-3 rounded-lg font-medium hover:bg-red-600 hover:text-white transition-colors">
+           class="inline-flex items-center border-2 border-red-600 text-red-600 px-6 py-3 rounded-lg btn-text hover:bg-red-600 hover:text-white transition-colors">
             <i class="fas fa-graduation-cap mr-2"></i>
             Xem khóa học
         </a>

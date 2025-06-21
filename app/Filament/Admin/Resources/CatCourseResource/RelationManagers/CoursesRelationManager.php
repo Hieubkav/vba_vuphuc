@@ -48,13 +48,6 @@ class CoursesRelationManager extends RelationManager
 
                 Forms\Components\Section::make('Cấu hình')
                     ->schema([
-                        Forms\Components\TextInput::make('price')
-                            ->label('Giá khóa học (VNĐ)')
-                            ->required()
-                            ->numeric()
-                            ->default(0)
-                            ->suffix('VNĐ'),
-
                         Forms\Components\TextInput::make('duration_hours')
                             ->label('Thời lượng (giờ)')
                             ->required()
@@ -138,11 +131,7 @@ class CoursesRelationManager extends RelationManager
                         } : '')
                     ),
 
-                Tables\Columns\TextColumn::make('price')
-                    ->label('Giá')
-                    ->money('VND')
-                    ->sortable()
-                    ->alignCenter(),
+
 
                 Tables\Columns\TextColumn::make('duration_hours')
                     ->label('Thời lượng')

@@ -23,8 +23,6 @@ class Course extends Model
         'og_image_link',
         'slug',
         'thumbnail',
-        'price',
-        'compare_price',
         'duration_hours',
         'level',
         'status',
@@ -39,15 +37,12 @@ class Course extends Model
         'show_form_link',
         'show_group_link',
         'show_instructor',
-        'show_price',
         'cat_course_id',
         'instructor_id',
         'course_group_id',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'compare_price' => 'decimal:2',
         'duration_hours' => 'integer',
         'is_featured' => 'boolean',
         'status' => 'string',
@@ -61,7 +56,6 @@ class Course extends Model
         'show_form_link' => 'boolean',
         'show_group_link' => 'boolean',
         'show_instructor' => 'boolean',
-        'show_price' => 'boolean',
     ];
 
     protected static function boot()
@@ -211,18 +205,6 @@ class Course extends Model
     }
 
     // Accessors & Mutators
-    public function getFormattedPriceAttribute()
-    {
-        return number_format($this->price, 0, ',', '.') . ' VNĐ';
-    }
-
-    public function getDiscountPercentageAttribute()
-    {
-        if ($this->compare_price && $this->compare_price > $this->price) {
-            return round((($this->compare_price - $this->price) / $this->compare_price) * 100);
-        }
-        return 0;
-    }
 
     public function getEnrolledStudentsCountAttribute()
     {

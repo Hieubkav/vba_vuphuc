@@ -42,19 +42,43 @@ export default {
                     900: '#7f1d1d',     // red-900
                 }
             },
+            // Typography System - Chuẩn hóa font và cỡ chữ
             fontFamily: {
-                'heading': ['Montserrat', 'sans-serif'],
+                'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+                'heading': ['Montserrat', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                'body': ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
                 'montserrat': ['Montserrat', 'sans-serif'],
                 'open-sans': ['Open Sans', 'sans-serif']
+            },
+            // Typography Scale - Cỡ chữ chuẩn hóa
+            fontSize: {
+                // Display sizes - cho hero, banner lớn
+                'display-2xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }], // 72px
+                'display-xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }], // 60px
+                'display-lg': ['3rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }], // 48px
+
+                // Heading sizes - cho tiêu đề
+                'heading-xl': ['2.25rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }], // 36px
+                'heading-lg': ['1.875rem', { lineHeight: '1.3', letterSpacing: '-0.005em', fontWeight: '600' }], // 30px
+                'heading-md': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }], // 24px
+                'heading-sm': ['1.25rem', { lineHeight: '1.4', fontWeight: '600' }], // 20px
+                'heading-xs': ['1.125rem', { lineHeight: '1.4', fontWeight: '600' }], // 18px
+
+                // Body sizes - cho nội dung
+                'body-xl': ['1.25rem', { lineHeight: '1.6', fontWeight: '400' }], // 20px
+                'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }], // 18px
+                'body-md': ['1rem', { lineHeight: '1.6', fontWeight: '400' }], // 16px
+                'body-sm': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }], // 14px
+                'body-xs': ['0.75rem', { lineHeight: '1.5', fontWeight: '400' }], // 12px
+
+                // Caption sizes - cho chú thích, meta
+                'caption-lg': ['0.875rem', { lineHeight: '1.4', fontWeight: '500' }], // 14px
+                'caption-md': ['0.75rem', { lineHeight: '1.4', fontWeight: '500' }], // 12px
+                'caption-sm': ['0.6875rem', { lineHeight: '1.3', fontWeight: '500' }], // 11px
             },
             boxShadow: {
                 '3xl': '0 35px 60px -12px rgba(0, 0, 0, 0.25)',
             },
-            textColor: theme => ({
-                'heading': {
-                    DEFAULT: theme('colors.gray.800')
-                }
-            }),
             keyframes: {
                 slideIn: {
                     'from': { transform: 'translateX(-100%) scale(0.8)', opacity: '0', filter: 'blur(10px)' },
@@ -139,7 +163,131 @@ export default {
     },
     plugins: [
         require('preline/plugin'),
-        require('flowbite/plugin')
+        require('flowbite/plugin'),
+        // Plugin tùy chỉnh cho Typography Components
+        function({ addComponents, theme }) {
+            addComponents({
+                // Hero/Banner Typography
+                '.hero-title': {
+                    fontSize: theme('fontSize.display-lg[0]'),
+                    lineHeight: theme('fontSize.display-lg[1].lineHeight'),
+                    letterSpacing: theme('fontSize.display-lg[1].letterSpacing'),
+                    fontWeight: theme('fontSize.display-lg[1].fontWeight'),
+                    fontFamily: theme('fontFamily.heading'),
+                    color: theme('colors.gray.900'),
+                    '@screen md': {
+                        fontSize: theme('fontSize.display-xl[0]'),
+                        lineHeight: theme('fontSize.display-xl[1].lineHeight'),
+                        letterSpacing: theme('fontSize.display-xl[1].letterSpacing'),
+                        fontWeight: theme('fontSize.display-xl[1].fontWeight'),
+                    },
+                    '@screen lg': {
+                        fontSize: theme('fontSize.display-2xl[0]'),
+                        lineHeight: theme('fontSize.display-2xl[1].lineHeight'),
+                        letterSpacing: theme('fontSize.display-2xl[1].letterSpacing'),
+                        fontWeight: theme('fontSize.display-2xl[1].fontWeight'),
+                    }
+                },
+
+                // Section Headings
+                '.section-title': {
+                    fontSize: theme('fontSize.heading-lg[0]'),
+                    lineHeight: theme('fontSize.heading-lg[1].lineHeight'),
+                    letterSpacing: theme('fontSize.heading-lg[1].letterSpacing'),
+                    fontWeight: theme('fontSize.heading-lg[1].fontWeight'),
+                    fontFamily: theme('fontFamily.heading'),
+                    color: theme('colors.gray.900'),
+                    '@screen md': {
+                        fontSize: theme('fontSize.heading-xl[0]'),
+                        lineHeight: theme('fontSize.heading-xl[1].lineHeight'),
+                        letterSpacing: theme('fontSize.heading-xl[1].letterSpacing'),
+                        fontWeight: theme('fontSize.heading-xl[1].fontWeight'),
+                    }
+                },
+
+                // Card Titles
+                '.card-title': {
+                    fontSize: theme('fontSize.heading-sm[0]'),
+                    lineHeight: theme('fontSize.heading-sm[1].lineHeight'),
+                    fontWeight: theme('fontSize.heading-sm[1].fontWeight'),
+                    fontFamily: theme('fontFamily.heading'),
+                    color: theme('colors.gray.900'),
+                    '@screen md': {
+                        fontSize: theme('fontSize.heading-md[0]'),
+                        lineHeight: theme('fontSize.heading-md[1].lineHeight'),
+                        fontWeight: theme('fontSize.heading-md[1].fontWeight'),
+                    }
+                },
+
+                // Subtitle/Description
+                '.subtitle': {
+                    fontSize: theme('fontSize.body-lg[0]'),
+                    lineHeight: theme('fontSize.body-lg[1].lineHeight'),
+                    fontWeight: theme('fontSize.body-lg[1].fontWeight'),
+                    fontFamily: theme('fontFamily.body'),
+                    color: theme('colors.gray.600'),
+                    '@screen md': {
+                        fontSize: theme('fontSize.body-xl[0]'),
+                        lineHeight: theme('fontSize.body-xl[1].lineHeight'),
+                        fontWeight: theme('fontSize.body-xl[1].fontWeight'),
+                    }
+                },
+
+                // Body Text
+                '.body-text': {
+                    fontSize: theme('fontSize.body-md[0]'),
+                    lineHeight: theme('fontSize.body-md[1].lineHeight'),
+                    fontWeight: theme('fontSize.body-md[1].fontWeight'),
+                    fontFamily: theme('fontFamily.body'),
+                    color: theme('colors.gray.700'),
+                },
+
+                // Small Text/Caption
+                '.caption-text': {
+                    fontSize: theme('fontSize.caption-md[0]'),
+                    lineHeight: theme('fontSize.caption-md[1].lineHeight'),
+                    fontWeight: theme('fontSize.caption-md[1].fontWeight'),
+                    fontFamily: theme('fontFamily.body'),
+                    color: theme('colors.gray.500'),
+                },
+
+                // Button Typography
+                '.btn-text': {
+                    fontSize: theme('fontSize.body-md[0]'),
+                    lineHeight: theme('fontSize.body-md[1].lineHeight'),
+                    fontWeight: '600',
+                    fontFamily: theme('fontFamily.body'),
+                    letterSpacing: '0.025em',
+                },
+
+                '.btn-text-lg': {
+                    fontSize: theme('fontSize.body-lg[0]'),
+                    lineHeight: theme('fontSize.body-lg[1].lineHeight'),
+                    fontWeight: '600',
+                    fontFamily: theme('fontFamily.body'),
+                    letterSpacing: '0.025em',
+                },
+
+                // Navigation Typography
+                '.nav-text': {
+                    fontSize: theme('fontSize.body-md[0]'),
+                    lineHeight: theme('fontSize.body-md[1].lineHeight'),
+                    fontWeight: '500',
+                    fontFamily: theme('fontFamily.body'),
+                    color: theme('colors.gray.700'),
+                },
+
+                // Meta/Badge Typography
+                '.badge-text': {
+                    fontSize: theme('fontSize.caption-lg[0]'),
+                    lineHeight: theme('fontSize.caption-lg[1].lineHeight'),
+                    fontWeight: theme('fontSize.caption-lg[1].fontWeight'),
+                    fontFamily: theme('fontFamily.body'),
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                }
+            })
+        }
     ],
     darkMode: 'class',
 }

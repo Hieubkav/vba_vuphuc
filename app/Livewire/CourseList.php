@@ -90,12 +90,6 @@ class CourseList extends Component
 
         // Apply sorting
         switch ($this->sort) {
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
             case 'newest':
                 $query->orderBy('created_at', 'desc');
                 break;

@@ -24,7 +24,7 @@
                         ->with(['instructor:id,name'])
                         ->select([
                             'id', 'title', 'slug', 'thumbnail', 'seo_title', 'seo_description',
-                            'description', 'cat_course_id', 'instructor_id', 'price', 'level',
+                            'description', 'cat_course_id', 'instructor_id', 'level',
                             'duration_hours', 'start_date', 'gg_form', 'created_at', 'order'
                         ])
                         ->orderBy('created_at', 'desc')
@@ -133,7 +133,7 @@
     <!-- CTA Section - Minimalist -->
     <div class="text-center">
         <a href="{{ route('courses.index') }}"
-           class="inline-flex items-center px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white font-semibold text-lg rounded-2xl transition-colors duration-300 shadow-lg hover:shadow-xl"
+           class="inline-flex items-center px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white btn-text-lg rounded-2xl transition-colors duration-300 shadow-lg hover:shadow-xl"
            aria-label="Xem tất cả khóa học làm bánh">
             <span>Xem tất cả khóa học làm bánh</span>
             <i class="fas fa-arrow-right ml-3"></i>
@@ -156,11 +156,11 @@
         </div>
 
         <!-- Enhanced Typography -->
-        <h3 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
+        <h3 class="section-title text-center mb-6">
             Chưa có khóa học làm bánh nào
         </h3>
 
-        <p class="text-gray-600 text-lg leading-relaxed max-w-lg mb-10 font-light">
+        <p class="subtitle text-center max-w-lg mb-10">
             Các khóa học làm bánh sẽ sớm được cập nhật.
             <br class="hidden sm:block">
             Hãy theo dõi để không bỏ lỡ những khóa học hữu ích!
@@ -168,7 +168,7 @@
 
         <!-- Enhanced CTA Button -->
         <a href="{{ route('posts.index') }}"
-           class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold text-lg rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/50"
+           class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white btn-text-lg rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/50"
            aria-label="Xem bài viết khác">
             <span>Xem bài viết khác</span>
             <i class="fas fa-arrow-right ml-3 transition-transform duration-300 group-hover:translate-x-1"></i>

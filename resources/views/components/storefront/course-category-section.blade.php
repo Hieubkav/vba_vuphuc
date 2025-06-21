@@ -343,11 +343,7 @@
                                     </a>
                                 </div>
                                 @endif
-                                @if(isset($course->price) && $course->price > 0)
-                                <div class="text-right">
-                                    <span class="text-xs font-light text-gray-900">{{ number_format($course->price) }}đ</span>
-                                </div>
-                                @endif
+
                             </div>
                         </div>
                     </div>

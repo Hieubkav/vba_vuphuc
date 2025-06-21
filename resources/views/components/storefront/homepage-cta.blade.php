@@ -18,11 +18,11 @@
 <div class="container mx-auto px-4 relative z-10">
     <div class="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-16">
         <div class="text-center md:text-left max-w-2xl">
-            <span class="text-xs uppercase tracking-widest font-semibold bg-white bg-opacity-20 px-3 py-1 rounded-full mb-4 inline-block">Học tập chuyên nghiệp</span>
-            <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+            <span class="badge-text bg-white bg-opacity-20 text-white px-3 py-1 rounded-full mb-4 inline-block">Học tập chuyên nghiệp</span>
+            <h2 class="hero-title text-white mb-4">
                 {!! nl2br(e($ctaTitle)) !!}
             </h2>
-            <p class="text-white text-opacity-90 text-lg">{{ $ctaDescription }}</p>
+            <p class="subtitle text-white/90">{{ $ctaDescription }}</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-4">
             @if($primaryButtonText && $primaryButtonUrl)

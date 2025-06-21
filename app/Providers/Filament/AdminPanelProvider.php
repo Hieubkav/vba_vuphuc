@@ -57,6 +57,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
                 \App\Filament\Admin\Pages\Dashboard::class,
+                \App\Filament\Admin\Pages\ManageGlobalCta::class,
             ])
             ->navigationGroups([
                 NavigationGroup::make()

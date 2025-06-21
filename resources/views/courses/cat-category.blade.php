@@ -89,16 +89,7 @@
                                 </div>
                             @endif
                             
-                            <!-- Price Badge -->
-                            @if($course->price > 0)
-                                <div class="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    {{ number_format($course->price, 0, ',', '.') }}đ
-                                </div>
-                            @else
-                                <div class="absolute top-3 right-3 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                    Miễn phí
-                                </div>
-                            @endif
+
 
                             <!-- Featured Badge -->
                             @if($course->is_featured)

@@ -36,13 +36,7 @@ class CourseController extends Controller
             $query->where('level', $request->level);
         }
 
-        // Filter theo price range
-        if ($request->filled('price_min')) {
-            $query->where('price', '>=', $request->price_min);
-        }
-        if ($request->filled('price_max')) {
-            $query->where('price', '<=', $request->price_max);
-        }
+
 
         // Search
         if ($request->filled('search')) {
@@ -59,12 +53,6 @@ class CourseController extends Controller
         // Sort
         $sort = $request->get('sort', 'order');
         switch ($sort) {
-            case 'price_asc':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_desc':
-                $query->orderBy('price', 'desc');
-                break;
             case 'newest':
                 $query->orderBy('created_at', 'desc');
                 break;
@@ -97,14 +85,12 @@ class CourseController extends Controller
                 ->select('level', DB::raw('count(*) as count'))
                 ->groupBy('level')
                 ->pluck('count', 'level'),
-            'price_range' => [
-                'min' => Course::where('status', 'active')->min('price'),
-                'max' => Course::where('status', 'active')->max('price'),
-            ]
         ];
 
         return view('courses.index', compact('courses', 'categories', 'stats'));
     }
+
+
 
     /**
      * Hiển thị chi tiết khóa học
@@ -231,7 +217,7 @@ class CourseController extends Controller
                   });
             })
             ->with(['courseCategory', 'instructor'])
-            ->select(['id', 'title', 'slug', 'thumbnail', 'price', 'cat_course_id', 'instructor_id'])
+            ->select(['id', 'title', 'slug', 'thumbnail', 'cat_course_id', 'instructor_id'])
             ->orderBy('is_featured', 'desc')
             ->take(8)
             ->get();
@@ -243,7 +229,7 @@ class CourseController extends Controller
                 'slug' => $course->slug,
                 'url' => route('courses.show', $course->slug),
                 'thumbnail' => $course->thumbnail ? asset('storage/' . $course->thumbnail) : null,
-                'price' => $course->formatted_price,
+
                 'instructor' => $course->instructor?->name,
                 'category' => $course->category?->name,
             ];

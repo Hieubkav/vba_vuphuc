@@ -34,7 +34,7 @@ class CoursesOverview extends Component
                               ->with(['instructor:id,name'])
                               ->select([
                                   'id', 'title', 'slug', 'thumbnail', 'description',
-                                  'cat_course_id', 'instructor_id', 'price', 'level',
+                                  'cat_course_id', 'instructor_id', 'level',
                                   'duration_hours', 'start_date', 'created_at', 'order'
                               ])
                               ->orderBy('created_at', 'desc')

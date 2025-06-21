@@ -67,13 +67,7 @@ class CourseCard extends Component
         };
     }
 
-    public function getDiscountPercentage()
-    {
-        if ($this->course->compare_price && $this->course->compare_price > $this->course->price) {
-            return round((($this->course->compare_price - $this->course->price) / $this->course->compare_price) * 100);
-        }
-        return 0;
-    }
+
 
     public function render()
     {
@@ -82,7 +76,6 @@ class CourseCard extends Component
             'shortDescription' => $this->getShortDescription(),
             'levelBadgeColor' => $this->getLevelBadgeColor(),
             'levelText' => $this->getLevelText(),
-            'discountPercentage' => $this->getDiscountPercentage(),
         ]);
     }
 }

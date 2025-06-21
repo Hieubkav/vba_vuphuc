@@ -3,17 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Carbon;
 
-class Student extends Model
+class Student extends Authenticatable
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
         'email',
+        'password',
         'phone',
         'birth_date',
         'gender',
@@ -26,6 +27,11 @@ class Student extends Model
         'email_verified_at',
         'status',
         'order',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
