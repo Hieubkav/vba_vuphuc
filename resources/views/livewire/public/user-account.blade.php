@@ -17,11 +17,10 @@
             <div class="absolute inset-0 rounded-full bg-blue-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
         </a>
 
-        <!-- Enhanced Tooltip -->
-        <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
-            <div class="bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg px-3 py-2 shadow-xl">
-                <div class="font-medium">Đăng nhập</div>
-                <div class="text-xs text-gray-300">Tài khoản</div>
+        <!-- Enhanced Tooltip - Horizontal Layout -->
+        <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
+            <div class="bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg px-4 py-2 shadow-xl whitespace-nowrap">
+                <span class="font-medium">Đăng nhập tài khoản</span>
             </div>
             <!-- Tooltip Arrow -->
             <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900 dark:border-t-gray-700"></div>

@@ -211,10 +211,57 @@ class Course extends Model
         return $this->students()->wherePivot('status', '!=', 'dropped')->count();
     }
 
+    public function getStudentsCountAttribute()
+    {
+        return $this->enrolled_students_count;
+    }
+
     public function getIsFullAttribute()
     {
         if (!$this->max_students) return false;
         return $this->enrolled_students_count >= $this->max_students;
+    }
+
+    // Accessor cho featured image
+    public function getFeaturedImageAttribute()
+    {
+        return $this->images()->where('is_main', true)->where('status', 'active')->first()
+            ?? $this->images()->where('status', 'active')->orderBy('order')->first();
+    }
+
+    // Accessor cho category (alias cho courseCategory)
+    public function getCategoryAttribute()
+    {
+        return $this->courseCategory;
+    }
+
+    // Accessor cho objectives (alias cho what_you_learn)
+    public function getObjectivesAttribute()
+    {
+        return $this->what_you_learn ?? [];
+    }
+
+    // Accessor cho short description
+    public function getShortDescriptionAttribute()
+    {
+        if (!$this->description) return null;
+        return strlen($this->description) > 200
+            ? substr($this->description, 0, 200) . '...'
+            : $this->description;
+    }
+
+    // Accessor cho duration display
+    public function getDurationAttribute()
+    {
+        if (!$this->duration_hours) return null;
+
+        if ($this->duration_hours < 1) {
+            return round($this->duration_hours * 60) . ' phút';
+        } elseif ($this->duration_hours == 1) {
+            return '1 giờ';
+        } else {
+            return $this->duration_hours . ' giờ';
+        }
     }
 
     // Helper Methods

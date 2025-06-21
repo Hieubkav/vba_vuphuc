@@ -1,0 +1,46 @@
+# Course Album Preferences
+- User prefers carousel-style album displays.
+- User prefers carousel auto-play with 3-second intervals for image transitions.
+- User prefers optimized spacing for clean layout.
+- User prefers subtle/small action buttons for course album interfaces.
+
+# Course Model
+- Courses should not have price attribute - remove price from Course model and all related frontend/admin interfaces.
+
+# Course Detail Page
+- User prefers course descriptions to be displayed differently than the current HTML paragraph format, finding the current implementation unsatisfactory.
+- User prefers course materials to be displayed directly below course content without being contained within tabs.
+- User wants authentication system for students to access locked course materials.
+- User prefers course detail page to have course materials tab removed, as materials are displayed within the page content.
+- User prefers to remove short description below course title when full course description is already displayed on the page to avoid redundancy.
+
+# Authentication
+- Login page at /dang-nhap should use student model for authentication.
+
+# General Preferences
+- User prefers Vietnamese date format.
+- User prefers consistent filter interface patterns across similar pages (wants learning group page to have same filter UI as course page).
+- User prefers moving reusable UI components (like CTA sections) to global layouts instead of keeping them in specific page templates for better code reusability.
+- User prefers navbar user icon tooltips to be horizontally aligned rather than the current styling for better appearance.
+- User prefers data consistency between UI and models, sharing data through ViewServiceProvider, and immediate cache clearing when database is updated.
+
+# Hero Banners
+- User prefers hero banners with carousel auto-play (8s intervals).
+- User prefers hero banners with dynamic background color extraction from images.
+- User prefers hero banners with responsive height calculation based on viewport/navbar.
+- User prefers hero banners with separate mobile/desktop layouts with backdrop blur effects and gradient overlays.
+- User prefers hero banners with image error handling with fallbacks.
+- User prefers hero banners with dominant color extraction for dynamic backgrounds.
+- User prefers hero banners with enhanced responsive design with proper mobile/desktop object-fit handling.
+
+# Error Pages
+- User prefers simple error pages (404, etc.) with only basic navigation options like 'go to homepage' or 'go back' without complex layouts or designs.
+
+# Admin Interface
+- User prefers to remove the entire web design management section with drag-drop functionality from the admin interface.
+- User prefers to remove instructional/guidance information from the web design management admin interface to reduce clutter.
+- User prefers admin web design management page (/admin/manage-web-design) to have all sections collapsed by default.
+- User prefers to remove unused admin features and routes, specifically questioning the utility of /admin/manage-global-cta route.
+
+# Agent Mode
+- User wants audio notifications when agent mode completes tasks, created play-notification.ps1 script that plays system sounds via PowerShell command "[System.Media.SystemSounds]::Asterisk.Play()" to notify task completion.

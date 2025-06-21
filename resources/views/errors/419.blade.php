@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Truy cập bị từ chối - 403</title>
+    <title>Phiên làm việc hết hạn - 419</title>
     <style>
         body {
             margin: 0;
@@ -62,12 +62,12 @@
 </head>
 <body>
     <div class="container">
-        <h1 class="error-code">403</h1>
-        <h2 class="error-title">Truy cập bị từ chối</h2>
-        <p class="error-message">Bạn không có quyền truy cập vào trang này.</p>
-
+        <h1 class="error-code">419</h1>
+        <h2 class="error-title">Phiên làm việc hết hạn</h2>
+        <p class="error-message">Phiên làm việc của bạn đã hết hạn. Vui lòng tải lại trang và thử lại.</p>
+        
         <a href="{{ route('storeFront') }}" class="btn btn-primary">Về trang chủ</a>
-        <button onclick="history.back()" class="btn btn-secondary">Quay lại</button>
+        <button onclick="location.reload()" class="btn btn-secondary">Tải lại trang</button>
     </div>
 </body>
 </html>

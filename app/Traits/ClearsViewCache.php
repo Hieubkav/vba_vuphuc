@@ -49,11 +49,19 @@ trait ClearsViewCache
             case 'App\Models\Post':
             case 'App\Models\Partner':
             case 'App\Models\Slider':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                break;
+
             case 'App\Models\Course':
             case 'App\Models\CatCourse':
             case 'App\Models\CourseGroup':
+            case 'App\Models\CourseMaterial':
+            case 'App\Models\CourseImage':
+            case 'App\Models\Instructor':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::clearCourseDetailCaches();
                 break;
 
             default:

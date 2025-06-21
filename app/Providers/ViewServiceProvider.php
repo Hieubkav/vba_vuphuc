@@ -411,6 +411,36 @@ class ViewServiceProvider extends ServiceProvider
         Cache::forget('storefront_faqs');
 
         Cache::forget('navigation_data');
+
+        // Clear course detail caches
+        self::clearCourseDetailCaches();
+    }
+
+    /**
+     * Clear course detail caches
+     */
+    public static function clearCourseDetailCaches()
+    {
+        try {
+            // Nếu sử dụng Redis cache
+            if (config('cache.default') === 'redis') {
+                $cacheKeys = Cache::getRedis()->keys('*course_detail_*');
+                foreach ($cacheKeys as $key) {
+                    Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                }
+
+                $relatedKeys = Cache::getRedis()->keys('*related_courses_*');
+                foreach ($relatedKeys as $key) {
+                    Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                }
+            } else {
+                // Fallback: Clear cache bằng cách flush toàn bộ (cho file/array cache)
+                Cache::flush();
+            }
+        } catch (\Exception $e) {
+            // Fallback: Clear cache bằng cách flush toàn bộ
+            Cache::flush();
+        }
     }
 
     /**
@@ -435,6 +465,7 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('storefront_course_groups');
                 Cache::forget('storefront_albums');
                 Cache::forget('storefront_partners');
+                self::clearCourseDetailCaches();
                 break;
             case 'webdesign':
                 Cache::forget('web_design_settings');

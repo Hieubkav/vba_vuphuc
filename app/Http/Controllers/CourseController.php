@@ -93,40 +93,45 @@ class CourseController extends Controller
 
 
     /**
-     * Hiển thị chi tiết khóa học
+     * Hiển thị chi tiết khóa học với cache
      */
     public function show(string $slug): View
     {
-        $course = Course::with([
-            'courseCategory',
-            'instructor',
-            'courseGroup', // Thêm quan hệ courseGroup để lấy group_link
-            'images' => function($q) {
-                $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
-            },
-            'materials' => function($q) {
-                $q->orderBy('order');
-            },
-            'students' => function($q) {
-                $q->wherePivot('status', '!=', 'dropped');
-            }
-        ])
-        ->where('slug', $slug)
-        ->where('status', 'active')
-        ->firstOrFail();
+        // Cache course detail trong 30 phút
+        $course = Cache::remember("course_detail_{$slug}", 1800, function () use ($slug) {
+            return Course::with([
+                'courseCategory',
+                'instructor',
+                'courseGroup',
+                'images' => function($q) {
+                    $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
+                },
+                'materials' => function($q) {
+                    $q->orderBy('order');
+                },
+                'students' => function($q) {
+                    $q->wherePivot('status', '!=', 'dropped');
+                }
+            ])
+            ->where('slug', $slug)
+            ->where('status', 'active')
+            ->firstOrFail();
+        });
 
-        // Get related courses - chỉ lấy khóa học cùng danh mục khóa học (cat_course_id) - giảm từ 4 xuống 3
-        $relatedCourses = Course::with(['courseCategory', 'instructor', 'images' => function($q) {
-            $q->where('status', 'active')->orderBy('is_main', 'desc')->take(1);
-        }])
-        ->where('status', 'active')
-        ->where('id', '!=', $course->id)
-        ->where('cat_course_id', $course->cat_course_id)
-        ->whereNotNull('cat_course_id')
-        ->orderBy('is_featured', 'desc')
-        ->orderBy('order')
-        ->take(3)
-        ->get();
+        // Cache related courses trong 1 giờ
+        $relatedCourses = Cache::remember("related_courses_{$course->cat_course_id}_{$course->id}", 3600, function () use ($course) {
+            return Course::with(['courseCategory', 'instructor', 'images' => function($q) {
+                $q->where('status', 'active')->orderBy('is_main', 'desc')->take(1);
+            }])
+            ->where('status', 'active')
+            ->where('id', '!=', $course->id)
+            ->where('cat_course_id', $course->cat_course_id)
+            ->whereNotNull('cat_course_id')
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('order')
+            ->take(3)
+            ->get();
+        });
 
         // Get open materials (tài liệu mở - ai cũng xem và tải được)
         $openMaterials = $course->materials()
@@ -140,8 +145,8 @@ class CourseController extends Controller
             ->orderBy('order')
             ->get();
 
-        // Kiểm tra user hiện tại có đăng ký khóa học không
-        $user = auth()->user();
+        // Kiểm tra user hiện tại có đăng ký khóa học không (sử dụng student guard)
+        $user = auth('student')->user();
         $isEnrolled = false;
         if ($user) {
             $isEnrolled = $course->students()->where('student_id', $user->id)->exists();

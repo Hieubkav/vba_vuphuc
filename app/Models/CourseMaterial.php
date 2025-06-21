@@ -83,6 +83,12 @@ class CourseMaterial extends Model
         }
     }
 
+    // Alias for compatibility
+    public function getFileSizeFormattedAttribute()
+    {
+        return $this->getFormattedFileSizeAttribute();
+    }
+
     public function getFileUrlAttribute()
     {
         return Storage::url($this->file_path);
