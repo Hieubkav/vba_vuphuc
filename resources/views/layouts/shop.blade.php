@@ -144,7 +144,9 @@
     @include('components.global.cta-section')
 
     <!-- Footer -->
-    @include('components.public.footer')
+    @if(webDesignVisible('footer'))
+        @include('components.public.footer')
+    @endif
 
     <!-- Action Buttons -->
     @include('components.public.speedial')
@@ -168,6 +170,31 @@
 
     <!-- Shop Layout Scripts - Moved to external file -->
     <script src="{{ asset('js/shop-layout.js') }}"></script>
+
+    <!-- Global Image Error Handler -->
+    <script>
+        // Global image error handler
+        function handleImageError(img) {
+            // Ẩn ảnh lỗi
+            img.style.display = 'none';
+
+            // Tìm container để hiển thị fallback
+            const container = img.closest('.association-item') || img.parentElement;
+            if (container) {
+                // Tạo fallback placeholder nếu chưa có
+                let fallback = container.querySelector('.image-fallback');
+                if (!fallback) {
+                    fallback = document.createElement('div');
+                    fallback.className = 'image-fallback w-12 h-12 bg-gradient-to-br from-red-50 to-red-100 rounded-lg flex items-center justify-center';
+                    fallback.innerHTML = '<i class="fas fa-building text-red-400 text-sm"></i>';
+                    container.appendChild(fallback);
+                }
+                fallback.style.display = 'flex';
+            }
+
+            console.log('Image error:', img.src);
+        }
+    </script>
 
     @stack('scripts')
 </body>

@@ -65,10 +65,10 @@
                     </time>
                 </div>
 
-                @if($post->category)
+                @if($post->categories->count() > 0)
                     <div class="flex items-center">
                         <i class="fas fa-folder mr-2"></i>
-                        <span>{{ $post->category->name }}</span>
+                        <span>{{ $post->categories->pluck('name')->join(', ') }}</span>
                     </div>
                 @endif
 
@@ -110,7 +110,7 @@
 
             <!-- Article Content -->
             <article class="prose prose-lg max-w-none prose-red">
-                {!! $post->content !!}
+                <x-post-content :post="$post" />
             </article>
         </div>
     </div>
@@ -176,7 +176,7 @@
 
             <!-- View All Button -->
             <div class="text-center">
-                <a href="{{ route('posts.index') }}"
+                <a href="{{ route('posts.categories') }}"
                    class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-300">
                     <span>Xem tất cả bài viết</span>
                     <i class="fas fa-arrow-right ml-2"></i>

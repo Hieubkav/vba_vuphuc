@@ -8,14 +8,8 @@
 @if($sectionKey === 'hero_banner')
     @include('components.storefront.hero-banner')
 @elseif($sectionKey === 'courses_overview')
-    <x-storefront-section
-        title="{{ $section['title'] ?? 'Khóa học VBA Excel chuyên nghiệp' }}"
-        description="{{ $section['description'] ?? 'Nâng cao kỹ năng Excel với các khóa học VBA từ cơ bản đến nâng cao' }}"
-        bg-color="{{ $section['bg_color'] ?? 'bg-white' }}"
-        animation-class="{{ $section['animation_class'] ?? 'animate-fade-in-optimized' }}"
-        :has-data="true">
-        @livewire('courses-overview')
-    </x-storefront-section>
+    {{-- courses-overview component tự quản lý title/description từ WebDesign --}}
+    @include('components.storefront.courses-overview')
 @elseif($sectionKey === 'homepage_cta')
     {{-- CTA đã được di chuyển vào layout chung, không hiển thị ở đây nữa --}}
     @php

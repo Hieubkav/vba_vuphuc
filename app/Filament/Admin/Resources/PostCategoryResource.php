@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\PostCategoryResource\Pages;
 use App\Models\CatPost;
 use App\Traits\HasImageUpload;
 
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
@@ -28,11 +29,11 @@ class PostCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?string $navigationLabel = 'Danh mục bài viết';
+    protected static ?string $navigationLabel = 'Chuyên mục';
 
-    protected static ?string $modelLabel = 'danh mục bài viết';
+    protected static ?string $modelLabel = 'chuyên mục';
 
-    protected static ?string $pluralModelLabel = 'danh mục bài viết';
+    protected static ?string $pluralModelLabel = 'chuyên mục';
 
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
@@ -42,12 +43,12 @@ class PostCategoryResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make('Thông tin danh mục')
+                Tabs::make('Thông tin chuyên mục')
                     ->tabs([
                         Tabs\Tab::make('Thông tin cơ bản')
                             ->schema([
                                 TextInput::make('name')
-                                    ->label('Tên danh mục')
+                                    ->label('Tên chuyên mục')
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
@@ -58,7 +59,7 @@ class PostCategoryResource extends Resource
                                     ->maxLength(255)
                                     ->unique(ignoreRecord: true)
                                     ->rules(['alpha_dash'])
-                                    ->helperText('Để trống để tự động tạo từ tên danh mục'),
+                                    ->helperText('Để trống để tự động tạo từ tên chuyên mục'),
 
                                 Textarea::make('description')
                                     ->label('Mô tả')
@@ -86,18 +87,38 @@ class PostCategoryResource extends Resource
                                 TextInput::make('seo_title')
                                     ->label('Tiêu đề SEO')
                                     ->maxLength(255)
-                                    ->helperText('Để trống để tự động tạo từ tên danh mục'),
+                                    ->helperText('Để trống để tự động tạo từ tên chuyên mục'),
 
                                 Textarea::make('seo_description')
                                     ->label('Mô tả SEO')
                                     ->rows(3)
                                     ->maxLength(160)
-                                    ->helperText('Để trống để tự động tạo từ mô tả danh mục'),
+                                    ->helperText('Để trống để tự động tạo từ mô tả chuyên mục'),
 
-                                TextInput::make('og_image_link')
+                                FileUpload::make('og_image_link')
                                     ->label('Ảnh OG (Open Graph)')
-                                    ->url()
-                                    ->helperText('Để trống để sử dụng ảnh mặc định'),
+                                    ->image()
+                                    ->directory('post-categories/og-images')
+                                    ->visibility('public')
+                                    ->imageResizeMode('cover')
+                                    ->imageResizeTargetWidth(1200)
+                                    ->imageResizeTargetHeight(630)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->maxSize(5120)
+                                    ->imageEditor()
+                                    ->saveUploadedFileUsing(function ($file, $get) {
+                                        $imageService = app(\App\Services\ImageService::class);
+                                        $name = $get('name') ?? 'category';
+                                        return $imageService->saveImage(
+                                            $file,
+                                            'post-categories/og-images',
+                                            1200,
+                                            630,
+                                            85,
+                                            "og-{$name}"
+                                        );
+                                    })
+                                    ->helperText('Kích thước tối ưu: 1200x630px. Để trống để sử dụng ảnh mặc định.'),
                             ])->columns(1),
                     ])
                     ->columnSpanFull(),
@@ -115,7 +136,7 @@ class PostCategoryResource extends Resource
                     ->width('80px'),
 
                 TextColumn::make('name')
-                    ->label('Tên danh mục')
+                    ->label('Tên chuyên mục')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
@@ -127,9 +148,9 @@ class PostCategoryResource extends Resource
                     ->copyMessage('Đã sao chép!')
                     ->color('gray'),
 
-                TextColumn::make('posts_count')
+                TextColumn::make('posts_many_count')
                     ->label('Số bài viết')
-                    ->counts('posts')
+                    ->counts('postsMany')
                     ->sortable()
                     ->badge()
                     ->color('success'),
@@ -174,7 +195,8 @@ class PostCategoryResource extends Resource
                         ->label('Xóa đã chọn'),
                 ]),
             ])
-            ->defaultSort('order', 'asc');
+            ->defaultSort('order', 'asc')
+            ->reorderable('order');
     }
 
     public static function getRelations(): array

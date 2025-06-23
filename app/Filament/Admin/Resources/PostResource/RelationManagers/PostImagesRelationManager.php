@@ -8,6 +8,8 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Traits\HasImageUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\ImageColumn;
@@ -34,9 +36,38 @@ class PostImagesRelationManager extends RelationManager
                     600
                 )->required()->columnSpanFull(),
 
+                Select::make('image_type')
+                    ->label('Loại hình ảnh')
+                    ->options([
+                        'gallery' => '🖼️ Thư viện',
+                        'inline' => '📄 Nội dung',
+                        'featured' => '⭐ Nổi bật',
+                        'thumbnail' => '🏷️ Thumbnail',
+                    ])
+                    ->default('gallery')
+                    ->required()
+                    ->columnSpan(1),
+
+                TextInput::make('title')
+                    ->label('Tiêu đề ảnh')
+                    ->maxLength(255)
+                    ->columnSpan(1),
+
                 TextInput::make('alt_text')
                     ->label('Alt text (SEO)')
                     ->maxLength(255)
+                    ->columnSpanFull(),
+
+                Textarea::make('caption')
+                    ->label('Chú thích')
+                    ->rows(2)
+                    ->maxLength(500)
+                    ->columnSpanFull(),
+
+                Textarea::make('description')
+                    ->label('Mô tả chi tiết')
+                    ->rows(3)
+                    ->maxLength(1000)
                     ->columnSpanFull(),
 
                 TextInput::make('order')
@@ -70,10 +101,44 @@ class PostImagesRelationManager extends RelationManager
                     ->height(80)
                     ->width(120),
 
-                TextColumn::make('alt_text')
-                    ->label('Alt text')
-                    ->limit(50)
-                    ->searchable(),
+                TextColumn::make('image_type')
+                    ->label('Loại')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'gallery' => 'primary',
+                        'inline' => 'success',
+                        'featured' => 'warning',
+                        'thumbnail' => 'secondary',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'gallery' => '🖼️ Thư viện',
+                        'inline' => '📄 Nội dung',
+                        'featured' => '⭐ Nổi bật',
+                        'thumbnail' => '🏷️ Thumbnail',
+                        default => $state,
+                    }),
+
+                TextColumn::make('title')
+                    ->label('Tiêu đề')
+                    ->limit(30)
+                    ->searchable()
+                    ->description(fn ($record): string => $record->alt_text ? "Alt: {$record->alt_text}" : ''),
+
+                TextColumn::make('caption')
+                    ->label('Chú thích')
+                    ->limit(40)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('dimensions')
+                    ->label('Kích thước')
+                    ->getStateUsing(fn ($record) => $record->getDimensions())
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('file_size')
+                    ->label('Dung lượng')
+                    ->getStateUsing(fn ($record) => $record->getFormattedFileSize())
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 ToggleColumn::make('status')
                     ->label('Hiển thị')
@@ -82,9 +147,19 @@ class PostImagesRelationManager extends RelationManager
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('image_type')
+                    ->label('Loại hình ảnh')
+                    ->options([
+                        'gallery' => 'Thư viện',
+                        'inline' => 'Nội dung',
+                        'featured' => 'Nổi bật',
+                        'thumbnail' => 'Thumbnail',
+                    ]),
+
                 Tables\Filters\TernaryFilter::make('status')
                     ->label('Trạng thái hiển thị')
                     ->boolean()

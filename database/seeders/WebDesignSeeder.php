@@ -23,8 +23,8 @@ class WebDesignSeeder extends Seeder
                 // Courses Overview Settings
                 'courses_overview_enabled' => true,
                 'courses_overview_order' => 2,
-                'courses_overview_title' => 'Khóa học VBA Excel chuyên nghiệp',
-                'courses_overview_description' => 'Nâng cao kỹ năng Excel với các khóa học VBA từ cơ bản đến nâng cao',
+                'courses_overview_title' => 'Khóa học chuyên nghiệp',
+                'courses_overview_description' => 'Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu',
                 'courses_overview_bg_color' => 'bg-white',
                 'courses_overview_animation_class' => 'animate-fade-in-optimized',
                 

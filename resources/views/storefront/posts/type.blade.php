@@ -320,8 +320,8 @@
                                                 @if($post->is_featured)
                                                     <span class="inline-block px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">NỔI BẬT</span>
                                                 @endif
-                                                @if($post->category)
-                                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-700 rounded-full">{{ $post->category->name }}</span>
+                                                @if($post->categories->count() > 0)
+                                                    <span class="inline-block px-2 py-1 text-xs font-semibold bg-gray-100 text-gray-700 rounded-full">{{ $post->categories->first()->name }}</span>
                                                 @endif
                                             </div>
 

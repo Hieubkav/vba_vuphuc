@@ -88,6 +88,23 @@ class WebDesign extends Model
         'homepage_cta_primary_button_url',
         'homepage_cta_secondary_button_text',
         'homepage_cta_secondary_button_url',
+
+        // Footer
+        'footer_enabled',
+        'footer_order',
+        'footer_policy_1_title',
+        'footer_policy_1_type',
+        'footer_policy_1_url',
+        'footer_policy_1_post',
+        'footer_policy_2_title',
+        'footer_policy_2_type',
+        'footer_policy_2_url',
+        'footer_policy_2_post',
+        'footer_policy_3_title',
+        'footer_policy_3_type',
+        'footer_policy_3_url',
+        'footer_policy_3_post',
+        'footer_copyright',
     ];
 
     protected $casts = [
@@ -111,6 +128,8 @@ class WebDesign extends Model
         'blog_posts_order' => 'integer',
         'homepage_cta_enabled' => 'boolean',
         'homepage_cta_order' => 'integer',
+        'footer_enabled' => 'boolean',
+        'footer_order' => 'integer',
     ];
 
     /**
@@ -132,8 +151,8 @@ class WebDesign extends Model
                 'description' => $this->courses_overview_description,
                 'bg_color' => $this->courses_overview_bg_color,
                 'animation_class' => $this->courses_overview_animation_class,
-                'component' => 'courses-overview',
-                'type' => 'livewire'
+                'component' => 'components.storefront.courses-overview',
+                'type' => 'include'
             ],
             'album_timeline' => [
                 'enabled' => $this->album_timeline_enabled,
@@ -209,6 +228,12 @@ class WebDesign extends Model
                 'enabled' => $this->homepage_cta_enabled,
                 'order' => $this->homepage_cta_order,
                 'component' => 'components.storefront.homepage-cta',
+                'type' => 'include'
+            ],
+            'footer' => [
+                'enabled' => $this->footer_enabled,
+                'order' => $this->footer_order,
+                'component' => 'components.public.footer',
                 'type' => 'include'
             ]
         ];

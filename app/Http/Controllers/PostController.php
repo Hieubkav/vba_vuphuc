@@ -9,13 +9,7 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * Hiển thị trang filter tổng thể cho tất cả bài viết với Livewire
-     */
-    public function index()
-    {
-        return view('storefront.posts.index');
-    }
+
 
     /**
      * Hiển thị danh sách bài viết theo danh mục
@@ -25,11 +19,26 @@ class PostController extends Controller
         $category = CatPost::where('slug', $slug)->where('status', 'active')->firstOrFail();
 
         // Query builder cho bài viết
-        $query = Post::where('category_id', $category->id)
-            ->where('status', 'active')
-            ->with(['category', 'images' => function($query) {
+        $query = Post::where('status', 'active')
+            ->with(['categories', 'images' => function($query) {
                 $query->where('status', 'active')->orderBy('order');
             }]);
+
+        // Lọc theo chuyên mục chính hoặc chuyên mục phụ
+        if (request('category_filter')) {
+            // Lọc theo chuyên mục khác
+            $filterCategory = CatPost::where('slug', request('category_filter'))->first();
+            if ($filterCategory) {
+                $query->whereHas('categories', function($q) use ($filterCategory) {
+                    $q->where('cat_post_id', $filterCategory->id);
+                });
+            }
+        } else {
+            // Lọc theo chuyên mục hiện tại
+            $query->whereHas('categories', function($q) use ($category) {
+                $q->where('cat_post_id', $category->id);
+            });
+        }
 
 
 
@@ -54,14 +63,15 @@ class PostController extends Controller
     }
 
     /**
-     * Hiển thị danh sách tất cả danh mục bài viết
+     * Hiển thị danh sách tất cả chuyên mục bài viết
      */
     public function categories()
     {
         $categories = CatPost::where('status', 'active')
-            ->withCount(['posts' => function($query) {
+            ->withCount(['postsMany' => function($query) {
                 $query->where('status', 'active');
             }])
+            ->having('posts_many_count', '>', 0)
             ->orderBy('order')
             ->get();
 
@@ -79,21 +89,28 @@ class PostController extends Controller
                 'images' => function($query) {
                     $query->where('status', 'active')->orderBy('order');
                 },
-                'category'
+                'categories'
             ])
             ->firstOrFail();
 
-        // Bài viết liên quan
-        $relatedPosts = Post::where('category_id', $post->category_id)
-            ->where('id', '!=', $post->id)
-            ->where('status', 'active')
-            ->with(['images' => function($query) {
-                $query->where('status', 'active')->orderBy('order')->limit(1);
-            }])
-            ->orderBy('order')
-            ->orderBy('created_at', 'desc')
-            ->limit(6)
-            ->get();
+        // Bài viết liên quan (dựa trên chuyên mục chung)
+        $categoryIds = $post->categories->pluck('id')->toArray();
+        $relatedPosts = collect();
+
+        if (!empty($categoryIds)) {
+            $relatedPosts = Post::whereHas('categories', function($q) use ($categoryIds) {
+                    $q->whereIn('cat_post_id', $categoryIds);
+                })
+                ->where('id', '!=', $post->id)
+                ->where('status', 'active')
+                ->with(['images' => function($query) {
+                    $query->where('status', 'active')->orderBy('order')->limit(1);
+                }])
+                ->orderBy('order')
+                ->orderBy('created_at', 'desc')
+                ->limit(6)
+                ->get();
+        }
 
         // SEO data
         $seoData = [
@@ -104,7 +121,7 @@ class PostController extends Controller
             'breadcrumbs' => [
                 ['name' => 'Trang chủ', 'url' => route('storeFront')],
                 ['name' => 'Bài viết', 'url' => route('posts.categories')],
-                ['name' => $post->category->name ?? 'Danh mục', 'url' => route('posts.category', $post->category->slug ?? '#')],
+                ['name' => $post->categories->first()->name ?? 'Chuyên mục', 'url' => $post->categories->first() ? route('posts.category', $post->categories->first()->slug) : '#'],
                 ['name' => $post->title, 'url' => route('posts.show', $post->slug)]
             ]
         ];

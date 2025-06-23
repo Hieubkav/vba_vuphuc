@@ -130,10 +130,14 @@ Route::controller(AlbumController::class)->group(function () {
 | - Danh mục bài viết
 */
 Route::controller(PostController::class)->group(function () {
-    Route::get('/bai-viet', 'index')->name('posts.index');
-    Route::get('/bai-viet/{slug}', 'show')->name('posts.show');
     Route::get('/danh-muc-bai-viet', 'categories')->name('posts.categories');
     Route::get('/danh-muc-bai-viet/{slug}', 'category')->name('posts.category');
+    Route::get('/bai-viet/{slug}', 'show')->name('posts.show');
+
+    // Redirect route cũ /bai-viet về trang filter mới
+    Route::get('/bai-viet', function() {
+        return redirect()->route('posts.categories');
+    })->name('posts.index');
 });
 
 /*
@@ -239,3 +243,10 @@ Route::get('/api/realtime-stats', function () {
         ], 500);
     }
 })->middleware('auth')->name('api.realtime-stats');
+
+
+
+
+
+
+

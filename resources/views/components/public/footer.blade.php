@@ -31,33 +31,90 @@
                 <p class="text-gray-600 mb-2 font-bold">VUPHUC BAKING®</p>
                 <p class="text-gray-600 mb-3">Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009</p>
                 <p class="text-gray-600 mb-3">Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc</p>
-
-                <!-- Certification Images -->
-                @if(isset($associations) && $associations->count() > 0)
-                    <div class="mt-4 flex flex-wrap gap-3">
-                        @foreach($associations as $association)
-                            @if(!empty($association->image_link))
-                                @if(!empty($association->website_link))
-                                    <a href="{{ $association->website_link }}" target="_blank" title="{{ $association->name }}">
-                                        <img src="{{ asset('storage/' . $association->image_link) }}" alt="{{ $association->name }}" class="h-12 hover:opacity-80 transition-opacity" onerror="handleImageError(this)">
-                                    </a>
-                                @else
-                                    <img src="{{ asset('storage/' . $association->image_link) }}" alt="{{ $association->name }}" class="h-12" onerror="handleImageError(this)">
-                                @endif
-                            @endif
-                        @endforeach
-                    </div>
-                @endif
             </div>
 
             <!-- Policies -->
             <div>
                 <h3 class="text-lg font-semibold text-red-700 mb-5">Chính sách</h3>
-                <ul class="space-y-3 text-gray-600">
-                    @foreach(['CHÍNH SÁCH & ĐIỀU KHOẢN MUA BÁN HÀNG HÓA','HỆ THỐNG ĐẠI LÝ & ĐIỂM BÁN HÀNG','BẢO MẬT & QUYỀN RIÊNG TƯ'] as $policy)
-                        <li><a href="#" class="hover:text-red-700 transition-colors">{{ $policy }}</a></li>
+                <ul class="space-y-3 text-gray-600 mb-8">
+                    @php
+                        $policies = webDesignContent('footer', 'policies', [
+                            ['title' => 'CHÍNH SÁCH & ĐIỀU KHOẢN MUA BÁN HÀNG HÓA', 'url' => '#'],
+                            ['title' => 'HỆ THỐNG ĐẠI LÝ & ĐIỂM BÁN HÀNG', 'url' => '#'],
+                            ['title' => 'BẢO MẬT & QUYỀN RIÊNG TƯ', 'url' => '#'],
+                        ]);
+                    @endphp
+                    @foreach($policies as $policy)
+                        <li>
+                            <a href="{{ $policy['url'] ?? '#' }}" class="hover:text-red-700 transition-colors">
+                                {{ $policy['title'] ?? '' }}
+                            </a>
+                        </li>
                     @endforeach
                 </ul>
+
+                <!-- Hiệp hội & Chứng nhận -->
+                @if(isset($associations) && $associations->count() > 0)
+                    <div>
+                        <h4 class="text-lg font-semibold text-red-700 mb-3">Hiệp hội & Chứng nhận</h4>
+
+                        @php
+                            $associationsWithImages = $associations->filter(function($association) {
+                                return !empty($association->image_link);
+                            });
+                            $associationsWithoutImages = $associations->filter(function($association) {
+                                return empty($association->image_link);
+                            });
+                        @endphp
+
+                        <!-- Hiển thị associations có ảnh -->
+                        @if($associationsWithImages->count() > 0)
+                            <div class="flex flex-wrap gap-3 mb-4">
+                                @foreach($associationsWithImages as $association)
+                                    <div class="association-item relative group">
+                                        @if(!empty($association->website_link))
+                                            <a href="{{ $association->website_link }}"
+                                               target="_blank"
+                                               title="{{ $association->name }}"
+                                               class="block">
+                                                <img src="{{ asset('storage/' . $association->image_link) }}"
+                                                     alt="{{ $association->name }}"
+                                                     class="h-12 w-auto object-contain bg-white rounded-lg p-1 border border-gray-100 hover:border-red-200 hover:shadow-md transition-all duration-300 group-hover:scale-105"
+                                                     onerror="handleImageError(this)">
+                                            </a>
+                                        @else
+                                            <img src="{{ asset('storage/' . $association->image_link) }}"
+                                                 alt="{{ $association->name }}"
+                                                 title="{{ $association->name }}"
+                                                 class="h-12 w-auto object-contain bg-white rounded-lg p-1 border border-gray-100 hover:border-red-200 hover:shadow-md transition-all duration-300"
+                                                 onerror="handleImageError(this)">
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <!-- Hiển thị associations không có ảnh dưới dạng text links -->
+                        @if($associationsWithoutImages->count() > 0)
+                            <div class="space-y-2">
+                                @foreach($associationsWithoutImages as $association)
+                                    <div class="flex items-center text-sm">
+                                        <i class="fas fa-building text-red-500 mr-2 text-xs"></i>
+                                        @if(!empty($association->website_link))
+                                            <a href="{{ $association->website_link }}"
+                                               target="_blank"
+                                               class="text-gray-600 hover:text-red-600 transition-colors">
+                                                {{ $association->name }}
+                                            </a>
+                                        @else
+                                            <span class="text-gray-600">{{ $association->name }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -67,7 +124,10 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-sm">
-                    &copy; {{ date('Y') }} Copyright by {{ $globalSettings->site_name ?? 'VUPHUC BAKING®' }} - All Rights Reserved
+                    @php
+                        $copyright = webDesignContent('footer', 'copyright', '© ' . date('Y') . ' Copyright by VBA Vũ Phúc - All Rights Reserved');
+                    @endphp
+                    {{ $copyright }}
                 </p>
             </div>
         </div>

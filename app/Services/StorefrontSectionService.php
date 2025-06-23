@@ -19,12 +19,12 @@ class StorefrontSectionService
             'courses_overview' => [
                 'enabled' => true,
                 'order' => 2,
-                'title' => 'Khóa học VBA Excel chuyên nghiệp',
-                'description' => 'Nâng cao kỹ năng Excel với các khóa học VBA từ cơ bản đến nâng cao',
+                'title' => 'Khóa học chuyên nghiệp',
+                'description' => 'Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu',
                 'bg_color' => 'bg-white',
                 'animation_class' => 'animate-fade-in-optimized',
-                'component' => 'courses-overview',
-                'type' => 'livewire'
+                'component' => 'components.storefront.courses-overview',
+                'type' => 'include'
             ],
             'album_timeline' => [
                 'enabled' => true,

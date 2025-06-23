@@ -333,10 +333,10 @@ class ViewServiceProvider extends ServiceProvider
 
                 // Post Categories cho navigation
                 'postCategories' => CatPost::where('status', 'active')
-                    ->whereHas('posts', function($query) {
+                    ->whereHas('postsMany', function($query) {
                         $query->where('status', 'active');
                     })
-                    ->withCount(['posts' => function($query) {
+                    ->withCount(['postsMany' => function($query) {
                         $query->where('status', 'active');
                     }])
                     ->orderBy('order')

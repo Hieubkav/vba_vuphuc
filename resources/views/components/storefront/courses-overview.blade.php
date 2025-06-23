@@ -2,7 +2,12 @@
     // Sử dụng dữ liệu từ ViewServiceProvider với fallback tối ưu
     $courseCategoriesData = $courseCategories ?? collect();
 
-
+    // Lấy dữ liệu WebDesign cho section này
+    $webDesignData = $webDesign ?? null;
+    $sectionTitle = $webDesignData?->courses_overview_title ?? 'Khóa học chuyên nghiệp';
+    $sectionDescription = $webDesignData?->courses_overview_description ?? 'Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu';
+    $sectionBgColor = $webDesignData?->courses_overview_bg_color ?? 'bg-white';
+    $sectionAnimationClass = $webDesignData?->courses_overview_animation_class ?? 'animate-fade-in-optimized';
 
     // Fallback: nếu không có dữ liệu từ ViewServiceProvider, lấy trực tiếp từ model với cache
     if ($courseCategoriesData->isEmpty()) {
@@ -51,37 +56,93 @@
     $useSwiper = $categoriesCount > 3; // Sử dụng Swiper nếu có nhiều hơn 3 danh mục
 @endphp
 
-<!-- Swiper CSS -->
+<!-- CSS Swiper - Giao diện đỏ trắng hiện đại -->
 @if($useSwiper)
 @push('styles')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <style>
+:root {
+    --primary-red: #dc2626;
+    --primary-red-light: #ef4444;
+    --primary-red-dark: #b91c1c;
+    --accent-red: #fef2f2;
+    --surface-white: #ffffff;
+    --surface-gray: #f8fafc;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-large: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
 .courses-swiper-container {
-    padding: 0 50px; /* Space for navigation buttons */
+    padding: 0 60px;
+    background: linear-gradient(135deg, var(--surface-white) 0%, var(--surface-gray) 100%);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.courses-swiper-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 20%, rgba(220, 38, 38, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(220, 38, 38, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.courses-swiper {
+    position: relative;
+    z-index: 1;
+    padding: 32px 0;
 }
 
 .courses-swiper .swiper-slide {
     height: auto;
     display: flex;
+    padding: 0 8px;
 }
 
 .courses-swiper .swiper-slide article {
     width: 100%;
     height: 100%;
+    transform: translateY(0);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.courses-swiper .swiper-slide-active article {
+    transform: translateY(-4px);
 }
 
 .courses-swiper .swiper-pagination-bullet {
-    background: #dc2626;
-    opacity: 0.3;
+    background: var(--primary-red);
+    opacity: 0.2;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
 }
 
 .courses-swiper .swiper-pagination-bullet-active {
     opacity: 1;
+    transform: scale(1.2);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-light) 100%);
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
 }
 
 @media (max-width: 768px) {
     .courses-swiper-container {
-        padding: 0 20px;
+        padding: 0 24px;
+        border-radius: 20px;
+    }
+
+    .courses-swiper {
+        padding: 24px 0;
     }
 
     .swiper-button-next,
@@ -95,13 +156,22 @@
 
 @if($hasData)
 
-<!-- KISS: Main Content đơn giản -->
-<div class="container mx-auto px-4">
+<!-- Nội dung chính hiện đại với giao diện đỏ trắng -->
+<section class="{{ $sectionBgColor }} py-12">
+<div class="container mx-auto px-4 {{ $sectionAnimationClass }}">
+    <!-- Tiêu đề phần gọn gàng -->
+    <div class="text-center mb-12">
+        <h2 class="section-title mb-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
+            {{ $sectionTitle }}
+        </h2>
+        <p class="subtitle max-w-2xl mx-auto">
+            {{ $sectionDescription }}
+        </p>
+    </div>
 
-
-    <!-- Course Categories - Dynamic Layout (Grid hoặc Swiper) -->
+    <!-- Danh mục khóa học - Bố cục linh hoạt (Lưới hoặc Trượt) -->
     @if($useSwiper)
-        <!-- Swiper Layout cho nhiều danh mục -->
+        <!-- Bố cục trượt cho nhiều danh mục -->
         <div class="courses-swiper-container relative mb-12">
             <div class="swiper courses-swiper">
                 <div class="swiper-wrapper">
@@ -110,71 +180,77 @@
                             @include('components.storefront.course-card', ['category' => $category, 'useSwiper' => true])
                         </div>
                     @endforeach
-                </div> <!-- End swiper-wrapper -->
+                </div> <!-- Kết thúc swiper-wrapper -->
 
-                <!-- Swiper Navigation -->
-                <div class="swiper-button-next !text-red-600 !w-10 !h-10 !mt-0 !top-1/2 !-translate-y-1/2 !right-4 !bg-white !rounded-full !shadow-lg hover:!bg-red-50 transition-colors duration-300"></div>
-                <div class="swiper-button-prev !text-red-600 !w-10 !h-10 !mt-0 !top-1/2 !-translate-y-1/2 !left-4 !bg-white !rounded-full !shadow-lg hover:!bg-red-50 transition-colors duration-300"></div>
+                <!-- Điều hướng trượt gọn gàng -->
+                <div class="swiper-button-next !text-red-600 !w-10 !h-10 !mt-0 !top-1/2 !-translate-y-1/2 !right-6 !bg-white !rounded-full !shadow-md hover:!bg-red-50 transition-all duration-300"></div>
+                <div class="swiper-button-prev !text-red-600 !w-10 !h-10 !mt-0 !top-1/2 !-translate-y-1/2 !left-6 !bg-white !rounded-full !shadow-md hover:!bg-red-50 transition-all duration-300"></div>
 
-                <!-- Swiper Pagination -->
-                <div class="swiper-pagination !bottom-4 !relative !mt-8"></div>
-            </div> <!-- End swiper -->
-        </div> <!-- End swiper-container -->
+                <!-- Phân trang trượt gọn gàng -->
+                <div class="swiper-pagination !bottom-0 !relative !mt-6"></div>
+            </div> <!-- Kết thúc swiper -->
+        </div> <!-- Kết thúc swiper-container -->
     @else
-        <!-- Grid Layout cho ít danh mục -->
+        <!-- Bố cục lưới hiện đại cho ít danh mục -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             @foreach($courseCategoriesData as $index => $category)
                 @include('components.storefront.course-card', ['category' => $category, 'useSwiper' => false])
             @endforeach
-        </div> <!-- End grid -->
+        </div> <!-- Kết thúc lưới -->
     @endif
 
-
-    <!-- CTA Section - Minimalist -->
+    <!-- Phần kêu gọi hành động gọn gàng -->
     <div class="text-center">
         <a href="{{ route('courses.index') }}"
-           class="inline-flex items-center px-8 py-4 bg-gray-900 hover:bg-gray-800 text-white btn-text-lg rounded-2xl transition-colors duration-300 shadow-lg hover:shadow-xl"
-           aria-label="Xem tất cả khóa học làm bánh">
-            <span>Xem tất cả khóa học làm bánh</span>
-            <i class="fas fa-arrow-right ml-3"></i>
+           class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white btn-text-lg rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-red-500/30"
+           aria-label="Xem tất cả khóa học">
+            <span class="font-semibold">Xem tất cả khóa học</span>
         </a>
     </div>
 </div>
+</section>
 
 @else
-<!-- Enhanced Empty State với Better UX -->
-<div class="container mx-auto px-4 relative z-10">
-    <div class="flex flex-col items-center text-center py-20 animate-fade-in">
-        <!-- Animated Icon Container với Font Awesome -->
-        <div class="relative mb-8">
-            <div class="w-32 h-32 bg-gradient-to-br from-red-100 to-red-200 rounded-3xl flex items-center justify-center shadow-xl">
-                <i class="fas fa-graduation-cap text-6xl text-red-500"></i>
+<!-- Trạng thái trống hiện đại với thiết kế tinh tế -->
+<section class="{{ $sectionBgColor }} py-12">
+<div class="container mx-auto px-4 {{ $sectionAnimationClass }}">
+    <div class="max-w-xl mx-auto">
+        <div class="bg-gradient-to-br from-white to-red-50/30 rounded-2xl p-8 shadow-lg border border-red-100/50 backdrop-blur-sm">
+            <div class="flex flex-col items-center text-center space-y-6">
+                <!-- Khung biểu tượng gọn gàng -->
+                <div class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg mx-auto">
+                    <i class="fas fa-graduation-cap text-xl text-white"></i>
+                </div>
+
+                <!-- Kiểu chữ hiện đại -->
+                <div class="space-y-3">
+                    <h3 class="section-title bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                        {{ $sectionTitle }}
+                    </h3>
+                    <p class="subtitle max-w-md text-sm">
+                        {{ $sectionDescription }}
+                        <br class="hidden sm:block">
+                        Đăng ký nhận thông báo để không bỏ lỡ!
+                    </p>
+                </div>
+
+                <!-- Nút hành động gọn gàng -->
+                <div class="flex flex-col sm:flex-row gap-2 w-full max-w-sm">
+                    <a href="{{ route('posts.index') }}"
+                       class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white btn-text rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-red-500/30 text-sm"
+                       aria-label="Xem bài viết khác">
+                        <span class="font-medium">Xem bài viết</span>
+                    </a>
+                    <button class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white hover:bg-red-50 text-red-600 hover:text-red-700 btn-text rounded-lg transition-all duration-300 border border-red-200 hover:border-red-300 focus:outline-none focus:ring-4 focus:ring-red-500/20 text-sm"
+                            onclick="alert('Tính năng đăng ký thông báo sẽ sớm ra mắt!')">
+                        <span class="font-medium">Nhận thông báo</span>
+                    </button>
+                </div>
             </div>
-            <!-- Floating Elements -->
-            <div class="absolute -top-2 -right-2 w-6 h-6 bg-red-400 rounded-full animate-bounce"></div>
-            <div class="absolute -bottom-2 -left-2 w-4 h-4 bg-red-300 rounded-full animate-pulse"></div>
         </div>
-
-        <!-- Enhanced Typography -->
-        <h3 class="section-title text-center mb-6">
-            Chưa có khóa học làm bánh nào
-        </h3>
-
-        <p class="subtitle text-center max-w-lg mb-10">
-            Các khóa học làm bánh sẽ sớm được cập nhật.
-            <br class="hidden sm:block">
-            Hãy theo dõi để không bỏ lỡ những khóa học hữu ích!
-        </p>
-
-        <!-- Enhanced CTA Button -->
-        <a href="{{ route('posts.index') }}"
-           class="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white btn-text-lg rounded-2xl hover:from-red-700 hover:to-red-800 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-red-500/50"
-           aria-label="Xem bài viết khác">
-            <span>Xem bài viết khác</span>
-            <i class="fas fa-arrow-right ml-3 transition-transform duration-300 group-hover:translate-x-1"></i>
-        </a>
     </div>
 </div>
+</section>
 @endif
 
 <!-- KISS: Scripts đơn giản -->

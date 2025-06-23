@@ -5,8 +5,10 @@ namespace App\Filament\Admin\Resources;
 use App\Filament\Admin\Resources\MenuItemResource\Pages;
 use App\Models\MenuItem;
 use App\Models\CatPost;
-
 use App\Models\Post;
+use App\Models\CatCourse;
+use App\Models\Course;
+use App\Models\CourseGroup;
 
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -65,6 +67,10 @@ class MenuItemResource extends Resource
                                 'cat_post' => 'Danh mục bài viết',
                                 'all_posts' => 'Tất cả bài viết',
                                 'post' => 'Bài viết',
+                                'cat_course' => 'Danh mục khóa học',
+                                'all_courses' => 'Tất cả khóa học',
+                                'course' => 'Khóa học',
+                                'course_group' => 'Nhóm khóa học',
                                 'display_only' => 'Chỉ hiển thị (không dẫn đến đâu)',
                             ])
                             ->required()
@@ -95,6 +101,26 @@ class MenuItemResource extends Resource
                             ->visible(fn ($get) => $get('type') === 'post')
                             ->required(fn ($get) => $get('type') === 'post'),
 
+                        Select::make('cat_course_id')
+                            ->label('Danh mục khóa học')
+                            ->options(CatCourse::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->visible(fn ($get) => $get('type') === 'cat_course')
+                            ->required(fn ($get) => $get('type') === 'cat_course'),
+
+                        Select::make('course_id')
+                            ->label('Khóa học')
+                            ->options(Course::all()->pluck('title', 'id'))
+                            ->searchable()
+                            ->visible(fn ($get) => $get('type') === 'course')
+                            ->required(fn ($get) => $get('type') === 'course'),
+
+                        Select::make('course_group_id')
+                            ->label('Nhóm khóa học')
+                            ->options(CourseGroup::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->visible(fn ($get) => $get('type') === 'course_group')
+                            ->required(fn ($get) => $get('type') === 'course_group'),
 
                     ]),
 
@@ -121,10 +147,10 @@ class MenuItemResource extends Resource
     {
         return $table
             ->query(
-                // Sắp xếp theo cấu trúc phân cấp: parent trước, children sau
+                // Sắp xếp đơn giản theo order
                 MenuItem::query()
                     ->with('parent')
-                    ->orderByRaw('COALESCE(parent_id, id), parent_id IS NULL DESC, `order` ASC')
+                    ->orderBy('order')
             )
             ->columns([
                 TextColumn::make('order')
@@ -162,6 +188,10 @@ class MenuItemResource extends Resource
                         'cat_post' => 'info',
                         'all_posts' => 'blue',
                         'post' => 'success',
+                        'cat_course' => 'warning',
+                        'all_courses' => 'orange',
+                        'course' => 'emerald',
+                        'course_group' => 'indigo',
                         'display_only' => 'purple',
                         default => 'gray',
                     })
@@ -170,6 +200,10 @@ class MenuItemResource extends Resource
                         'cat_post' => 'Danh mục bài viết',
                         'all_posts' => 'Tất cả bài viết',
                         'post' => 'Bài viết',
+                        'cat_course' => 'Danh mục khóa học',
+                        'all_courses' => 'Tất cả khóa học',
+                        'course' => 'Khóa học',
+                        'course_group' => 'Nhóm khóa học',
                         'display_only' => 'Chỉ hiển thị',
                         default => $state,
                     }),
@@ -192,6 +226,10 @@ class MenuItemResource extends Resource
                         'cat_post' => 'Danh mục bài viết',
                         'all_posts' => 'Tất cả bài viết',
                         'post' => 'Bài viết',
+                        'cat_course' => 'Danh mục khóa học',
+                        'all_courses' => 'Tất cả khóa học',
+                        'course' => 'Khóa học',
+                        'course_group' => 'Nhóm khóa học',
                         'display_only' => 'Chỉ hiển thị (không dẫn đến đâu)',
                     ]),
 
@@ -243,4 +281,6 @@ class MenuItemResource extends Resource
     {
         return 'success';
     }
+
+
 }

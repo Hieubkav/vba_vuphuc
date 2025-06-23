@@ -165,11 +165,11 @@
                                         <!-- Post Content -->
                                         <div class="p-6 flex-grow flex flex-col">
                                             <!-- Category Badge -->
-                                            @if($post->category)
+                                            @if($post->categories->count() > 0)
                                             <div class="flex items-center mb-4">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 font-open-sans">
                                                     <i class="fas fa-folder mr-1"></i>
-                                                    {{ $post->category->name }}
+                                                    {{ $post->categories->first()->name }}
                                                 </span>
                                             </div>
                                             @endif

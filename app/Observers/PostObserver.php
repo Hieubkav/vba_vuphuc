@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Post;
 use App\Providers\ViewServiceProvider;
+use App\Services\PostContentService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -11,13 +12,19 @@ class PostObserver
 {
     protected $oldThumbnails = []; // Array to store old thumbnails by post ID
     protected $oldOgImages = []; // Array to store old OG images by post ID
+    protected PostContentService $contentService;
+
+    public function __construct(PostContentService $contentService)
+    {
+        $this->contentService = $contentService;
+    }
 
     /**
      * Handle the Post "creating" event.
      */
     public function creating(Post $post): void
     {
-        $this->generateSeoFields($post);
+        $this->contentService->updateAutoFields($post);
         $this->generateSlug($post);
     }
 
@@ -34,7 +41,7 @@ class PostObserver
      */
     public function updating(Post $post): void
     {
-        $this->generateSeoFields($post);
+        $this->contentService->updateAutoFields($post);
         $this->generateSlug($post);
 
         // Xử lý xóa file cũ
@@ -94,26 +101,7 @@ class PostObserver
         ViewServiceProvider::refreshCache('posts');
     }
 
-    /**
-     * Tự động sinh SEO fields nếu để trống
-     */
-    private function generateSeoFields(Post $post): void
-    {
-        // Tự động sinh SEO title nếu để trống
-        if (empty($post->seo_title)) {
-            $post->seo_title = $post->title;
-        }
 
-        // Tự động sinh SEO description nếu để trống
-        if (empty($post->seo_description)) {
-            $post->seo_description = Str::limit(strip_tags($post->content), 160);
-        }
-
-        // Tự động sinh OG image nếu để trống và có thumbnail
-        if (empty($post->og_image_link) && !empty($post->thumbnail)) {
-            $post->og_image_link = asset('storage/' . $post->thumbnail);
-        }
-    }
 
     /**
      * Tự động sinh slug nếu để trống

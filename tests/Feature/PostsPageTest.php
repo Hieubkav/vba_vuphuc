@@ -156,7 +156,7 @@ class PostsPageTest extends TestCase
             'category_id' => $this->category->id
         ]);
 
-        $response = $this->get('/bai-viet');
+        $response = $this->get('/danh-muc-bai-viet');
         $response->assertSee('max-w-2xl mx-auto');
     }
 
@@ -170,7 +170,7 @@ class PostsPageTest extends TestCase
             'category_id' => $this->category->id
         ]);
 
-        $response = $this->get('/bai-viet');
+        $response = $this->get('/danh-muc-bai-viet');
         $response->assertSee('fas fa-newspaper'); // Icon cho news type
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 /**
@@ -38,14 +39,27 @@ class ConvertImageToWebp
     public function handle(UploadedFile $file, string $directory, ?string $customName = null, int $width = 0, int $height = 0): ?string
     {
         try {
+            // Kiểm tra file có tồn tại không
+            if (!$file->isValid()) {
+                Log::error('ConvertImageToWebp: Invalid file upload');
+                return null;
+            }
+
+            // Kiểm tra file path có tồn tại không
+            $filePath = $file->getPathname();
+            if (!file_exists($filePath)) {
+                Log::error('ConvertImageToWebp: File does not exist at path: ' . $filePath);
+                return null;
+            }
+
             // Tạo tên file
             $fileName = $this->generateFileName($customName) . '.webp';
 
             // Đường dẫn lưu
-            $filePath = $directory . '/' . $fileName;
+            $savePath = $directory . '/' . $fileName;
 
             // Đọc và convert sang WebP
-            $image = $this->manager->read($file->getPathname());
+            $image = $this->manager->read($filePath);
 
             // Resize nếu có kích thước
             if ($width > 0 && $height > 0) {
@@ -59,13 +73,24 @@ class ConvertImageToWebp
             $webpData = $image->toWebp(95); // 95% chất lượng
 
             // Lưu file
-            Storage::disk('public')->put($filePath, $webpData);
+            Storage::disk('public')->put($savePath, $webpData);
 
-            return $filePath;
+            return $savePath;
 
         } catch (\Exception $e) {
+            Log::error('ConvertImageToWebp error: ' . $e->getMessage(), [
+                'file_name' => $file->getClientOriginalName() ?? 'unknown',
+                'file_size' => $file->getSize() ?? 'unknown',
+                'directory' => $directory
+            ]);
+
             // Fallback: lưu file gốc nếu convert lỗi
-            return $file->store($directory, 'public');
+            try {
+                return $file->store($directory, 'public');
+            } catch (\Exception $fallbackError) {
+                Log::error('ConvertImageToWebp fallback error: ' . $fallbackError->getMessage());
+                return null;
+            }
         }
     }
 

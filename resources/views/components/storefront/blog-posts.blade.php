@@ -1,19 +1,15 @@
 @php
-    // KISS: Lấy dữ liệu từ ViewServiceProvider (latestPosts) hoặc fallback
-    $postsData = $latestPosts ?? collect();
-
-    // Fallback: nếu ViewServiceProvider chưa có dữ liệu
-    if ($postsData->isEmpty()) {
-        try {
-            $postsData = \App\Models\Post::where('status', 'active')
-                ->with(['category:id,name,slug'])
-                ->orderBy('order')
-                ->orderBy('created_at', 'desc')
-                ->take(4)
-                ->get();
-        } catch (\Exception $e) {
-            $postsData = collect();
-        }
+    // Lấy dữ liệu bài viết nổi bật (is_featured = true) và đang hiển thị
+    try {
+        $postsData = \App\Models\Post::where('status', 'active')
+            ->where('is_featured', true)
+            ->with(['category:id,name,slug'])
+            ->orderBy('order')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+    } catch (\Exception $e) {
+        $postsData = collect();
     }
 
     // Tách bài viết chính (đầu tiên) và bài viết phụ (3 bài còn lại)
@@ -116,9 +112,9 @@
             <div class="p-4">
                 <!-- Category & Date -->
                 <div class="flex items-center gap-2 mb-3">
-                    @if($post->category)
+                    @if($post->categories->count() > 0)
                     <span class="category-badge bg-gray-100 text-gray-700 caption-text px-2 py-1 rounded-full hover:bg-red-50 hover:text-red-700">
-                        {{ $post->category->name }}
+                        {{ $post->categories->first()->name }}
                     </span>
                     @endif
                     @if($post->created_at)
@@ -163,8 +159,8 @@
 <!-- Nút xem tất cả với hiệu ứng đẹp - Layout 2 dòng -->
 <div class="text-center mt-12 pt-8 border-t border-gray-100">
     <div class="max-w-md mx-auto">
-        <h3 class="card-title mb-3">Khám phá thêm nhiều bài viết</h3>
-        <p class="body-text text-gray-600 mb-6">Cập nhật kiến thức Excel, VBA và kỹ năng văn phòng mới nhất</p>
+        {{-- <h3 class="card-title mb-3">Khám phá thêm nhiều bài viết</h3>
+        <p class="body-text text-gray-600 mb-6">Cập nhật kiến thức Excel, VBA và kỹ năng văn phòng mới nhất</p> --}}
         <a href="{{ route('posts.index') }}"
            class="cta-button inline-flex items-center text-white px-8 py-4 rounded-xl btn-text-lg relative overflow-hidden group shadow-lg">
             <i class="fas fa-newspaper mr-3 transform group-hover:scale-110 transition-transform duration-300"></i>
