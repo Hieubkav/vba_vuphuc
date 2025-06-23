@@ -25,7 +25,7 @@ Model WebDesign cho phép quản lý hoàn toàn giao diện trang chủ website
    - Màu nền: bg-white
    - Component: @livewire('courses-overview')
 
-3. **📸 Thư viện tài liệu** (Thứ tự: 3)
+3. **📸 Timeline khóa học** (Thứ tự: 3)
    - Hiển thị album và tài liệu khóa học
    - Màu nền: bg-gray-25
    - Component: album-timeline

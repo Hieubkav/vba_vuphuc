@@ -16,15 +16,8 @@ class UpdateCourseMaterialsAccessTypeSeeder extends Seeder
     {
         $this->command->info('🔄 Cập nhật access_type cho tài liệu khóa học...');
 
-        // Cập nhật tài liệu preview thành public
-        $previewCount = CourseMaterial::where('is_preview', true)
-            ->update(['access_type' => 'public']);
-
-        $this->command->info("✅ Đã cập nhật {$previewCount} tài liệu preview thành 'public'");
-
         // Cập nhật một số tài liệu thành enrolled (tài liệu khóa)
-        $materials = CourseMaterial::where('is_preview', false)
-            ->where('access_type', 'public')
+        $materials = CourseMaterial::where('access_type', 'public')
             ->get();
 
         $enrolledCount = 0;
@@ -43,8 +36,8 @@ class UpdateCourseMaterialsAccessTypeSeeder extends Seeder
         $enrolledOnlyCount = CourseMaterial::where('access_type', 'enrolled')->count();
 
         $this->command->info("📊 Thống kê tài liệu:");
-        $this->command->info("   - Tài liệu mở (public): {$publicCount}");
-        $this->command->info("   - Tài liệu khóa (enrolled): {$enrolledOnlyCount}");
+        $this->command->info("   - Tài liệu công khai (public): {$publicCount}");
+        $this->command->info("   - Tài liệu dành cho học viên (enrolled): {$enrolledOnlyCount}");
         $this->command->info("   - Tổng cộng: " . ($publicCount + $enrolledOnlyCount));
 
         $this->command->info('✨ Hoàn thành cập nhật access_type!');

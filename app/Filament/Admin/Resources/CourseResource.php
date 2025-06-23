@@ -78,11 +78,26 @@ class CourseResource extends Resource
                                             )
                                             ->helperText('Đường dẫn SEO-friendly. Để trống sẽ tự động tạo từ tiêu đề khi lưu.'),
 
-                                        Forms\Components\Textarea::make('description')
+                                        Forms\Components\RichEditor::make('description')
                                             ->label('Mô tả khóa học')
-                                            ->rows(4)
                                             ->columnSpanFull()
-                                            ->helperText('Mô tả chi tiết về nội dung và mục tiêu của khóa học'),
+                                            ->toolbarButtons([
+                                                'attachFiles',
+                                                'blockquote',
+                                                'bold',
+                                                'bulletList',
+                                                'codeBlock',
+                                                'h2',
+                                                'h3',
+                                                'italic',
+                                                'link',
+                                                'orderedList',
+                                                'redo',
+                                                'strike',
+                                                'underline',
+                                                'undo',
+                                            ])
+                                            ->helperText('Mô tả chi tiết về nội dung và mục tiêu của khóa học. Hỗ trợ định dạng văn bản phong phú.'),
 
                                         Forms\Components\FileUpload::make('thumbnail')
                                             ->label('Ảnh đại diện')
@@ -545,7 +560,8 @@ class CourseResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CourseMaterialsRelationManager::class,
+            RelationManagers\CourseImagesRelationManager::class,
         ];
     }
 

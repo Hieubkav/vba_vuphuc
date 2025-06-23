@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Album;
-use App\Models\AlbumImage;
+
 use Illuminate\Support\Str;
 
 class AlbumSeeder extends Seeder
@@ -75,37 +75,13 @@ class AlbumSeeder extends Seeder
 
             // Thêm file PDF mẫu
             $albumData['pdf_file'] = 'albums/pdfs/sample-album-' . $albumData['order'] . '.pdf';
-            $albumData['thumbnail'] = 'albums/thumbnails/sample-thumbnail-' . $albumData['order'] . '.svg';
 
-            $album = Album::updateOrCreate(
+            Album::updateOrCreate(
                 ['slug' => $albumData['slug']],
                 $albumData
             );
 
-            // Xóa ảnh cũ nếu có
-            $album->images()->delete();
-
-            // Tạo ảnh mẫu cho mỗi album
-            $imageCount = rand(3, 6);
-            for ($i = 1; $i <= $imageCount; $i++) {
-                // Sử dụng ảnh mẫu có sẵn hoặc tạo tên file động
-                $imagePath = 'albums/images/sample-' . $album->id . '-' . $i . '.svg';
-
-                // Nếu không có file cụ thể, sử dụng file mẫu chung
-                if (!file_exists(storage_path('app/public/' . $imagePath))) {
-                    $imagePath = 'albums/images/sample-1-' . (($i - 1) % 3 + 1) . '.svg';
-                }
-
-                AlbumImage::create([
-                    'album_id' => $album->id,
-                    'image_path' => $imagePath,
-                    'alt_text' => $album->title . ' - Hình ' . $i,
-                    'caption' => 'Hình ảnh ' . $i . ' từ ' . $album->title,
-                    'order' => $i,
-                    'status' => 'active',
-                    'is_featured' => $i === 1, // Ảnh đầu tiên là featured
-                ]);
-            }
+            // Đã xóa phần tạo images vì không cần thiết nữa
         }
     }
 }

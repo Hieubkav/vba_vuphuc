@@ -20,7 +20,7 @@
             @foreach($albums as $index => $album)
             @php
                 $isEven = $index % 2 === 0;
-                $animationDelay = $index * 0.3;
+                $pdfUrl = $album->pdf_file ? asset('storage/' . $album->pdf_file) : null;
             @endphp
 
             <!-- Timeline Item - Responsive Layout -->
@@ -36,7 +36,7 @@
                 <div class="{{ $isEven ? 'lg:order-1' : 'lg:order-2' }}">
                     <div class="timeline-content bg-white border border-red-100 hover:border-red-200 hover:shadow-md transition-all duration-300 group p-3 sm:p-4 lg:p-5 rounded-lg">
 
-                        <!-- Date Badge & Order - Responsive -->
+                        <!-- Date Badge -->
                         <div class="mb-2 flex items-center gap-2 flex-wrap">
                             <span class="inline-block px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded">
                                 @php
@@ -54,6 +54,11 @@
                                     }
                                 @endphp
                             </span>
+                            @if($album->total_pages)
+                                <span class="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
+                                    {{ $album->total_pages }} trang
+                                </span>
+                            @endif
                         </div>
 
                         <!-- Album Title -->
@@ -62,72 +67,85 @@
                         </h3>
 
                         <!-- Description -->
-                        <p class="text-gray-600 mb-2 leading-relaxed font-light text-sm">
-                            {{ Str::limit($album->description, 80) }}
+                        <p class="text-gray-600 mb-3 leading-relaxed font-light text-sm">
+                            {{ Str::limit($album->description, 100) }}
                         </p>
+
+                        <!-- Download Stats -->
+                        @if($album->download_count > 0)
+                            <div class="text-xs text-gray-500 mb-2">
+                                <i class="fas fa-download mr-1"></i>{{ $album->download_count }} lượt tải
+                            </div>
+                        @endif
                     </div>
                 </div>
 
-                <!-- Images Side - Carousel -->
+                <!-- PDF Carousel Side -->
                 <div class="{{ $isEven ? 'lg:order-2' : 'lg:order-1' }}">
-                    @if($album->images && $album->images->count() > 0)
-                        <!-- Carousel Container -->
-                        <div class="relative group" id="carousel-{{ $album->id }}">
-                            <!-- Main Carousel -->
-                            <div class="aspect-[4/3] overflow-hidden bg-gray-50 border border-red-100 rounded-lg relative">
-                                <div class="carousel-track flex transition-transform duration-500 ease-in-out h-full" data-album="{{ $album->id }}">
-                                    @foreach($album->images as $index => $image)
-                                        <div class="carousel-slide w-full flex-shrink-0 relative">
-                                            <img src="{{ $image->image_url }}"
-                                                 alt="{{ $image->alt_text ?? $album->title }}"
-                                                 class="w-full h-full object-cover cursor-pointer"
-                                                 loading="lazy"
-                                                 onclick="window.open('{{ $image->image_url }}', '_blank')"
-                                                 onerror="handleImageError(this)">
-                                        </div>
-                                    @endforeach
+                    @if($pdfUrl)
+                        <!-- PDF Carousel Container -->
+                        <div class="relative group bg-white border border-red-100 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300" id="pdf-carousel-{{ $album->id }}">
+                            <!-- PDF Pages Container -->
+                            <div class="aspect-[4/3] relative bg-gray-50">
+                                <!-- PDF Page Display -->
+                                <div class="pdf-page-container w-full h-full flex items-center justify-center">
+                                    <canvas id="pdf-canvas-{{ $album->id }}" class="max-w-full max-h-full"></canvas>
+                                </div>
+
+                                <!-- Loading State -->
+                                <div id="pdf-loading-{{ $album->id }}" class="absolute inset-0 flex items-center justify-center bg-gray-50">
+                                    <div class="text-center">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-2"></div>
+                                        <p class="text-gray-500 text-sm">Đang tải PDF...</p>
+                                    </div>
                                 </div>
 
                                 <!-- Navigation Arrows -->
-                                @if($album->images->count() > 1)
-                                    <button class="carousel-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
-                                            onclick="prevSlide({{ $album->id }})">
-                                        <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
-                                    </button>
-                                    <button class="carousel-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
-                                            onclick="nextSlide({{ $album->id }})">
-                                        <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
-                                    </button>
-                                @endif
+                                <button class="pdf-nav-btn pdf-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                        onclick="prevPage({{ $album->id }})" style="display: none;">
+                                    <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
+                                </button>
+                                <button class="pdf-nav-btn pdf-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                        onclick="nextPage({{ $album->id }})" style="display: none;">
+                                    <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
+                                </button>
 
-                                <!-- Dots Indicator -->
-                                @if($album->images->count() > 1)
-                                    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-1.5">
-                                        @foreach($album->images as $index => $image)
-                                            <button class="carousel-dot w-2 h-2 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-white' : 'bg-white/50' }}"
-                                                    onclick="goToSlide({{ $album->id }}, {{ $index }})"></button>
-                                        @endforeach
-                                    </div>
-                                @endif
-
-                                <!-- Image Counter -->
+                                <!-- Page Counter -->
                                 <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
-                                    <span class="current-slide">1</span>/<span class="total-slides">{{ $album->images->count() }}</span>
+                                    <span id="current-page-{{ $album->id }}">1</span>/<span id="total-pages-{{ $album->id }}">{{ $album->total_pages ?? '?' }}</span>
+                                </div>
+
+                                <!-- PDF Icon -->
+                                <div class="absolute top-2 left-2 bg-red-500/90 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
+                                    <i class="fas fa-file-pdf mr-1"></i>PDF
                                 </div>
                             </div>
 
-                            <!-- View Album Button - Tinh tế ở góc -->
-                            <button onclick="openAlbumGallery({{ $album->id }})"
-                                    class="absolute bottom-2 left-2 bg-white/90 hover:bg-white backdrop-blur-sm px-2 py-1 text-xs text-gray-700 hover:text-red-600 font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md opacity-0 group-hover:opacity-100">
-                                <i class="fas fa-images mr-1"></i>Xem album
-                            </button>
+                            <!-- PDF Actions -->
+                            <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <button onclick="window.open('{{ $pdfUrl }}', '_blank')"
+                                        class="bg-white/90 hover:bg-white backdrop-blur-sm px-2 py-1 text-xs text-gray-700 hover:text-red-600 font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
+                                    <i class="fas fa-external-link-alt mr-1"></i>Mở PDF
+                                </button>
+                                <a href="{{ $pdfUrl }}" download="{{ $album->title }}.pdf"
+                                   class="bg-red-500/90 hover:bg-red-500 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
+                                    <i class="fas fa-download mr-1"></i>Tải về
+                                </a>
+                            </div>
                         </div>
+
+                        <!-- Initialize PDF for this album -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                initPDFCarousel({{ $album->id }}, '{{ $pdfUrl }}');
+                            });
+                        </script>
                     @else
-                        <!-- Fallback when no images -->
+                        <!-- Fallback when no PDF -->
                         <div class="aspect-[4/3] bg-red-50 border border-red-100 flex items-center justify-center rounded-lg">
                             <div class="text-center">
-                                <i class="fas fa-images text-red-300 text-3xl mb-2"></i>
-                                <p class="text-red-400 font-light text-sm">Chưa có hình ảnh</p>
+                                <i class="fas fa-file-pdf text-red-300 text-3xl mb-2"></i>
+                                <p class="text-red-400 font-light text-sm">Chưa có tài liệu PDF</p>
                             </div>
                         </div>
                     @endif
@@ -151,7 +169,7 @@
             Timeline
         </h2>
         <p class="text-gray-500 max-w-md mx-auto font-light text-sm">
-            Hành trình học tập qua thời gian
+            Tài liệu PDF từ các khóa học
         </p>
     </div>
 
@@ -185,17 +203,17 @@
                     </h3>
 
                     <p class="text-gray-600 mb-4 leading-relaxed font-light text-sm">
-                        Các album khóa học sẽ sớm được thêm vào timeline này.
+                        Các tài liệu PDF sẽ sớm được thêm vào timeline này.
                     </p>
                 </div>
             </div>
 
-            <!-- Empty Image -->
+            <!-- Empty PDF -->
             <div class="lg:order-2">
-                <div class="aspect-[4/3] bg-gray-50 border border-gray-100 flex items-center justify-center rounded-lg">
+                <div class="aspect-[4/3] bg-red-50 border border-red-100 flex items-center justify-center rounded-lg">
                     <div class="text-center">
-                        <i class="fas fa-images text-gray-300 text-4xl mb-3"></i>
-                        <p class="text-gray-400 font-light text-sm">Chưa có hình ảnh</p>
+                        <i class="fas fa-file-pdf text-red-300 text-4xl mb-3"></i>
+                        <p class="text-red-400 font-light text-sm">Chưa có tài liệu PDF</p>
                     </div>
                 </div>
             </div>
@@ -218,238 +236,149 @@
 </div>
 @endif
 
+{{-- PDF Timeline with Carousel Navigation --}}
+
 @push('scripts')
+<!-- PDF.js Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-// Carousel functionality - Fixed version
-const carouselStates = {};
-const carouselIntervals = {};
+// PDF Carousel State Management
+const pdfStates = {};
 
-// Debug function
-function debugCarousel(albumId, message) {
-    console.log(`[Carousel ${albumId}] ${message}`);
-}
+// Initialize PDF Carousel
+async function initPDFCarousel(albumId, pdfUrl) {
+    try {
+        const loadingTask = pdfjsLib.getDocument(pdfUrl);
+        const pdf = await loadingTask.promise;
 
-function initCarousel(albumId) {
-    if (!carouselStates[albumId]) {
-        const slides = document.querySelectorAll(`#carousel-${albumId} .carousel-slide`);
-        carouselStates[albumId] = {
-            currentSlide: 0,
-            totalSlides: slides.length
+        pdfStates[albumId] = {
+            pdf: pdf,
+            currentPage: 1,
+            totalPages: pdf.numPages,
+            scale: 1.5
         };
-        debugCarousel(albumId, `Initialized with ${slides.length} slides`);
+
+        // Update total pages display
+        document.getElementById(`total-pages-${albumId}`).textContent = pdf.numPages;
+
+        // Show navigation if more than 1 page
+        if (pdf.numPages > 1) {
+            const navBtns = document.querySelectorAll(`#pdf-carousel-${albumId} .pdf-nav-btn`);
+            navBtns.forEach(btn => btn.style.display = 'flex');
+        }
+
+        // Render first page
+        await renderPage(albumId, 1);
+
+        // Hide loading
+        document.getElementById(`pdf-loading-${albumId}`).style.display = 'none';
+
+    } catch (error) {
+        console.error('Error loading PDF:', error);
+        document.getElementById(`pdf-loading-${albumId}`).innerHTML =
+            '<div class="text-center"><i class="fas fa-exclamation-triangle text-red-400 text-2xl mb-2"></i><p class="text-red-400 text-sm">Lỗi tải PDF</p></div>';
     }
 }
 
-function updateCarousel(albumId) {
-    const track = document.querySelector(`#carousel-${albumId} .carousel-track`);
-    const dots = document.querySelectorAll(`#carousel-${albumId} .carousel-dot`);
-    const counter = document.querySelector(`#carousel-${albumId} .current-slide`);
+// Render specific page
+async function renderPage(albumId, pageNum) {
+    const state = pdfStates[albumId];
+    if (!state || !state.pdf) return;
 
-    if (!track) {
-        debugCarousel(albumId, 'Track not found!');
-        return;
+    try {
+        const page = await state.pdf.getPage(pageNum);
+        const canvas = document.getElementById(`pdf-canvas-${albumId}`);
+        const context = canvas.getContext('2d');
+
+        // Calculate scale to fit container
+        const container = canvas.parentElement;
+        const containerWidth = container.clientWidth;
+        const containerHeight = container.clientHeight;
+
+        const viewport = page.getViewport({ scale: 1 });
+        const scaleX = containerWidth / viewport.width;
+        const scaleY = containerHeight / viewport.height;
+        const scale = Math.min(scaleX, scaleY) * 0.9; // 90% to add some padding
+
+        const scaledViewport = page.getViewport({ scale: scale });
+
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: scaledViewport
+        };
+
+        await page.render(renderContext).promise;
+
+        // Update current page display
+        document.getElementById(`current-page-${albumId}`).textContent = pageNum;
+        state.currentPage = pageNum;
+
+    } catch (error) {
+        console.error('Error rendering page:', error);
     }
+}
 
-    const state = carouselStates[albumId];
-    if (!state) {
-        debugCarousel(albumId, 'State not found!');
-        return;
+// Navigation functions
+function nextPage(albumId) {
+    const state = pdfStates[albumId];
+    if (!state) return;
+
+    if (state.currentPage < state.totalPages) {
+        renderPage(albumId, state.currentPage + 1);
     }
+}
 
-    const translateX = -state.currentSlide * 100;
-    track.style.transform = `translateX(${translateX}%)`;
+function prevPage(albumId) {
+    const state = pdfStates[albumId];
+    if (!state) return;
 
-    debugCarousel(albumId, `Moving to slide ${state.currentSlide + 1}/${state.totalSlides} (${translateX}%)`);
+    if (state.currentPage > 1) {
+        renderPage(albumId, state.currentPage - 1);
+    }
+}
 
-    // Update dots
-    dots.forEach((dot, index) => {
-        if (index === state.currentSlide) {
-            dot.classList.remove('bg-white/50');
-            dot.classList.add('bg-white');
-        } else {
-            dot.classList.remove('bg-white');
-            dot.classList.add('bg-white/50');
+// Handle window resize
+window.addEventListener('resize', function() {
+    Object.keys(pdfStates).forEach(albumId => {
+        const state = pdfStates[albumId];
+        if (state && state.pdf) {
+            renderPage(albumId, state.currentPage);
         }
     });
-
-    // Update counter
-    if (counter) {
-        counter.textContent = state.currentSlide + 1;
-    }
-}
-
-function nextSlide(albumId) {
-    debugCarousel(albumId, 'Next slide clicked');
-    initCarousel(albumId);
-    const state = carouselStates[albumId];
-    if (state.totalSlides <= 1) return;
-
-    state.currentSlide = (state.currentSlide + 1) % state.totalSlides;
-    updateCarousel(albumId);
-}
-
-function prevSlide(albumId) {
-    debugCarousel(albumId, 'Previous slide clicked');
-    initCarousel(albumId);
-    const state = carouselStates[albumId];
-    if (state.totalSlides <= 1) return;
-
-    state.currentSlide = state.currentSlide === 0 ? state.totalSlides - 1 : state.currentSlide - 1;
-    updateCarousel(albumId);
-}
-
-function goToSlide(albumId, slideIndex) {
-    debugCarousel(albumId, `Go to slide ${slideIndex + 1}`);
-    initCarousel(albumId);
-    const state = carouselStates[albumId];
-    if (slideIndex >= 0 && slideIndex < state.totalSlides) {
-        state.currentSlide = slideIndex;
-        updateCarousel(albumId);
-    }
-}
-
-function openAlbumGallery(albumId) {
-    const images = document.querySelectorAll(`#carousel-${albumId} .carousel-slide img`);
-    if (images.length > 0) {
-        const currentIndex = carouselStates[albumId]?.currentSlide || 0;
-        window.open(images[currentIndex].src, '_blank');
-    }
-}
-
-// Auto-play carousel - Simplified
-function startAutoPlay(albumId, interval = 3000) {
-    const carousel = document.querySelector(`#carousel-${albumId}`);
-    if (!carousel) return;
-
-    const state = carouselStates[albumId];
-    if (!state || state.totalSlides <= 1) return;
-
-    debugCarousel(albumId, `Starting auto-play with ${interval}ms interval`);
-
-    // Clear existing interval
-    if (carouselIntervals[albumId]) {
-        clearInterval(carouselIntervals[albumId]);
-    }
-
-    carouselIntervals[albumId] = setInterval(() => {
-        // Skip if hovering
-        if (carousel.matches(':hover')) return;
-
-        // Skip if tab hidden
-        if (document.hidden) return;
-
-        nextSlide(albumId);
-    }, interval);
-}
-
-function stopAutoPlay(albumId) {
-    if (carouselIntervals[albumId]) {
-        clearInterval(carouselIntervals[albumId]);
-        delete carouselIntervals[albumId];
-        debugCarousel(albumId, 'Auto-play stopped');
-    }
-}
-
-// Initialize all carousels
-function initAllCarousels() {
-    debugCarousel('ALL', 'Initializing all carousels...');
-
-    document.querySelectorAll('[id^="carousel-"]').forEach(carousel => {
-        const albumId = parseInt(carousel.id.replace('carousel-', ''));
-
-        // Initialize carousel
-        initCarousel(albumId);
-        updateCarousel(albumId);
-
-        // Start auto-play
-        startAutoPlay(albumId, 3000);
-
-        // Add hover events
-        carousel.addEventListener('mouseenter', () => stopAutoPlay(albumId));
-        carousel.addEventListener('mouseleave', () => startAutoPlay(albumId, 3000));
-    });
-}
-
-// Wait for DOM and images to load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAllCarousels);
-} else {
-    initAllCarousels();
-}
-
-// Also try after a short delay to ensure images are loaded
-setTimeout(initAllCarousels, 1000);
-
-// Handle image errors
-function handleImageError(img) {
-    img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik04NyA2NUw5MyA3MUwxMDUgNTlMMTIzIDc3SDE3VjEyM0gxNzdWNzdMMTIzIDc3WiIgZmlsbD0iI0Q1RDlERCIvPgo8Y2lyY2xlIGN4PSI3NyIgY3k9IjU5IiByPSI4IiBmaWxsPSIjRDVEOUREIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iOTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5Q0EzQUYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxMiI+S2jDtG5nIHThuqNpIMSRxrDhu6NjIGjDrG5oPC90ZXh0Pgo8L3N2Zz4K';
-    img.alt = 'Không tải được hình';
-}
-
-// Global functions for debugging
-window.debugCarousel = debugCarousel;
-window.carouselStates = carouselStates;
+});
 </script>
 @endpush
 
-{{-- KISS: Không cần global handler phức tạp --}}
-
 <style>
-/* Carousel Styles - Fixed */
-.carousel-track {
-    will-change: transform;
-    transition: transform 0.5s ease-in-out;
-    display: flex;
-    height: 100%;
-}
-
-.carousel-slide {
-    min-width: 100%;
-    width: 100%;
-    flex-shrink: 0;
-    position: relative;
-}
-
-.carousel-slide img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.carousel-dot {
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-    outline: none;
-}
-
-.carousel-dot:hover {
-    transform: scale(1.2);
-}
-
-.carousel-dot:focus {
-    outline: 2px solid rgba(239, 68, 68, 0.5);
-    outline-offset: 2px;
-}
-
-/* Navigation buttons */
-.carousel-prev,
-.carousel-next {
-    border: none;
-    outline: none;
-    cursor: pointer;
-}
-
-.carousel-prev:focus,
-.carousel-next:focus {
-    outline: 2px solid rgba(239, 68, 68, 0.5);
-    outline-offset: 2px;
-}
-
 /* Timeline Optimizations */
 .timeline-item {
     transition: all 0.3s ease;
+}
+
+/* PDF Carousel Styles */
+.pdf-page-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-nav-btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.pdf-nav-btn:focus {
+    outline: 2px solid rgba(239, 68, 68, 0.5);
+    outline-offset: 2px;
+}
+
+.pdf-nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Responsive spacing optimizations */
@@ -488,19 +417,15 @@ window.carouselStates = carouselStates;
     }
 }
 
-/* Hover effects */
-.group:hover .carousel-prev,
-.group:hover .carousel-next {
-    opacity: 1 !important;
-}
-
 /* Smooth transitions */
 * {
     scroll-behavior: smooth;
 }
 
-/* Debug styles - Remove in production */
-.carousel-track {
-    border: 1px solid transparent; /* For debugging */
+/* PDF Canvas styling */
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0.25rem;
 }
 </style>

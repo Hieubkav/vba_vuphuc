@@ -145,19 +145,16 @@ class CourseController extends Controller
             ->orderBy('order')
             ->get();
 
-        // Kiểm tra user hiện tại có đăng ký khóa học không (sử dụng student guard)
+        // Kiểm tra user hiện tại đã đăng nhập chưa (chỉ cần đăng nhập là được xem tài liệu)
         $user = auth('student')->user();
-        $isEnrolled = false;
-        if ($user) {
-            $isEnrolled = $course->students()->where('student_id', $user->id)->exists();
-        }
+        $isLoggedIn = $user !== null;
 
         return view('courses.show', compact(
             'course',
             'relatedCourses',
             'openMaterials',
             'enrolledMaterials',
-            'isEnrolled'
+            'isLoggedIn'
         ));
     }
 

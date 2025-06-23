@@ -248,18 +248,14 @@ class ViewServiceProvider extends ServiceProvider
                 }
             }),
 
-            // Albums - Album khóa học với PDF và ảnh - Cache 2 giờ
+            // Albums - Album timeline với PDF - Cache 2 giờ
             'albums' => Cache::remember('storefront_albums', 7200, function () {
                 try {
                     return \App\Models\Album::where('status', 'active')
                         ->where('published_date', '<=', now())
-                        ->with(['images' => function($query) {
-                            $query->where('status', 'active')
-                                ->orderBy('order')
-                                ->orderBy('created_at');
-                        }])
+                        ->whereNotNull('pdf_file') // Chỉ lấy album có PDF
                         ->select([
-                            'id', 'title', 'description', 'slug', 'pdf_file', 'thumbnail',
+                            'id', 'title', 'description', 'slug', 'pdf_file',
                             'published_date', 'featured', 'total_pages', 'file_size',
                             'download_count', 'view_count', 'created_at', 'order'
                         ])

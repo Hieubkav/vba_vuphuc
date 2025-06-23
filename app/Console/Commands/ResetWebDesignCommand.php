@@ -56,7 +56,7 @@ class ResetWebDesignCommand extends Command
             // Album Timeline Settings
             'album_timeline_enabled' => true,
             'album_timeline_order' => 3,
-            'album_timeline_title' => 'Thư viện tài liệu',
+            'album_timeline_title' => 'Timeline khóa học',
             'album_timeline_description' => 'Tài liệu và hình ảnh từ các khóa học đã diễn ra',
             'album_timeline_bg_color' => 'bg-gray-25',
             'album_timeline_animation_class' => 'animate-fade-in-optimized',

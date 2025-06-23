@@ -58,7 +58,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\MenuItem::observe(\App\Observers\CacheObserver::class);
         \App\Models\Student::observe(\App\Observers\CacheObserver::class);
         \App\Models\Album::observe(\App\Observers\CacheObserver::class);
-        \App\Models\AlbumImage::observe(\App\Observers\CacheObserver::class);
+        // Đã xóa AlbumImage observer vì không cần thiết
         // Partner sử dụng PartnerObserver riêng (đã có logic clear cache)
 
         // Đăng ký Blade directive đơn giản cho lazy loading

@@ -79,7 +79,6 @@ class CourseMaterialResource extends Resource
                             ->options([
                                 'public' => 'Công khai',
                                 'enrolled' => 'Dành cho học viên',
-                                'premium' => 'Premium',
                             ])
                             ->default('enrolled')
                             ->required(),
@@ -87,14 +86,6 @@ class CourseMaterialResource extends Resource
 
                 Forms\Components\Section::make('Cài đặt')
                     ->schema([
-                        Forms\Components\Toggle::make('is_downloadable')
-                            ->label('Cho phép tải xuống')
-                            ->default(true),
-
-                        Forms\Components\Toggle::make('is_preview')
-                            ->label('Cho phép xem trước')
-                            ->default(false),
-
                         Forms\Components\TextInput::make('order')
                             ->label('Thứ tự hiển thị')
                             ->numeric()
@@ -157,31 +148,15 @@ class CourseMaterialResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'public' => 'success',
                         'enrolled' => 'warning',
-                        'premium' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'public' => 'Công khai',
                         'enrolled' => 'Học viên',
-                        'premium' => 'Premium',
                         default => $state,
                     }),
 
-                Tables\Columns\IconColumn::make('is_downloadable')
-                    ->label('Tải xuống')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-arrow-down-tray')
-                    ->falseIcon('heroicon-o-x-mark')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
 
-                Tables\Columns\IconColumn::make('is_preview')
-                    ->label('Xem trước')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-eye')
-                    ->falseIcon('heroicon-o-x-mark')
-                    ->trueColor('info')
-                    ->falseColor('gray'),
 
                 Tables\Columns\TextColumn::make('order')
                     ->label('Thứ tự')
@@ -231,7 +206,6 @@ class CourseMaterialResource extends Resource
                     ->options([
                         'public' => 'Công khai',
                         'enrolled' => 'Học viên',
-                        'premium' => 'Premium',
                     ]),
 
                 Tables\Filters\SelectFilter::make('status')

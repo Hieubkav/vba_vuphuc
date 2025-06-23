@@ -3,8 +3,8 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\AlbumResource\Pages;
-use App\Filament\Admin\Resources\AlbumResource\RelationManagers;
-use App\Filament\Admin\Resources\AlbumImageResource;
+
+
 use App\Models\Album;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -22,11 +22,11 @@ class AlbumResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?string $navigationLabel = 'Album khóa học';
+    protected static ?string $navigationLabel = 'Album - Timeline';
 
-    protected static ?string $modelLabel = 'album khóa học';
+    protected static ?string $modelLabel = 'album timeline';
 
-    protected static ?string $pluralModelLabel = 'album khóa học';
+    protected static ?string $pluralModelLabel = 'album timeline';
 
     protected static ?string $navigationGroup = 'Quản lý khóa học';
 
@@ -81,29 +81,8 @@ class AlbumResource extends Resource
                                     ])
                                     ->columns(2),
 
-                                Forms\Components\Section::make('File và Media')
+                                Forms\Components\Section::make('File PDF')
                                     ->schema([
-                                        Forms\Components\FileUpload::make('thumbnail')
-                                            ->label('Ảnh thumbnail')
-                                            ->image()
-                                            ->directory('albums/thumbnails')
-                                            ->visibility('public')
-                                            ->maxSize(5120)
-                                            ->imageEditor()
-                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->helperText('Ảnh đại diện cho album. Kích thước tối đa: 5MB')
-                                            ->saveUploadedFileUsing(function ($file, $get) {
-                                                $title = $get('title') ?? 'album';
-                                                $customName = 'album-' . $title;
-
-                                                return \App\Actions\ConvertImageToWebp::run(
-                                                    $file,
-                                                    'albums/thumbnails',
-                                                    $customName,
-                                                    800,
-                                                    600
-                                                );
-                                            }),
 
                                         Forms\Components\FileUpload::make('pdf_file')
                                             ->label('File PDF')
@@ -140,7 +119,7 @@ class AlbumResource extends Resource
                                         Forms\Components\Toggle::make('featured')
                                             ->label('Album nổi bật')
                                             ->default(false)
-                                            ->helperText('Hiển thị trong danh sách album nổi bật'),
+                                            ->helperText('Hiển thị trong timeline'),
                                     ])
                                     ->columns(2),
                             ]),
@@ -206,10 +185,7 @@ class AlbumResource extends Resource
                     ->color('gray')
                     ->width('80px'),
 
-                Tables\Columns\ImageColumn::make('thumbnail')
-                    ->label('Thumbnail')
-                    ->circular()
-                    ->size(50),
+                // Đã xóa thumbnail column vì không cần thiết
 
                 Tables\Columns\TextColumn::make('title')
                     ->label('Tiêu đề')
@@ -301,22 +277,10 @@ class AlbumResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('published_date', '<=', now())),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('manage_images')
-                    ->label('Quản lý ảnh album')
-                    ->icon('heroicon-o-photo')
-                    ->color('info')
-                    ->url(fn () => AlbumImageResource::getUrl('index', [
-                        'tableFilters[album_id][value]' => null
-                    ])),
+                // Đã xóa quản lý ảnh album vì không cần thiết
             ])
             ->actions([
-                Tables\Actions\Action::make('view_images')
-                    ->label('Xem ảnh')
-                    ->icon('heroicon-o-photo')
-                    ->color('info')
-                    ->url(fn ($record) => AlbumImageResource::getUrl('index', [
-                        'tableFilters[album_id][value]' => $record->id
-                    ])),
+                // Đã xóa action xem ảnh vì không cần thiết
                 Tables\Actions\EditAction::make()
                     ->label('Sửa'),
                 Tables\Actions\DeleteAction::make()
@@ -335,7 +299,7 @@ class AlbumResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\AlbumImagesRelationManager::class,
+            // Đã xóa AlbumImagesRelationManager vì không cần thiết
         ];
     }
 

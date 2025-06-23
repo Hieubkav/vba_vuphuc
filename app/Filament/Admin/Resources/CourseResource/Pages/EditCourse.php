@@ -21,7 +21,14 @@ class EditCourse extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\Action::make('view_frontend')
+                ->label('Xem trên website')
+                ->icon('heroicon-o-eye')
+                ->color('info')
+                ->url(fn () => route('courses.show', $this->record->slug))
+                ->openUrlInNewTab(),
+            Actions\DeleteAction::make()
+                ->label('Xóa'),
         ];
     }
 }

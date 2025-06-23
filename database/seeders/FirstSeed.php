@@ -89,7 +89,6 @@ class FirstSeed extends Seeder
             'youtube_link' => 'https://youtube.com/vuphucbaking',
             'tiktok_link' => 'https://tiktok.com/@vuphucbaking',
             'working_hours' => '6:00 - 22:00 (Thứ 2 - Chủ nhật)',
-            'footer_description' => '',
             'order' => 1,
             'status' => 'active',
         ]);

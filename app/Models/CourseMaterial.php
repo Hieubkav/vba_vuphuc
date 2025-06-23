@@ -21,13 +21,12 @@ class CourseMaterial extends Model
         'file_size',
         'material_type',
         'access_type',
-        'is_preview',
         'order',
+        'status',
     ];
 
     protected $casts = [
         'file_size' => 'integer',
-        'is_preview' => 'boolean',
         'order' => 'integer',
         'access_type' => 'string',
     ];
@@ -39,11 +38,6 @@ class CourseMaterial extends Model
     }
 
     // Scopes
-
-    public function scopePreview($query)
-    {
-        return $query->where('is_preview', true);
-    }
 
 
 
@@ -233,24 +227,44 @@ class CourseMaterial extends Model
     // Helper Methods
     public function canDownload(): bool
     {
-        return $this->isOpen(); // Chỉ tài liệu mở mới có thể tải
+        // Tài liệu công khai: ai cũng có thể tải
+        // Tài liệu học viên: chỉ khi đã đăng nhập
+        if ($this->access_type === 'public') {
+            return true;
+        }
+
+        if ($this->access_type === 'enrolled') {
+            return auth('student')->check();
+        }
+
+        return false;
     }
 
     public function canPreview(): bool
     {
-        return $this->is_preview;
+        // Tài liệu công khai: ai cũng có thể xem
+        // Tài liệu học viên: chỉ khi đã đăng nhập
+        if ($this->access_type === 'public') {
+            return true;
+        }
+
+        if ($this->access_type === 'enrolled') {
+            return auth('student')->check();
+        }
+
+        return false;
     }
 
     public function exists(): bool
     {
-        return Storage::exists($this->file_path);
+        return Storage::disk('public')->exists($this->file_path);
     }
 
     public function delete()
     {
         // Xóa file vật lý trước khi xóa record
         if ($this->exists()) {
-            Storage::delete($this->file_path);
+            Storage::disk('public')->delete($this->file_path);
         }
 
         return parent::delete();

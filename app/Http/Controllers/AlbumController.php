@@ -35,28 +35,18 @@ class AlbumController extends Controller
     }
 
     /**
-     * Lấy danh sách ảnh của album
+     * Lấy thông tin PDF của album
      */
-    public function getImages(Album $album): JsonResponse
+    public function getPdf(Album $album): JsonResponse
     {
-        $images = $album->images()
-            ->where('status', 'active')
-            ->orderBy('order')
-            ->orderBy('created_at')
-            ->get()
-            ->map(function ($image) {
-                return [
-                    'id' => $image->id,
-                    'url' => $image->image_url,
-                    'alt_text' => $image->alt_text,
-                    'caption' => $image->caption,
-                    'is_featured' => $image->is_featured,
-                ];
-            });
+        $pdfUrl = $album->pdf_file ? asset('storage/' . $album->pdf_file) : null;
 
         return response()->json([
             'success' => true,
-            'images' => $images
+            'pdf_url' => $pdfUrl,
+            'title' => $album->title,
+            'total_pages' => $album->total_pages,
+            'file_size' => $album->file_size,
         ]);
     }
 }

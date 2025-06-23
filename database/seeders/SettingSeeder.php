@@ -34,7 +34,6 @@ class SettingSeeder extends Seeder
                 'tiktok_link' => 'https://tiktok.com/@vbavuphuc',
                 'messenger_link' => 'https://m.me/vbavuphuc',
                 'working_hours' => 'Thứ 2 - Thứ 6: 8:00 - 17:00, Thứ 7: 8:00 - 12:00',
-                'footer_description' => 'VBA Vũ Phúc - Trung tâm đào tạo làm bánh hàng đầu Việt Nam. Chúng tôi cam kết mang đến cho học viên những khóa học chất lượng cao với đội ngũ giảng viên giàu kinh nghiệm.',
                 'status' => 'active',
                 'order' => 1,
             ]

@@ -3,19 +3,55 @@
 @section('title', $course->seo_title ?: $course->title)
 @section('meta_description', $course->seo_description ?: $course->short_description)
 
-{{-- Debug: Kiểm tra ảnh --}}
-@if(config('app.debug'))
-<!-- DEBUG INFO (chỉ hiển thị khi APP_DEBUG=true) -->
-<!--
-Course ID: {{ $course->id }}
-Course Images Count: {{ $course->images->count() }}
-Active Images Count: {{ $course->images->where('status', 'active')->count() }}
-Thumbnail: {{ $course->thumbnail }}
-@if($course->images->where('status', 'active')->count() > 0)
-First Active Image: {{ $course->images->where('status', 'active')->first()->image_link }}
-@endif
--->
-@endif
+@push('styles')
+<style>
+    /* Gallery Grid Styles */
+    .gallery-item {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Responsive gallery grid */
+    @media (max-width: 640px) {
+        .gallery-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+    }
+
+    @media (min-width: 641px) and (max-width: 768px) {
+        .gallery-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .gallery-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    /* Smooth image loading */
+    .gallery-item img {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .gallery-item img[src=""] {
+        opacity: 0;
+    }
+</style>
+@endpush
+
+
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
@@ -42,28 +78,24 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
             <div class="flex flex-col lg:flex-row gap-8">
                 <!-- Course Image -->
                 <div class="lg:w-2/5">
+                    <!-- Main Course Thumbnail -->
                     <div class="relative overflow-hidden rounded-xl shadow-lg">
                         @php
-                            // Debug: Lấy ảnh chính
-                            $mainImage = $course->images()->where('is_main', true)->where('status', 'active')->first()
-                                ?? $course->images()->where('status', 'active')->orderBy('order')->first();
-
-                            $imageUrl = null;
-                            if ($mainImage && \Illuminate\Support\Facades\Storage::disk('public')->exists($mainImage->image_link)) {
-                                $imageUrl = asset('storage/' . $mainImage->image_link);
-                            } elseif ($course->thumbnail && \Illuminate\Support\Facades\Storage::disk('public')->exists($course->thumbnail)) {
-                                $imageUrl = asset('storage/' . $course->thumbnail);
+                            // Sử dụng thumbnail từ Course model làm ảnh đại diện chính
+                            $thumbnailUrl = null;
+                            if ($course->thumbnail && \Illuminate\Support\Facades\Storage::disk('public')->exists($course->thumbnail)) {
+                                $thumbnailUrl = asset('storage/' . $course->thumbnail);
                             }
                         @endphp
 
-                        @if($imageUrl)
-                        <img src="{{ $imageUrl }}"
-                             alt="{{ $mainImage->alt_text ?? $course->title }}"
+                        @if($thumbnailUrl)
+                        <img src="{{ $thumbnailUrl }}"
+                             alt="{{ $course->title }}"
                              class="w-full h-64 lg:h-80 object-cover"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         @endif
 
-                        <div class="w-full h-64 lg:h-80 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center {{ $imageUrl ? 'hidden' : '' }}">
+                        <div class="w-full h-64 lg:h-80 bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center {{ $thumbnailUrl ? 'hidden' : '' }}">
                             <div class="text-center text-red-600">
                                 <i class="fas fa-graduation-cap text-6xl opacity-60 mb-4"></i>
                                 <p class="text-lg font-medium">{{ $course->title }}</p>
@@ -71,10 +103,10 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
                         </div>
 
                         <!-- Course Badge -->
-                        @if($course->category)
+                        @if($course->courseCategory)
                         <div class="absolute top-4 left-4">
                             <span class="inline-block px-3 py-1 bg-red-600 text-white text-sm font-medium rounded-full shadow-lg">
-                                {{ $course->category->name }}
+                                {{ $course->courseCategory->name }}
                             </span>
                         </div>
                         @endif
@@ -176,6 +208,64 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
                         </div>
                         @endif
 
+                        <!-- Course Gallery -->
+                        @if($course->images && $course->images->where('status', 'active')->count() > 0)
+                        <div class="mb-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900">Hình ảnh khóa học</h2>
+                                <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                    {{ $course->images->where('status', 'active')->count() }} ảnh
+                                </span>
+                            </div>
+
+                            <!-- Gallery Grid với spacing tối ưu -->
+                            <div class="gallery-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                @foreach($course->images->where('status', 'active')->sortBy('order')->take(8) as $index => $image)
+                                @php
+                                    $galleryImageUrl = null;
+                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($image->image_link)) {
+                                        $galleryImageUrl = asset('storage/' . $image->image_link);
+                                    }
+                                @endphp
+                                <div class="group relative overflow-hidden rounded-lg cursor-pointer gallery-item aspect-square shadow-md hover:shadow-lg transition-all duration-300"
+                                     data-src="{{ $galleryImageUrl ?: asset('images/placeholder-course.jpg') }}"
+                                     data-title="{{ $course->title }}"
+                                     data-description="Hình ảnh {{ $index + 1 }}">
+                                    @if($galleryImageUrl)
+                                    <img src="{{ $galleryImageUrl }}"
+                                         alt="{{ $image->alt_text ?: $course->title }}"
+                                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    @endif
+
+                                    <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center text-red-600 {{ $galleryImageUrl ? 'hidden' : '' }}">
+                                        <i class="fas fa-image text-2xl opacity-60 mb-2"></i>
+                                        <span class="text-xs font-medium">Ảnh {{ $index + 1 }}</span>
+                                    </div>
+
+                                    <!-- Overlay với icon zoom -->
+                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
+                                        <div class="transform scale-75 group-hover:scale-100 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                                            <div class="bg-white bg-opacity-90 rounded-full p-3">
+                                                <i class="fas fa-search-plus text-gray-800 text-lg"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
+                            @if($course->images->where('status', 'active')->count() > 8)
+                            <div class="text-center mt-6">
+                                <p class="text-sm text-gray-500 bg-gray-50 inline-block px-4 py-2 rounded-full">
+                                    <i class="fas fa-images mr-2"></i>
+                                    Còn {{ $course->images->where('status', 'active')->count() - 8 }} ảnh khác
+                                </p>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
+
                         <!-- What You'll Learn -->
                         @if($course->objectives && count($course->objectives) > 0)
                         <div class="mb-8">
@@ -211,41 +301,42 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
                         @endif
                     </div>
                 </div>
+            </div>
 
-                <!-- Course Materials Section (Moved outside tabs) -->
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Course Materials Section -->
                 @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-8">
-                    <div class="p-8">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Tài liệu khóa học</h2>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-4">Tài liệu khóa học</h3>
 
                         <!-- Auth Status Alert -->
                         @if(!auth('student')->check())
-                            <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <svg class="h-5 w-5 text-blue-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="h-4 w-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
                                     </svg>
                                     <div>
-                                        <p class="text-blue-800 font-medium">Đăng nhập để xem tài liệu khóa học</p>
-                                        <p class="text-blue-700 text-sm mt-1">
-                                            <a href="{{ route('auth.login') }}" class="underline hover:no-underline">Đăng nhập</a>
-                                            hoặc
-                                            <a href="{{ route('auth.register') }}" class="underline hover:no-underline">đăng ký</a>
-                                            để truy cập tài liệu dành cho học viên.
+                                        <p class="text-blue-800 font-medium text-sm">Đăng nhập để xem tài liệu</p>
+                                        <p class="text-blue-700 text-xs mt-1">
+                                            <a href="{{ route('auth.login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="underline hover:no-underline">Đăng nhập</a>
+                                            để truy cập tài liệu.
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                        @elseif(auth('student')->check() && !$isEnrolled)
-                            <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                <div class="flex items-center">
-                                    <svg class="h-5 w-5 text-yellow-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        @elseif(auth('student')->check() && $isLoggedIn)
+                            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div class="flex items-start">
+                                    <svg class="h-4 w-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                     </svg>
                                     <div>
-                                        <p class="text-yellow-800 font-medium">Bạn chưa đăng ký khóa học này</p>
-                                        <p class="text-yellow-700 text-sm mt-1">
-                                            Vui lòng đăng ký khóa học để truy cập tài liệu dành cho học viên.
+                                        <p class="text-green-800 font-medium text-sm">Đã đăng nhập</p>
+                                        <p class="text-green-700 text-xs mt-1">
+                                            Bạn có thể truy cập tất cả tài liệu học viên.
                                         </p>
                                     </div>
                                 </div>
@@ -254,43 +345,40 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
 
                         <!-- Open Materials -->
                         @if($openMaterials && $openMaterials->count() > 0)
-                        <div class="mb-8">
-                            <div class="flex items-center mb-4">
-                                <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="mb-6">
+                            <div class="flex items-center mb-3">
+                                <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
-                                <h3 class="text-lg font-semibold text-green-700">Tài liệu mở</h3>
-                                <span class="ml-2 text-sm text-gray-500">(Miễn phí cho tất cả)</span>
+                                <h4 class="text-sm font-semibold text-green-700">Tài liệu mở</h4>
                             </div>
-                            <div class="space-y-4">
+                            <div class="space-y-3">
                                 @foreach($openMaterials as $material)
-                                <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
-                                    <div class="flex items-center space-x-4">
+                                <div class="p-3 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                                    <div class="flex items-start space-x-3">
                                         <div class="flex-shrink-0">
-                                            <i class="{{ $material->file_icon }} text-2xl text-green-600"></i>
+                                            <i class="{{ $material->file_icon }} text-lg text-green-600"></i>
                                         </div>
-                                        <div>
-                                            <h4 class="font-medium text-gray-900">{{ $material->title }}</h4>
-                                            @if($material->description)
-                                            <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
-                                            @endif
-                                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                        <div class="flex-1 min-w-0">
+                                            <h5 class="font-medium text-gray-900 text-sm truncate">{{ $material->title }}</h5>
+                                            <div class="flex items-center space-x-2 mt-1 text-xs text-gray-500">
                                                 <span>{{ $material->file_size_formatted }}</span>
-                                                <span>{{ $material->file_type }}</span>
-                                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">Miễn phí</span>
+                                                <span class="px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs">Miễn phí</span>
+                                            </div>
+                                            <div class="flex items-center space-x-2 mt-2">
+                                                @if($material->canPreview())
+                                                    <a href="{{ route('course-materials.view', $material) }}"
+                                                       target="_blank"
+                                                       class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                                                        Xem
+                                                    </a>
+                                                @endif
+                                                <a href="{{ route('course.material.download', $material->id) }}"
+                                                   class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                                                    Tải về
+                                                </a>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        @if($material->canPreview())
-                                            <button class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                                                Xem trước
-                                            </button>
-                                        @endif
-                                        <a href="{{ route('course.material.download', $material->id) }}"
-                                           class="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                                            Tải về
-                                        </a>
                                     </div>
                                 </div>
                                 @endforeach
@@ -300,104 +388,53 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
 
                         <!-- Enrolled Materials -->
                         @if($enrolledMaterials && $enrolledMaterials->count() > 0)
-                        <div class="mb-8">
-                            <div class="flex items-center mb-4">
-                                <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="mb-4">
+                            <div class="flex items-center mb-3">
+                                <svg class="w-4 h-4 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
                                 </svg>
-                                <h3 class="text-lg font-semibold text-blue-700">Tài liệu dành cho học viên</h3>
-                                <span class="ml-2 text-sm text-gray-500">(Cần đăng ký khóa học)</span>
+                                <h4 class="text-sm font-semibold text-blue-700">Tài liệu học viên</h4>
                             </div>
 
-                            <div class="space-y-4">
+                            <div class="space-y-3">
                                 @foreach($enrolledMaterials as $material)
-                                <div class="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg {{ $isEnrolled ? 'hover:bg-blue-100' : 'opacity-60' }} transition-colors">
-                                    <div class="flex items-center space-x-4">
+                                <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg {{ $isLoggedIn ? 'hover:bg-blue-100' : 'opacity-60' }} transition-colors">
+                                    <div class="flex items-start space-x-3">
                                         <div class="flex-shrink-0">
-                                            <i class="{{ $material->file_icon }} text-2xl {{ $isEnrolled ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                                            <i class="{{ $material->file_icon }} text-lg {{ $isLoggedIn ? 'text-blue-600' : 'text-gray-400' }}"></i>
                                         </div>
-                                        <div>
-                                            <h4 class="font-medium text-gray-900">{{ $material->title }}</h4>
-                                            @if($material->description)
-                                            <p class="text-sm text-gray-600 mt-1">{{ $material->description }}</p>
-                                            @endif
-                                            <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                        <div class="flex-1 min-w-0">
+                                            <h5 class="font-medium text-gray-900 text-sm truncate">{{ $material->title }}</h5>
+                                            <div class="flex items-center space-x-2 mt-1 text-xs text-gray-500">
                                                 <span>{{ $material->file_size_formatted }}</span>
-                                                <span>{{ $material->file_type }}</span>
-                                                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Học viên</span>
+                                                <span class="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">Học viên</span>
+                                            </div>
+                                            <div class="flex items-center space-x-2 mt-2">
+                                                @if($isLoggedIn)
+                                                    <a href="{{ route('course-materials.view', $material) }}"
+                                                       target="_blank"
+                                                       class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                                                        Xem
+                                                    </a>
+                                                    <a href="{{ route('course.material.download', $material->id) }}"
+                                                       class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                                                        Tải về
+                                                    </a>
+                                                @else
+                                                    <div class="px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded cursor-not-allowed">
+                                                        <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                        Khóa
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        @if($isEnrolled)
-                                            @if($material->canPreview())
-                                                <button class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                                                    Xem trước
-                                                </button>
-                                            @endif
-                                            <a href="{{ route('course.material.download', $material->id) }}"
-                                               class="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
-                                                Tải về
-                                            </a>
-                                        @else
-                                            <div class="px-3 py-2 text-sm bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed">
-                                                <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
-                                                </svg>
-                                                Khóa
-                                            </div>
-                                        @endif
                                     </div>
                                 </div>
                                 @endforeach
                             </div>
                         </div>
-                        @endif
-                    </div>
-                </div>
-                @endif
-            </div>
-
-            <!-- Sidebar -->
-            <div class="lg:col-span-1">
-                <!-- Course Gallery -->
-                @if($course->images && $course->images->where('status', 'active')->count() > 0)
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-900 mb-4">Thư viện ảnh</h3>
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach($course->images->where('status', 'active')->sortBy('order')->take(6) as $image)
-                            @php
-                                $galleryImageUrl = null;
-                                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($image->image_link)) {
-                                    $galleryImageUrl = asset('storage/' . $image->image_link);
-                                }
-                            @endphp
-                            <div class="group relative overflow-hidden rounded-lg cursor-pointer gallery-item aspect-square"
-                                 data-src="{{ $galleryImageUrl ?: asset('images/placeholder-course.jpg') }}"
-                                 data-title="{{ $image->title }}"
-                                 data-description="{{ $image->description }}">
-                                @if($galleryImageUrl)
-                                <img src="{{ $galleryImageUrl }}"
-                                     alt="{{ $image->alt_text }}"
-                                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                @endif
-
-                                <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex flex-col items-center justify-center text-red-600 {{ $galleryImageUrl ? 'hidden' : '' }}">
-                                    <i class="fas fa-image text-lg opacity-60"></i>
-                                </div>
-
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                                    <i class="fas fa-search-plus text-white text-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></i>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        @if($course->images->where('status', 'active')->count() > 6)
-                        <p class="text-center text-sm text-gray-500 mt-3">
-                            Và {{ $course->images->where('status', 'active')->count() - 6 }} ảnh khác...
-                        </p>
                         @endif
                     </div>
                 </div>
@@ -414,13 +451,9 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
                                 <div class="flex space-x-3">
                                     <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
                                         @php
-                                            $relatedMainImage = $relatedCourse->images()->where('is_main', true)->where('status', 'active')->first()
-                                                ?? $relatedCourse->images()->where('status', 'active')->orderBy('order')->first();
-
+                                            // Sử dụng thumbnail từ Course model
                                             $relatedImageUrl = null;
-                                            if ($relatedMainImage && \Illuminate\Support\Facades\Storage::disk('public')->exists($relatedMainImage->image_link)) {
-                                                $relatedImageUrl = asset('storage/' . $relatedMainImage->image_link);
-                                            } elseif ($relatedCourse->thumbnail && \Illuminate\Support\Facades\Storage::disk('public')->exists($relatedCourse->thumbnail)) {
+                                            if ($relatedCourse->thumbnail && \Illuminate\Support\Facades\Storage::disk('public')->exists($relatedCourse->thumbnail)) {
                                                 $relatedImageUrl = asset('storage/' . $relatedCourse->thumbnail);
                                             }
                                         @endphp
@@ -492,7 +525,7 @@ First Active Image: {{ $course->images->where('status', 'active')->first()->imag
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gallery functionality
+    // Gallery Modal functionality
     const galleryItems = document.querySelectorAll('.gallery-item');
     const modal = document.getElementById('galleryModal');
 

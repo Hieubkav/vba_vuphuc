@@ -28,7 +28,6 @@ class Setting extends Model
         'tiktok_link',
         'messenger_link',
         'working_hours',
-        'footer_description',
         'order',
         'status',
     ];

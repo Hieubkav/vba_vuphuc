@@ -29,7 +29,7 @@ return new class extends Migration
             // Album Timeline Settings
             $table->boolean('album_timeline_enabled')->default(true);
             $table->integer('album_timeline_order')->default(3);
-            $table->string('album_timeline_title')->default('Thư viện tài liệu');
+            $table->string('album_timeline_title')->default('Timeline khóa học');
             $table->text('album_timeline_description')->default('Tài liệu và hình ảnh từ các khóa học đã diễn ra');
             $table->string('album_timeline_bg_color')->default('bg-gray-25');
             $table->string('album_timeline_animation_class')->default('animate-fade-in-optimized');

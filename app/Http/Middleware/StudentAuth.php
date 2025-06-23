@@ -20,7 +20,10 @@ class StudentAuth
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Vui lòng đăng nhập để tiếp tục'], 401);
             }
-            
+
+            // Lưu URL hiện tại để redirect về sau khi đăng nhập
+            session(['url.intended' => $request->fullUrl()]);
+
             return redirect()->route('auth.login')
                 ->with('error', 'Vui lòng đăng nhập để truy cập trang này');
         }

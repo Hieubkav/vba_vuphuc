@@ -100,6 +100,19 @@ if (!function_exists('webDesignContent')) {
             if ($field === 'copyright') {
                 return $webDesign->footer_copyright ?? '© ' . date('Y') . ' Copyright by VBA Vũ Phúc - All Rights Reserved';
             }
+
+            // Company info fields
+            if ($field === 'company_brand_name') {
+                return $webDesign->footer_company_brand_name ?? 'VUPHUC BAKING®';
+            }
+
+            if ($field === 'company_business_license') {
+                return $webDesign->footer_company_business_license ?? 'Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009';
+            }
+
+            if ($field === 'company_director_info') {
+                return $webDesign->footer_company_director_info ?? 'Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc';
+            }
         }
 
         // Xử lý các field thông thường

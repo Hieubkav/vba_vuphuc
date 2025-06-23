@@ -50,50 +50,34 @@ class ManageWebDesign extends Page implements HasForms
                 'courses_overview_order' => 2,
                 'courses_overview_title' => 'Khóa học VBA Excel chuyên nghiệp',
                 'courses_overview_description' => 'Nâng cao kỹ năng Excel với các khóa học VBA từ cơ bản đến nâng cao',
-                'courses_overview_bg_color' => 'bg-white',
-                'courses_overview_animation_class' => 'animate-fade-in-optimized',
                 'album_timeline_enabled' => true,
                 'album_timeline_order' => 3,
-                'album_timeline_title' => 'Thư viện tài liệu',
-                'album_timeline_description' => 'Tài liệu và hình ảnh từ các khóa học đã diễn ra',
-                'album_timeline_bg_color' => 'bg-gray-25',
-                'album_timeline_animation_class' => 'animate-fade-in-optimized',
+                'album_timeline_title' => 'Timeline khóa học',
+                'album_timeline_description' => 'Tài liệu PDF từ các khóa học đã diễn ra',
                 'course_groups_enabled' => true,
                 'course_groups_order' => 4,
                 'course_groups_title' => 'Nhóm học tập',
                 'course_groups_description' => 'Tham gia các nhóm Facebook/Zalo để học hỏi và trao đổi kinh nghiệm',
-                'course_groups_bg_color' => 'bg-white',
-                'course_groups_animation_class' => 'animate-fade-in-optimized',
                 'course_categories_enabled' => true,
                 'course_categories_order' => 5,
                 'course_categories_title' => 'Khóa học theo chuyên mục',
                 'course_categories_description' => 'Khám phá các khóa học được phân loại theo từng chuyên mục',
-                'course_categories_bg_color' => 'bg-gray-25',
-                'course_categories_animation_class' => 'animate-fade-in-optimized',
                 'testimonials_enabled' => true,
                 'testimonials_order' => 6,
                 'testimonials_title' => 'Đánh giá từ học viên',
                 'testimonials_description' => 'Chia sẻ từ những học viên đã tham gia khóa học',
-                'testimonials_bg_color' => 'bg-white',
-                'testimonials_animation_class' => 'animate-fade-in-optimized',
                 'faq_enabled' => true,
                 'faq_order' => 7,
                 'faq_title' => 'Câu hỏi thường gặp',
                 'faq_description' => 'Giải đáp những thắc mắc phổ biến về khóa học',
-                'faq_bg_color' => 'bg-gray-25',
-                'faq_animation_class' => 'animate-fade-in-optimized',
                 'partners_enabled' => true,
                 'partners_order' => 8,
                 'partners_title' => 'Đối tác tin cậy',
                 'partners_description' => 'Những đối tác đồng hành cùng chúng tôi',
-                'partners_bg_color' => 'bg-white',
-                'partners_animation_class' => 'animate-fade-in-optimized',
                 'blog_posts_enabled' => true,
                 'blog_posts_order' => 9,
                 'blog_posts_title' => 'Bài viết mới nhất',
                 'blog_posts_description' => 'Cập nhật kiến thức và thông tin hữu ích',
-                'blog_posts_bg_color' => 'bg-gray-25',
-                'blog_posts_animation_class' => 'animate-fade-in-optimized',
                 'footer_enabled' => true,
                 'footer_order' => 10,
                 'footer_policy_1_title' => 'Chính sách & Điều khoản',
@@ -138,8 +122,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->courses_overview_order ?? 2,
                     'title' => $webDesign->courses_overview_title ?? 'Khóa học chuyên nghiệp',
                     'description' => $webDesign->courses_overview_description ?? 'Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu',
-                    'bg_color' => $webDesign->courses_overview_bg_color ?? 'bg-white',
-                    'animation_class' => $webDesign->courses_overview_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -147,10 +129,8 @@ class ManageWebDesign extends Page implements HasForms
                 'data' => [
                     'enabled' => $webDesign->album_timeline_enabled ?? true,
                     'order' => $webDesign->album_timeline_order ?? 3,
-                    'title' => $webDesign->album_timeline_title ?? 'Thư viện tài liệu',
-                    'description' => $webDesign->album_timeline_description ?? 'Tài liệu và hình ảnh từ các khóa học đã diễn ra',
-                    'bg_color' => $webDesign->album_timeline_bg_color ?? 'bg-gray-25',
-                    'animation_class' => $webDesign->album_timeline_animation_class ?? 'animate-fade-in-optimized',
+                    'title' => $webDesign->album_timeline_title ?? 'Timeline khóa học',
+                    'description' => $webDesign->album_timeline_description ?? 'Tài liệu PDF từ các khóa học đã diễn ra',
                 ]
             ],
             [
@@ -160,8 +140,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->course_groups_order ?? 4,
                     'title' => $webDesign->course_groups_title ?? 'Nhóm học tập',
                     'description' => $webDesign->course_groups_description ?? 'Tham gia các nhóm Facebook/Zalo để học hỏi và trao đổi kinh nghiệm',
-                    'bg_color' => $webDesign->course_groups_bg_color ?? 'bg-white',
-                    'animation_class' => $webDesign->course_groups_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -171,8 +149,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->course_categories_order ?? 5,
                     'title' => $webDesign->course_categories_title ?? 'Khóa học theo chuyên mục',
                     'description' => $webDesign->course_categories_description ?? 'Khám phá các khóa học được phân loại theo từng chuyên mục',
-                    'bg_color' => $webDesign->course_categories_bg_color ?? 'bg-gray-25',
-                    'animation_class' => $webDesign->course_categories_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -182,8 +158,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->testimonials_order ?? 6,
                     'title' => $webDesign->testimonials_title ?? 'Đánh giá từ học viên',
                     'description' => $webDesign->testimonials_description ?? 'Chia sẻ từ những học viên đã tham gia khóa học',
-                    'bg_color' => $webDesign->testimonials_bg_color ?? 'bg-white',
-                    'animation_class' => $webDesign->testimonials_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -193,8 +167,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->faq_order ?? 7,
                     'title' => $webDesign->faq_title ?? 'Câu hỏi thường gặp',
                     'description' => $webDesign->faq_description ?? 'Giải đáp những thắc mắc phổ biến về khóa học',
-                    'bg_color' => $webDesign->faq_bg_color ?? 'bg-gray-25',
-                    'animation_class' => $webDesign->faq_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -204,8 +176,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->partners_order ?? 8,
                     'title' => $webDesign->partners_title ?? 'Đối tác tin cậy',
                     'description' => $webDesign->partners_description ?? 'Những đối tác đồng hành cùng chúng tôi',
-                    'bg_color' => $webDesign->partners_bg_color ?? 'bg-white',
-                    'animation_class' => $webDesign->partners_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -215,8 +185,6 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->blog_posts_order ?? 9,
                     'title' => $webDesign->blog_posts_title ?? 'Bài viết mới nhất',
                     'description' => $webDesign->blog_posts_description ?? 'Cập nhật kiến thức và thông tin hữu ích',
-                    'bg_color' => $webDesign->blog_posts_bg_color ?? 'bg-gray-25',
-                    'animation_class' => $webDesign->blog_posts_animation_class ?? 'animate-fade-in-optimized',
                 ]
             ],
             [
@@ -237,6 +205,9 @@ class ManageWebDesign extends Page implements HasForms
                     'policy_3_url' => $webDesign->footer_policy_3_url ?? '#',
                     'policy_3_post' => $webDesign->footer_policy_3_post ?? null,
                     'copyright' => $webDesign->footer_copyright ?? '© ' . date('Y') . ' Copyright by VBA Vũ Phúc - All Rights Reserved',
+                    'company_brand_name' => $webDesign->footer_company_brand_name ?? 'VUPHUC BAKING®',
+                    'company_business_license' => $webDesign->footer_company_business_license ?? 'Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009',
+                    'company_director_info' => $webDesign->footer_company_director_info ?? 'Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc',
                 ]
             ],
 
@@ -284,42 +255,20 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? 2))
                                                 ->helperText('Kéo thả để thay đổi thứ tự'),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Khóa học chuyên nghiệp')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-white'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Khóa học chuyên nghiệp')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
                                 // Album Timeline Block
                                 Builder\Block::make('album_timeline')
-                                    ->label('Thư viện tài liệu')
+                                    ->label('Album - Timeline')
                                     ->schema([
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
@@ -331,36 +280,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->content(fn($get) => 'Vị trí: ' . ($get('order') ?? 3))
                                                 ->helperText('Kéo thả để thay đổi thứ tự'),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Thư viện tài liệu')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-gray-25'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Tài liệu và hình ảnh từ các khóa học đã diễn ra')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Timeline khóa học')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Tài liệu PDF từ các khóa học đã diễn ra')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -380,36 +307,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Nhóm học tập')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-white'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Tham gia các nhóm Facebook/Zalo để học hỏi và trao đổi kinh nghiệm')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Nhóm học tập')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Tham gia các nhóm Facebook/Zalo để học hỏi và trao đổi kinh nghiệm')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -429,36 +334,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Khóa học theo chuyên mục')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-gray-25'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Khám phá các khóa học được phân loại theo từng chuyên mục')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Khóa học theo chuyên mục')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Khám phá các khóa học được phân loại theo từng chuyên mục')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -478,36 +361,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Đánh giá từ học viên')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-white'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Chia sẻ từ những học viên đã tham gia khóa học')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Đánh giá từ học viên')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Chia sẻ từ những học viên đã tham gia khóa học')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -527,36 +388,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Câu hỏi thường gặp')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-gray-25'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Giải đáp những thắc mắc phổ biến về khóa học')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Câu hỏi thường gặp')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Giải đáp những thắc mắc phổ biến về khóa học')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -576,36 +415,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Đối tác tin cậy')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-white'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Những đối tác đồng hành cùng chúng tôi')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Đối tác tin cậy')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Những đối tác đồng hành cùng chúng tôi')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -625,36 +442,14 @@ class ManageWebDesign extends Page implements HasForms
                                                 ->minValue(1)
                                                 ->maxValue(10),
                                         ]),
-                                        Grid::make(2)->schema([
-                                            TextInput::make('title')
-                                                ->label('Tiêu đề')
-                                                ->default('Bài viết mới nhất')
-                                                ->maxLength(255),
-                                            Select::make('bg_color')
-                                                ->label('Màu nền')
-                                                ->options([
-                                                    'bg-white' => 'Trắng',
-                                                    'bg-gray-25' => 'Xám nhạt',
-                                                    'bg-red-25' => 'Đỏ nhạt',
-                                                    'bg-red-50' => 'Đỏ rất nhạt',
-                                                ])
-                                                ->default('bg-gray-25'),
-                                        ]),
-                                        Grid::make(2)->schema([
-                                            Textarea::make('description')
-                                                ->label('Mô tả')
-                                                ->default('Cập nhật kiến thức và thông tin hữu ích')
-                                                ->rows(2),
-                                            Select::make('animation_class')
-                                                ->label('Hiệu ứng')
-                                                ->options([
-                                                    'animate-fade-in-optimized' => 'Fade In',
-                                                    'animate-slide-up' => 'Slide Up',
-                                                    'animate-bounce-in' => 'Bounce In',
-                                                    '' => 'Không có hiệu ứng',
-                                                ])
-                                                ->default('animate-fade-in-optimized'),
-                                        ]),
+                                        TextInput::make('title')
+                                            ->label('Tiêu đề')
+                                            ->default('Bài viết mới nhất')
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('Mô tả')
+                                            ->default('Cập nhật kiến thức và thông tin hữu ích')
+                                            ->rows(2),
                                     ])
                                     ->columns(1),
 
@@ -790,6 +585,28 @@ class ManageWebDesign extends Page implements HasForms
                                             ])
                                             ->collapsible()
                                             ->collapsed(false),
+
+                                        Section::make('Thông tin công ty')
+                                            ->description('Cấu hình thông tin công ty hiển thị trong footer')
+                                            ->schema([
+                                                TextInput::make('company_brand_name')
+                                                    ->label('Tên thương hiệu')
+                                                    ->default('VUPHUC BAKING®')
+                                                    ->maxLength(255)
+                                                    ->helperText('Tên thương hiệu hiển thị trong footer'),
+                                                TextInput::make('company_business_license')
+                                                    ->label('Giấy phép kinh doanh')
+                                                    ->default('Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009')
+                                                    ->maxLength(255)
+                                                    ->helperText('Thông tin giấy phép kinh doanh'),
+                                                TextInput::make('company_director_info')
+                                                    ->label('Thông tin người chịu trách nhiệm')
+                                                    ->default('Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc')
+                                                    ->maxLength(255)
+                                                    ->helperText('Thông tin người chịu trách nhiệm nội dung'),
+                                            ])
+                                            ->collapsible()
+                                            ->collapsed(false),
                                     ])
                                     ->columns(1),
 
@@ -848,7 +665,7 @@ class ManageWebDesign extends Page implements HasForms
                 'data' => [
                     'enabled' => true,
                     'order' => 3,
-                    'title' => 'Thư viện tài liệu',
+                    'title' => 'Timeline khóa học',
                     'description' => 'Tài liệu và hình ảnh từ các khóa học đã diễn ra',
                     'bg_color' => 'bg-gray-25',
                     'animation_class' => 'animate-fade-in-optimized',
@@ -954,8 +771,7 @@ class ManageWebDesign extends Page implements HasForms
         int $defaultOrder,
         bool $hasContent = true,
         string $defaultTitle = '',
-        string $defaultDescription = '',
-        string $defaultBgColor = 'bg-white'
+        string $defaultDescription = ''
     ): Section {
         $schema = [
             Grid::make(3)->schema([
@@ -980,41 +796,16 @@ class ManageWebDesign extends Page implements HasForms
         ];
 
         if ($hasContent) {
-            $schema[] = Grid::make(2)->schema([
-                TextInput::make($key . '_title')
-                    ->label('📝 Tiêu đề')
-                    ->default($defaultTitle)
-                    ->maxLength(255)
-                    ->prefixIcon('heroicon-m-pencil'),
+            $schema[] = TextInput::make($key . '_title')
+                ->label('📝 Tiêu đề')
+                ->default($defaultTitle)
+                ->maxLength(255)
+                ->prefixIcon('heroicon-m-pencil');
 
-                Select::make($key . '_bg_color')
-                    ->label('🎨 Màu nền')
-                    ->options([
-                        'bg-white' => '🤍 Trắng',
-                        'bg-gray-25' => '🩶 Xám nhạt',
-                        'bg-red-25' => '❤️ Đỏ nhạt',
-                        'bg-red-50' => '💗 Đỏ rất nhạt',
-                    ])
-                    ->default($defaultBgColor)
-                    ->prefixIcon('heroicon-m-paint-brush'),
-            ]);
-
-            $schema[] = Grid::make(2)->schema([
-                Textarea::make($key . '_description')
-                    ->label('Mô tả')
-                    ->default($defaultDescription)
-                    ->rows(2),
-
-                Select::make($key . '_animation_class')
-                    ->label('Hiệu ứng')
-                    ->options([
-                        'animate-fade-in-optimized' => 'Fade In',
-                        'animate-slide-up' => 'Slide Up',
-                        'animate-bounce-in' => 'Bounce In',
-                        '' => 'Không có hiệu ứng',
-                    ])
-                    ->default('animate-fade-in-optimized'),
-            ]);
+            $schema[] = Textarea::make($key . '_description')
+                ->label('Mô tả')
+                ->default($defaultDescription)
+                ->rows(2);
         }
 
         return Section::make($label)
@@ -1072,12 +863,6 @@ class ManageWebDesign extends Page implements HasForms
             if (isset($sectionData['description'])) {
                 $webDesignData[$type . '_description'] = $sectionData['description'];
             }
-            if (isset($sectionData['bg_color'])) {
-                $webDesignData[$type . '_bg_color'] = $sectionData['bg_color'];
-            }
-            if (isset($sectionData['animation_class'])) {
-                $webDesignData[$type . '_animation_class'] = $sectionData['animation_class'];
-            }
 
             // Handle footer specific fields
             if ($type === 'footer') {
@@ -1126,6 +911,17 @@ class ManageWebDesign extends Page implements HasForms
                 // Copyright
                 if (isset($sectionData['copyright'])) {
                     $webDesignData['footer_copyright'] = $sectionData['copyright'];
+                }
+
+                // Company Info
+                if (isset($sectionData['company_brand_name'])) {
+                    $webDesignData['footer_company_brand_name'] = $sectionData['company_brand_name'];
+                }
+                if (isset($sectionData['company_business_license'])) {
+                    $webDesignData['footer_company_business_license'] = $sectionData['company_business_license'];
+                }
+                if (isset($sectionData['company_director_info'])) {
+                    $webDesignData['footer_company_director_info'] = $sectionData['company_director_info'];
                 }
             }
 

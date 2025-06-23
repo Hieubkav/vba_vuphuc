@@ -14,70 +14,54 @@ class WebDesign extends Model
         // Hero Banner
         'hero_banner_enabled',
         'hero_banner_order',
-        
+
         // Courses Overview
         'courses_overview_enabled',
         'courses_overview_order',
         'courses_overview_title',
         'courses_overview_description',
-        'courses_overview_bg_color',
-        'courses_overview_animation_class',
-        
+
         // Album Timeline
         'album_timeline_enabled',
         'album_timeline_order',
         'album_timeline_title',
         'album_timeline_description',
-        'album_timeline_bg_color',
-        'album_timeline_animation_class',
-        
+
         // Course Groups
         'course_groups_enabled',
         'course_groups_order',
         'course_groups_title',
         'course_groups_description',
-        'course_groups_bg_color',
-        'course_groups_animation_class',
-        
+
         // Course Categories
         'course_categories_enabled',
         'course_categories_order',
         'course_categories_title',
         'course_categories_description',
-        'course_categories_bg_color',
-        'course_categories_animation_class',
-        
+
         // Testimonials
         'testimonials_enabled',
         'testimonials_order',
         'testimonials_title',
         'testimonials_description',
-        'testimonials_bg_color',
-        'testimonials_animation_class',
-        
+
         // FAQ
         'faq_enabled',
         'faq_order',
         'faq_title',
         'faq_description',
-        'faq_bg_color',
-        'faq_animation_class',
-        
+
         // Partners
         'partners_enabled',
         'partners_order',
         'partners_title',
         'partners_description',
-        'partners_bg_color',
-        'partners_animation_class',
-        
+
         // Blog Posts
         'blog_posts_enabled',
         'blog_posts_order',
         'blog_posts_title',
         'blog_posts_description',
-        'blog_posts_bg_color',
-        'blog_posts_animation_class',
         
         // Homepage CTA
         'homepage_cta_enabled',
@@ -105,6 +89,9 @@ class WebDesign extends Model
         'footer_policy_3_url',
         'footer_policy_3_post',
         'footer_copyright',
+        'footer_company_brand_name',
+        'footer_company_business_license',
+        'footer_company_director_info',
     ];
 
     protected $casts = [
@@ -149,8 +136,6 @@ class WebDesign extends Model
                 'order' => $this->courses_overview_order,
                 'title' => $this->courses_overview_title,
                 'description' => $this->courses_overview_description,
-                'bg_color' => $this->courses_overview_bg_color,
-                'animation_class' => $this->courses_overview_animation_class,
                 'component' => 'components.storefront.courses-overview',
                 'type' => 'include'
             ],
@@ -159,8 +144,6 @@ class WebDesign extends Model
                 'order' => $this->album_timeline_order,
                 'title' => $this->album_timeline_title,
                 'description' => $this->album_timeline_description,
-                'bg_color' => $this->album_timeline_bg_color,
-                'animation_class' => $this->album_timeline_animation_class,
                 'component' => 'components.storefront.album-timeline',
                 'type' => 'include'
             ],
@@ -169,8 +152,6 @@ class WebDesign extends Model
                 'order' => $this->course_groups_order,
                 'title' => $this->course_groups_title,
                 'description' => $this->course_groups_description,
-                'bg_color' => $this->course_groups_bg_color,
-                'animation_class' => $this->course_groups_animation_class,
                 'component' => 'components.storefront.course-groups',
                 'type' => 'include'
             ],
@@ -179,8 +160,6 @@ class WebDesign extends Model
                 'order' => $this->course_categories_order,
                 'title' => $this->course_categories_title,
                 'description' => $this->course_categories_description,
-                'bg_color' => $this->course_categories_bg_color,
-                'animation_class' => $this->course_categories_animation_class,
                 'component' => 'components.storefront.course-categories-sections',
                 'type' => 'include'
             ],
@@ -189,8 +168,6 @@ class WebDesign extends Model
                 'order' => $this->testimonials_order,
                 'title' => $this->testimonials_title,
                 'description' => $this->testimonials_description,
-                'bg_color' => $this->testimonials_bg_color,
-                'animation_class' => $this->testimonials_animation_class,
                 'component' => 'components.storefront.testimonials',
                 'type' => 'include'
             ],
@@ -199,8 +176,6 @@ class WebDesign extends Model
                 'order' => $this->faq_order,
                 'title' => $this->faq_title,
                 'description' => $this->faq_description,
-                'bg_color' => $this->faq_bg_color,
-                'animation_class' => $this->faq_animation_class,
                 'component' => 'components.storefront.faq-section',
                 'type' => 'include'
             ],
@@ -209,8 +184,6 @@ class WebDesign extends Model
                 'order' => $this->partners_order,
                 'title' => $this->partners_title,
                 'description' => $this->partners_description,
-                'bg_color' => $this->partners_bg_color,
-                'animation_class' => $this->partners_animation_class,
                 'component' => 'components.storefront.partners',
                 'type' => 'include'
             ],
@@ -219,8 +192,6 @@ class WebDesign extends Model
                 'order' => $this->blog_posts_order,
                 'title' => $this->blog_posts_title,
                 'description' => $this->blog_posts_description,
-                'bg_color' => $this->blog_posts_bg_color,
-                'animation_class' => $this->blog_posts_animation_class,
                 'component' => 'components.storefront.blog-posts',
                 'type' => 'include'
             ],

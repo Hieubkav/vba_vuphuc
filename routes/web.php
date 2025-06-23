@@ -107,17 +107,17 @@ Route::controller(CourseGroupController::class)->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Routes Album & Thư viện ảnh
+| Routes Album & PDF Timeline
 |--------------------------------------------------------------------------
-| API endpoints cho album ảnh khóa học:
+| API endpoints cho album PDF khóa học:
 | - Tăng lượt xem
 | - Tăng lượt tải
-| - Lấy danh sách ảnh
+| - Lấy thông tin PDF
 */
 Route::controller(AlbumController::class)->group(function () {
     Route::post('/api/albums/{album}/view', 'incrementView')->name('albums.view');
     Route::post('/api/albums/{album}/download', 'incrementDownload')->name('albums.download');
-    Route::get('/api/albums/{album}/images', 'getImages')->name('albums.images');
+    Route::get('/api/albums/{album}/pdf', 'getPdf')->name('albums.pdf');
 });
 
 /*
@@ -144,19 +144,56 @@ Route::controller(PostController::class)->group(function () {
 |--------------------------------------------------------------------------
 | Routes Tài liệu khóa học
 |--------------------------------------------------------------------------
-| Download tài liệu với kiểm tra quyền truy cập
+| Xem và download tài liệu với kiểm tra quyền truy cập
 */
 
+// Route xem tài liệu
+Route::get('/course-materials/{material}/view', function (\App\Models\CourseMaterial $material) {
+    // Kiểm tra quyền truy cập
+    if (!$material->canPreview()) {
+        abort(403, 'Bạn cần đăng nhập để xem tài liệu này');
+    }
+
+    // Kiểm tra file tồn tại trong public disk
+    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($material->file_path)) {
+        abort(404, 'Tài liệu không tồn tại');
+    }
+
+    // Đảm bảo Content-Type đúng
+    $contentType = $material->file_type;
+    if ($contentType === 'pdf') {
+        $contentType = 'application/pdf';
+    } elseif (!str_contains($contentType, '/')) {
+        // Nếu không có slash, thêm application/ prefix
+        $contentType = 'application/' . $contentType;
+    }
+
+    // Trả về file để xem trong browser
+    return response()->file(
+        storage_path('app/public/' . $material->file_path),
+        [
+            'Content-Type' => $contentType,
+            'Content-Disposition' => 'inline; filename="' . $material->file_name . '"'
+        ]
+    );
+})->name('course-materials.view');
+
+// Route download tài liệu
 Route::get('/course-material/{id}/download', function ($id) {
     $material = \App\Models\CourseMaterial::findOrFail($id);
-    $user = auth('student')->user();
 
-    if (!$material->canViewAndDownloadIfEnrolled($user, $material->course)) {
-        abort(403, 'Bạn cần đăng nhập và đăng ký khóa học để tải tài liệu này');
+    // Kiểm tra quyền truy cập
+    if (!$material->canDownload()) {
+        abort(403, 'Bạn cần đăng nhập để tải tài liệu này');
+    }
+
+    // Kiểm tra file tồn tại trong public disk
+    if (!\Illuminate\Support\Facades\Storage::disk('public')->exists($material->file_path)) {
+        abort(404, 'Tài liệu không tồn tại');
     }
 
     return response()->download(
-        storage_path('app/' . $material->file_path),
+        storage_path('app/public/' . $material->file_path),
         $material->file_name
     );
 })->name('course.material.download');
@@ -243,10 +280,4 @@ Route::get('/api/realtime-stats', function () {
         ], 500);
     }
 })->middleware('auth')->name('api.realtime-stats');
-
-
-
-
-
-
 

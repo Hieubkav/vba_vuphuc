@@ -192,9 +192,9 @@ class CourseMaterialSeeder extends Seeder
 
                 CourseMaterial::create(array_merge($materialData, [
                     'course_id' => $course->id,
-                    'is_preview' => false, // Mặc định false vì chúng ta không sử dụng nữa
                     'access_type' => $materialData['access_type'] ?? 'public', // Đảm bảo có access_type
-                    'material_type' => 'document' // Mặc định là document
+                    'material_type' => 'document', // Mặc định là document
+                    'status' => 'active' // Đảm bảo có status
                 ]));
             }
         }

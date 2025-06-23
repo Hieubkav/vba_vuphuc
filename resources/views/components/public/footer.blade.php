@@ -1,4 +1,4 @@
-<footer class="bg-gray-50 border-t border-gray-100">
+<div class="bg-gray-50 border-t border-gray-100">
     <div class="container mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Contact Info -->
@@ -28,9 +28,14 @@
                 </div>
 
                 <h3 class="text-lg font-semibold text-red-700 mb-3">{{ $companyName }}</h3>
-                <p class="text-gray-600 mb-2 font-bold">VUPHUC BAKING®</p>
-                <p class="text-gray-600 mb-3">Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009</p>
-                <p class="text-gray-600 mb-3">Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc</p>
+                @php
+                    $brandName = webDesignContent('footer', 'company_brand_name', 'VUPHUC BAKING®');
+                    $businessLicense = webDesignContent('footer', 'company_business_license', 'Giấy phép kinh doanh số 1800935879 cấp ngày 29/4/2009');
+                    $directorInfo = webDesignContent('footer', 'company_director_info', 'Chịu trách nhiệm nội dung: Trần Uy Vũ - Tổng Giám đốc');
+                @endphp
+                <p class="text-gray-600 mb-2 font-bold">{{ $brandName }}</p>
+                <p class="text-gray-600 mb-3">{{ $businessLicense }}</p>
+                <p class="text-gray-600 mb-3">{{ $directorInfo }}</p>
             </div>
 
             <!-- Policies -->
@@ -132,4 +137,4 @@
             </div>
         </div>
     </div>
-</footer>
+</div>

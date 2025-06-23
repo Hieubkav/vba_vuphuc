@@ -15,12 +15,17 @@
     @php
         // Skip homepage_cta vì đã được hiển thị trong layout chung
     @endphp
+@elseif($sectionKey === 'footer')
+    {{-- Footer đã được di chuyển vào layout chung, không hiển thị ở đây nữa --}}
+    @php
+        // Skip footer vì đã được hiển thị trong layout chung
+    @endphp
 @else
     <x-storefront-section
         title="{{ $section['title'] ?? '' }}"
         description="{{ $section['description'] ?? '' }}"
-        bg-color="{{ $section['bg_color'] ?? 'bg-white' }}"
-        animation-class="{{ $section['animation_class'] ?? 'animate-fade-in-optimized' }}"
+        bg-color="bg-white"
+        animation-class="animate-fade-in-optimized"
         :has-data="$hasData"
         empty-icon="{{ $section['empty_icon'] ?? 'fas fa-info-circle' }}"
         empty-message="{{ $section['empty_message'] ?? 'Chưa có dữ liệu' }}">

@@ -126,8 +126,8 @@ class CourseObserver
         if (!$filePath) return;
 
         // Chỉ xóa file trong storage, không xóa URL external
-        if (!str_starts_with($filePath, 'http') && Storage::exists($filePath)) {
-            Storage::delete($filePath);
+        if (!str_starts_with($filePath, 'http') && Storage::disk('public')->exists($filePath)) {
+            Storage::disk('public')->delete($filePath);
         }
     }
 

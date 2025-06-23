@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\StudentResource\Pages;
-use App\Filament\Admin\Resources\StudentResource\RelationManagers;
 use App\Models\Student;
 use App\Traits\HasImageUpload;
 
@@ -13,9 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
 use Filament\Support\Enums\FontWeight;
 
 class StudentResource extends Resource
@@ -40,133 +37,146 @@ class StudentResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make('Thông tin học viên')
-                    ->tabs([
-                        Tabs\Tab::make('Thông tin cá nhân')
-                            ->schema([
-                                Section::make('Thông tin cơ bản')
-                                    ->schema([
-                                        Forms\Components\TextInput::make('name')
-                                            ->label('Họ và tên')
-                                            ->required()
-                                            ->maxLength(255),
+                // Thông tin cơ bản - hàng đầu
+                Section::make('Thông tin cơ bản')
+                    ->description('Thông tin cá nhân và liên hệ của học viên')
+                    ->icon('heroicon-o-user')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Họ và tên')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpan(2),
 
-                                        Forms\Components\TextInput::make('email')
-                                            ->label('Email')
-                                            ->email()
-                                            ->required()
-                                            ->unique(Student::class, 'email', ignoreRecord: true)
-                                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->required()
+                            ->unique(Student::class, 'email', ignoreRecord: true)
+                            ->maxLength(255),
 
-                                        Forms\Components\TextInput::make('phone')
-                                            ->label('Số điện thoại')
-                                            ->tel()
-                                            ->maxLength(255),
+                        Forms\Components\TextInput::make('phone')
+                            ->label('Số điện thoại')
+                            ->tel()
+                            ->maxLength(255),
 
-                                        Forms\Components\DatePicker::make('birth_date')
-                                            ->label('Ngày sinh')
-                                            ->maxDate(now()->subYears(16))
-                                            ->displayFormat('d/m/Y'),
-                                    ])->columns(2),
+                        Forms\Components\DatePicker::make('birth_date')
+                            ->label('Ngày sinh')
+                            ->maxDate(now()->subYears(16))
+                            ->displayFormat('d/m/Y'),
 
-                                Section::make('Thông tin bổ sung')
-                                    ->schema([
-                                        Forms\Components\Select::make('gender')
-                                            ->label('Giới tính')
-                                            ->options([
-                                                'male' => 'Nam',
-                                                'female' => 'Nữ',
-                                                'other' => 'Khác',
-                                            ]),
-
-                                        Forms\Components\TextInput::make('occupation')
-                                            ->label('Nghề nghiệp')
-                                            ->maxLength(255),
-
-                                        Forms\Components\Select::make('education_level')
-                                            ->label('Trình độ học vấn')
-                                            ->options([
-                                                'high_school' => 'Trung học phổ thông',
-                                                'college' => 'Cao đẳng',
-                                                'university' => 'Đại học',
-                                                'master' => 'Thạc sĩ',
-                                                'phd' => 'Tiến sĩ',
-                                                'other' => 'Khác',
-                                            ]),
-
-                                        Forms\Components\Textarea::make('address')
-                                            ->label('Địa chỉ')
-                                            ->rows(2),
-                                    ])->columns(2),
-                            ]),
-
-                        Tabs\Tab::make('Mục tiêu học tập')
-                            ->schema([
-                                Section::make('Thông tin học tập')
-                                    ->schema([
-                                        Forms\Components\Textarea::make('learning_goals')
-                                            ->label('Mục tiêu học tập')
-                                            ->rows(4)
-                                            ->helperText('Mô tả mục tiêu và kỳ vọng của học viên'),
-
-                                        Forms\Components\TagsInput::make('interests')
-                                            ->label('Sở thích/Lĩnh vực quan tâm')
-                                            ->helperText('Nhập các từ khóa và nhấn Enter'),
-                                    ]),
-                            ]),
-
-                        Tabs\Tab::make('Cài đặt')
-                            ->schema([
-                                Section::make('Hình đại diện')
-                                    ->schema([
-                                        Forms\Components\FileUpload::make('avatar')
-                                            ->label('Ảnh đại diện')
-                                            ->image()
-                                            ->directory('students/avatars')
-                                            ->visibility('public')
-                                            ->maxSize(2048) // 2MB
-                                            ->imageEditor()
-                                            ->imageEditorAspectRatios(['1:1'])
-                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->helperText('Khuyến nghị kích thước: 300x300px (hình vuông)')
-                                            ->saveUploadedFileUsing(function ($file, $get) {
-                                                $name = $get('name') ?? 'student';
-                                                $customName = 'student-' . $name;
-
-                                                return \App\Actions\ConvertImageToWebp::run(
-                                                    $file,
-                                                    'students/avatars',
-                                                    $customName,
-                                                    300,
-                                                    300
-                                                );
-                                            }),
-                                    ]),
-
-                                Section::make('Trạng thái tài khoản')
-                                    ->schema([
-                                        Forms\Components\Select::make('status')
-                                            ->label('Trạng thái')
-                                            ->required()
-                                            ->options([
-                                                'active' => 'Hoạt động',
-                                                'inactive' => 'Tạm dừng',
-                                                'suspended' => 'Bị khóa',
-                                            ])
-                                            ->default('active'),
-
-                                        Forms\Components\DateTimePicker::make('email_verified_at')
-                                            ->label('Email đã xác thực')
-                                            ->helperText('Để trống nếu email chưa được xác thực'),
-
-                                        Forms\Components\TextInput::make('order')
-                                            ->label('Thứ tự sắp xếp')
-                                            ->numeric()
-                                            ->default(0)
-                                            ->helperText('Số nhỏ hơn sẽ hiển thị trước'),
-                                    ])->columns(2),
+                        Forms\Components\Select::make('gender')
+                            ->label('Giới tính')
+                            ->options([
+                                'male' => 'Nam',
+                                'female' => 'Nữ',
+                                'other' => 'Khác',
                             ]),
                     ])
+                    ->columns(3)
+                    ->collapsible(),
+
+                // Thông tin bổ sung và địa chỉ
+                Section::make('Thông tin bổ sung')
+                    ->description('Nghề nghiệp, học vấn và địa chỉ')
+                    ->icon('heroicon-o-academic-cap')
+                    ->schema([
+                        Forms\Components\TextInput::make('occupation')
+                            ->label('Nghề nghiệp')
+                            ->maxLength(255),
+
+                        Forms\Components\Select::make('education_level')
+                            ->label('Trình độ học vấn')
+                            ->options([
+                                'high_school' => 'Trung học phổ thông',
+                                'college' => 'Cao đẳng',
+                                'university' => 'Đại học',
+                                'master' => 'Thạc sĩ',
+                                'phd' => 'Tiến sĩ',
+                                'other' => 'Khác',
+                            ]),
+
+                        Forms\Components\Textarea::make('address')
+                            ->label('Địa chỉ')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->collapsible(),
+
+                // Mục tiêu học tập
+                Section::make('Mục tiêu học tập')
+                    ->description('Mục tiêu và sở thích học tập của học viên')
+                    ->icon('heroicon-o-light-bulb')
+                    ->schema([
+                        Forms\Components\Textarea::make('learning_goals')
+                            ->label('Mục tiêu học tập')
+                            ->rows(4)
+                            ->helperText('Mô tả mục tiêu và kỳ vọng của học viên')
+                            ->columnSpanFull(),
+
+                        Forms\Components\TagsInput::make('interests')
+                            ->label('Sở thích/Lĩnh vực quan tâm')
+                            ->helperText('Nhập các từ khóa và nhấn Enter')
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
+
+                // Hình đại diện và cài đặt tài khoản
+                Section::make('Cài đặt tài khoản')
+                    ->description('Hình đại diện và trạng thái tài khoản')
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->schema([
+                        Forms\Components\FileUpload::make('avatar')
+                            ->label('Ảnh đại diện')
+                            ->image()
+                            ->directory('students/avatars')
+                            ->visibility('public')
+                            ->maxSize(2048) // 2MB
+                            ->imageEditor()
+                            ->imageEditorAspectRatios(['1:1'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Khuyến nghị kích thước: 300x300px (hình vuông)')
+                            ->columnSpan(1)
+                            ->saveUploadedFileUsing(function ($file, $get) {
+                                $name = $get('name') ?? 'student';
+                                $customName = 'student-' . $name;
+
+                                return \App\Actions\ConvertImageToWebp::run(
+                                    $file,
+                                    'students/avatars',
+                                    $customName,
+                                    300,
+                                    300
+                                );
+                            }),
+
+                        Forms\Components\Group::make([
+                            Forms\Components\Select::make('status')
+                                ->label('Trạng thái')
+                                ->required()
+                                ->options([
+                                    'active' => 'Hoạt động',
+                                    'inactive' => 'Tạm dừng',
+                                    'suspended' => 'Bị khóa',
+                                ])
+                                ->default('active'),
+
+                            Forms\Components\DateTimePicker::make('email_verified_at')
+                                ->label('Email đã xác thực')
+                                ->helperText('Để trống nếu email chưa được xác thực'),
+
+                            Forms\Components\TextInput::make('order')
+                                ->label('Thứ tự sắp xếp')
+                                ->numeric()
+                                ->default(0)
+                                ->helperText('Số nhỏ hơn sẽ hiển thị trước'),
+                        ])
+                        ->columnSpan(2)
+                        ->columns(1),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
             ]);
     }
 

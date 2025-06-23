@@ -6,8 +6,6 @@
     $webDesignData = $webDesign ?? null;
     $sectionTitle = $webDesignData?->courses_overview_title ?? 'Khóa học chuyên nghiệp';
     $sectionDescription = $webDesignData?->courses_overview_description ?? 'Khám phá những khóa học được thiết kế bởi các chuyên gia hàng đầu';
-    $sectionBgColor = $webDesignData?->courses_overview_bg_color ?? 'bg-white';
-    $sectionAnimationClass = $webDesignData?->courses_overview_animation_class ?? 'animate-fade-in-optimized';
 
     // Fallback: nếu không có dữ liệu từ ViewServiceProvider, lấy trực tiếp từ model với cache
     if ($courseCategoriesData->isEmpty()) {
@@ -157,8 +155,8 @@
 @if($hasData)
 
 <!-- Nội dung chính hiện đại với giao diện đỏ trắng -->
-<section class="{{ $sectionBgColor }} py-12">
-<div class="container mx-auto px-4 {{ $sectionAnimationClass }}">
+<section class="bg-white py-12">
+<div class="container mx-auto px-4 animate-fade-in-optimized">
     <!-- Tiêu đề phần gọn gàng -->
     <div class="text-center mb-12">
         <h2 class="section-title mb-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
@@ -212,8 +210,8 @@
 
 @else
 <!-- Trạng thái trống hiện đại với thiết kế tinh tế -->
-<section class="{{ $sectionBgColor }} py-12">
-<div class="container mx-auto px-4 {{ $sectionAnimationClass }}">
+<section class="bg-white py-12">
+<div class="container mx-auto px-4 animate-fade-in-optimized">
     <div class="max-w-xl mx-auto">
         <div class="bg-gradient-to-br from-white to-red-50/30 rounded-2xl p-8 shadow-lg border border-red-100/50 backdrop-blur-sm">
             <div class="flex flex-col items-center text-center space-y-6">

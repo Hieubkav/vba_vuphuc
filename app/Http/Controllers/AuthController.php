@@ -15,8 +15,13 @@ class AuthController extends Controller
     /**
      * Hiển thị form đăng nhập
      */
-    public function showLoginForm(): View
+    public function showLoginForm(Request $request): View
     {
+        // Lưu URL redirect nếu có
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->get('redirect')]);
+        }
+
         return view('auth.login');
     }
 
@@ -59,15 +64,23 @@ class AuthController extends Controller
         // Đăng nhập thành công
         Auth::guard('student')->login($student, $request->filled('remember'));
 
-        return redirect()->intended(route('storeFront'))
+        // Redirect về trang trước đó hoặc trang chủ nếu không có
+        $intendedUrl = session()->pull('url.intended', route('storeFront'));
+
+        return redirect($intendedUrl)
             ->with('success', 'Đăng nhập thành công! Chào mừng ' . $student->name);
     }
 
     /**
      * Hiển thị form đăng ký
      */
-    public function showRegisterForm(): View
+    public function showRegisterForm(Request $request): View
     {
+        // Lưu URL redirect nếu có
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->get('redirect')]);
+        }
+
         return view('auth.register');
     }
 
@@ -115,18 +128,24 @@ class AuthController extends Controller
         // Tự động đăng nhập sau khi đăng ký
         Auth::guard('student')->login($student);
 
-        return redirect()->route('storeFront')
+        // Redirect về trang trước đó hoặc trang chủ nếu không có
+        $intendedUrl = session()->pull('url.intended', route('storeFront'));
+
+        return redirect($intendedUrl)
             ->with('success', 'Đăng ký thành công! Chào mừng bạn đến với VBA Vũ Phúc');
     }
 
     /**
      * Đăng xuất
      */
-    public function logout(): RedirectResponse
+    public function logout(Request $request): RedirectResponse
     {
         Auth::guard('student')->logout();
-        
-        return redirect()->route('storeFront')
+
+        // Lấy URL từ referer hoặc về trang chủ
+        $redirectUrl = $request->header('referer', route('storeFront'));
+
+        return redirect($redirectUrl)
             ->with('success', 'Đăng xuất thành công!');
     }
 }
