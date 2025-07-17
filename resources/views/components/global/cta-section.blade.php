@@ -5,15 +5,15 @@
 
 @php
     // Lấy dữ liệu CTA từ WebDesign hoặc sử dụng giá trị mặc định
-    $webDesign = app(\App\Services\GlobalCtaService::class)->getCtaData();
-    $ctaTitle = $webDesign['title'] ?? 'Bắt đầu hành trình với VBA Vũ Phúc';
-    $ctaDescription = $webDesign['description'] ?? 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.';
-    $primaryButtonText = $webDesign['primary_button_text'] ?? 'Xem khóa học';
-    $primaryButtonUrl = $webDesign['primary_button_url'] ?? '/courses';
-    $secondaryButtonText = $webDesign['secondary_button_text'] ?? 'Đăng ký học';
-    $secondaryButtonUrl = $webDesign['secondary_button_url'] ?? '/students/register';
-    $bgColor = $webDesign['bg_color'] ?? 'bg-gradient-to-r from-red-700 via-red-600 to-red-700';
-    $enabled = $webDesign['enabled'] ?? true;
+    $webDesign = \App\Models\WebDesign::first();
+    $ctaTitle = $webDesign->homepage_cta_title ?? 'Bắt đầu hành trình với VBA Vũ Phúc';
+    $ctaDescription = $webDesign->homepage_cta_description ?? 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.';
+    $primaryButtonText = $webDesign->homepage_cta_primary_button_text ?? 'Xem khóa học';
+    $primaryButtonUrl = $webDesign->homepage_cta_primary_button_url ?? '/courses';
+    $secondaryButtonText = $webDesign->homepage_cta_secondary_button_text ?? 'Đăng ký học';
+    $secondaryButtonUrl = $webDesign->homepage_cta_secondary_button_url ?? '/students/register';
+    $bgColor = 'bg-gradient-to-r from-red-700 via-red-600 to-red-700';
+    $enabled = $webDesign->homepage_cta_enabled ?? true;
     
     // Xử lý URL
     $primaryUrl = str_starts_with($primaryButtonUrl, 'http') ? $primaryButtonUrl : url($primaryButtonUrl);

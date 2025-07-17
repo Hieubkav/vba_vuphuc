@@ -44,13 +44,23 @@ class SimpleWebpService
             // Đọc và convert sang WebP
             $image = $this->manager->read($file->getPathname());
 
-            // Resize nếu có kích thước
+            // Resize nếu có kích thước - giữ nguyên tỷ lệ
             if ($width > 0 && $height > 0) {
-                $image->resize($width, $height);
+                // Resize với constraint để giữ tỷ lệ và fit trong khung
+                $image->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio(); // Giữ nguyên tỷ lệ
+                    $constraint->upsize(); // Không phóng to ảnh nhỏ
+                });
             } elseif ($width > 0) {
-                $image->resize(width: $width);
+                $image->resize($width, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
             } elseif ($height > 0) {
-                $image->resize(height: $height);
+                $image->resize(null, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                    $constraint->upsize();
+                });
             }
 
             $webpData = $image->toWebp(95); // 95% chất lượng

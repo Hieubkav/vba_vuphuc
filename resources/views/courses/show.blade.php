@@ -154,12 +154,30 @@
                     @if($course->instructor && $course->show_instructor)
                     <div class="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                                <i class="fas fa-user-tie text-white text-lg"></i>
+                            <!-- Instructor Avatar -->
+                            <div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                                @if($course->instructor->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($course->instructor->avatar))
+                                <img src="{{ asset('storage/' . $course->instructor->avatar) }}"
+                                     alt="{{ $course->instructor->name }}"
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                @endif
+                                <div class="w-full h-full bg-blue-600 flex items-center justify-center {{ ($course->instructor->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($course->instructor->avatar)) ? 'hidden' : '' }}">
+                                    <i class="fas fa-user-tie text-white text-lg"></i>
+                                </div>
                             </div>
                             <div>
                                 <p class="text-sm text-blue-600 font-medium">Giảng viên</p>
+                                @if($course->instructor->slug)
+                                <a href="{{ route('instructors.show', $course->instructor->slug) }}"
+                                   target="_blank"
+                                   class="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors duration-200 cursor-pointer">
+                                    {{ $course->instructor->name }}
+                                    <i class="fas fa-external-link-alt text-xs ml-1 opacity-60"></i>
+                                </a>
+                                @else
                                 <p class="text-lg font-semibold text-gray-900">{{ $course->instructor->name }}</p>
+                                @endif
                                 @if($course->instructor->specialization)
                                 <p class="text-sm text-gray-600">{{ $course->instructor->specialization }}</p>
                                 @endif
@@ -267,11 +285,11 @@
                         @endif
 
                         <!-- What You'll Learn -->
-                        @if($course->objectives && count($course->objectives) > 0)
+                        @if($course->what_you_learn && count($course->what_you_learn) > 0)
                         <div class="mb-8">
                             <h2 class="text-2xl font-bold text-gray-900 mb-4">Bạn sẽ học được gì</h2>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                @foreach($course->objectives as $objective)
+                                @foreach($course->what_you_learn as $objective)
                                 <div class="flex items-start space-x-3">
                                     <div class="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
                                         <i class="fas fa-check text-green-600 text-sm"></i>

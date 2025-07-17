@@ -305,16 +305,16 @@ class CourseResource extends Resource
 
                                 Forms\Components\Section::make('Nội dung khóa học')
                                     ->schema([
-                                        Forms\Components\Textarea::make('requirements')
+                                        Forms\Components\TagsInput::make('requirements')
                                             ->label('Yêu cầu đầu vào')
-                                            ->rows(4)
-                                            ->helperText('Các kiến thức, kỹ năng cần có trước khi học (mỗi yêu cầu một dòng)')
+                                            ->helperText('Nhấn Enter sau mỗi yêu cầu để tạo tag mới')
+                                            ->placeholder('Ví dụ: Kiến thức cơ bản về Excel')
                                             ->columnSpanFull(),
 
-                                        Forms\Components\Textarea::make('what_you_learn')
+                                        Forms\Components\TagsInput::make('what_you_learn')
                                             ->label('Những gì học được')
-                                            ->rows(4)
-                                            ->helperText('Các kiến thức, kỹ năng học viên sẽ đạt được (mỗi mục một dòng)')
+                                            ->helperText('Nhấn Enter sau mỗi mục để tạo tag mới')
+                                            ->placeholder('Ví dụ: Thành thạo các hàm Excel nâng cao')
                                             ->columnSpanFull(),
                                     ]),
 

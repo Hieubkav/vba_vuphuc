@@ -1,46 +1,79 @@
-# Course Album Preferences
-- User prefers carousel-style album displays.
-- User prefers carousel auto-play with 3-second intervals for image transitions.
-- User prefers optimized spacing for clean layout.
-- User prefers subtle/small action buttons for course album interfaces.
-
-# Course Model
-- Courses should not have price attribute - remove price from Course model and all related frontend/admin interfaces.
-
 # Course Detail Page
-- User prefers course descriptions to be displayed differently than the current HTML paragraph format, finding the current implementation unsatisfactory.
-- User prefers course materials to be displayed directly below course content without being contained within tabs.
+- User prefers course descriptions to be displayed differently than HTML paragraph format, using rich editor (WYSIWYG) instead of textarea.
+- User prefers to remove short description below course title when full description is already displayed.
+- User prefers PDF viewers with separate open/download buttons and horizontal page navigation with carousel buttons instead of vertical scrolling.
+- User prefers document/PDF viewers to open in new tabs/pages when clicking 'View' button rather than opening in the same page.
+- User prefers course frontend to use thumbnail field for main course image display, while course gallery images should be shown in a separate section with intelligent design layout.
+- User prefers optimized spacing and better layout positioning for image galleries, finding current layouts too cluttered and wanting cleaner, more organized visual presentation.
+- User prefers course materials to be displayed directly below course content without tabs.
+- User prefers course materials section to be placed in the same column as related courses on desktop layout instead of main content area.
 - User wants authentication system for students to access locked course materials.
-- User prefers course detail page to have course materials tab removed, as materials are displayed within the page content.
-- User prefers to remove short description below course title when full course description is already displayed on the page to avoid redundancy.
-
-# Authentication
-- Login page at /dang-nhap should use student model for authentication.
-
-# General Preferences
-- User prefers Vietnamese date format.
-- User prefers consistent filter interface patterns across similar pages (wants learning group page to have same filter UI as course page).
-- User prefers moving reusable UI components (like CTA sections) to global layouts instead of keeping them in specific page templates for better code reusability.
-- User prefers navbar user icon tooltips to be horizontally aligned rather than the current styling for better appearance.
-- User prefers data consistency between UI and models, sharing data through ViewServiceProvider, and immediate cache clearing when database is updated.
-
-# Hero Banners
-- User prefers hero banners with carousel auto-play (8s intervals).
-- User prefers hero banners with dynamic background color extraction from images.
-- User prefers hero banners with responsive height calculation based on viewport/navbar.
-- User prefers hero banners with separate mobile/desktop layouts with backdrop blur effects and gradient overlays.
-- User prefers hero banners with image error handling with fallbacks.
-- User prefers hero banners with dominant color extraction for dynamic backgrounds.
-- User prefers hero banners with enhanced responsive design with proper mobile/desktop object-fit handling.
-
-# Error Pages
-- User prefers simple error pages (404, etc.) with only basic navigation options like 'go to homepage' or 'go back' without complex layouts or designs.
+- User prefers that logged-in students should have access to course materials without requiring explicit course enrollment - just login should be sufficient.
+- User prefers that logged-in students should have both 'view' and 'download' buttons available for course materials, not just just download functionality.
+- User wants instructor/teacher pages accessible from course pages, suggesting navigation from course detail pages to instructor profiles.
+- User prefers instructor avatar/image to be displayed in course detail pages when instructor has an image available.
 
 # Admin Interface
-- User prefers to remove the entire web design management section with drag-drop functionality from the admin interface.
-- User prefers to remove instructional/guidance information from the web design management admin interface to reduce clutter.
-- User prefers admin web design management page (/admin/manage-web-design) to have all sections collapsed by default.
-- User prefers to remove unused admin features and routes, specifically questioning the utility of /admin/manage-global-cta route.
+- User prefers optimized text colors for better readability in both dark and light modes in admin interfaces.
+- User prefers to remove the web design management section with drag-drop functionality and instructional information.
+- User prefers admin web design management page to have all sections collapsed by default.
+- User prefers to remove unused admin features and routes (questioning utility of /admin/manage-global-cta).
+- User prefers 'chuyên mục' terminology instead of 'Danh mục bài viết' in admin interface.
+- User prefers drag-and-drop reordering functionality using the order field for sorting items.
+- User prefers admin detail pages to have buttons that open the corresponding frontend page.
+- User prefers CourseResource in Filament admin to have RelationManager for course images in addition to course materials.
+- User prefers course image admin to auto-generate alt text and remove 'main image' field since courses already have thumbnail field.
+- User prefers course material admin to use access rights (public vs student-only) instead of separate preview/download permission fields, and wants size/preview columns removed from course material listings.
+- User prefers course material access types to only have 'public' (công khai) and 'enrolled' (dành cho học viên) options, removing 'premium' from the dropdown.
+- User prefers admin forms to be spread out with better layout design without using tabs for a cleaner, more beautiful interface.
+- For file uploads in Filament/Laravel hosting environments, use Storage::disk('public')->put($path, $data) instead of Storage::put('public/' . $path, $data) to avoid upload failures where files load 100% but don't save to storage.
+- User prefers to remove background color and effects fields from admin web design management sections as they are unnecessary and cause confusion for admins.
+- User prefers global CTA management to be integrated into webdesign configuration as a layout component like footer, removing the separate /admin/manage-global-cta page entirely.
+- User prefers course groups admin interface to remove 'view on website' column and replace with a single button at the top for cleaner layout.
+- User prefers better color optimization for file items in admin interfaces beyond the current implementation.
 
-# Agent Mode
-- User wants audio notifications when agent mode completes tasks, created play-notification.ps1 script that plays system sounds via PowerShell command "[System.Media.SystemSounds]::Asterisk.Play()" to notify task completion.
+# Post & Category Management
+- User prefers Post model to support diverse content with multiple images and components beyond simple text.
+- User prefers simplified post form: remove SEO keywords, merge content and basic info tabs, use only builder editor.
+- User wants many-to-many relationship between posts and categories.
+- User prefers blog-posts component to filter posts by status='active' AND is_featured=true.
+- User wants category filtering functionality in post listing pages with interface design consistent with courses page.
+- User prefers to replace duplicate /bai-viet route with the new filter page design from /danh-muc-bai-viet.
+- User prefers related posts sections to use Swiper component for attractive display when there are more than 2 related posts.
+
+# Hero Banners & Layout
+- User prefers to remove large hero sections, finding them too bulky.
+- User prefers hero banners with: carousel auto-play (8s intervals), dynamic background color extraction, responsive height calculation, separate mobile/desktop layouts with backdrop blur and gradient overlays.
+- User prefers slider interfaces with titles and descriptions to have shadow effects or intelligent design to prevent text from appearing faded against backgrounds.
+- User prefers slider text backgrounds to have minimal or very transparent backdrop effects rather than noticeable blur effects.
+- User prefers moving reusable UI components (like CTA sections) to global layouts for better code reusability.
+- User prefers navbar user icon tooltips to be horizontally aligned and positioned below the icon.
+- User prefers to remove backdrop blur effects from sliders and use smaller text size instead to maintain text readability without visual interference.
+
+# Footer & General Preferences
+- User prefers to remove footer description field from admin settings management and Setting model as it's no longer needed.
+- User prefers footer management with 3 text fields and policy links, referencing vuphuc project patterns.
+- User prefers footer policy URL fields to have dropdown selection from existing posts instead of free text input.
+- User prefers associations/certifications section in the policies column instead of company info column.
+- User prefers Vietnamese date format and interface text only, no English words in the UI.
+- User prefers data consistency between UI and models, sharing data through ViewServiceProvider.
+- User prefers to use dynamic content from WebDesign configuration instead of hardcoded text.
+- User prefers simple error pages with only basic navigation options.
+- User prefers footer company information (business license, responsible person details) to be managed through WebDesign configuration instead of hardcoded values, with default data matching existing hardcoded content.
+
+# Authentication & Notifications
+- Login page at /dang-nhap should use student model for authentication.
+- User prefers authentication (login/logout) to redirect back to the current page instead of homepage to avoid losing navigation context.
+- User wants audio notifications when agent mode completes tasks, using play-notification.ps1 script.
+
+# Development Preferences
+- User prefers test files to be deleted after testing is complete to keep the codebase clean.
+
+# Homepage
+- User prefers trusted partners section on homepage to use Swiper component with design patterns from vuphuc project for attractive visual presentation.
+- User prefers partner logos to display in full color by default rather than grayscale with color on hover for better visual impact.
+
+# File Management
+- User prefers image manager to be expanded into a general file upload management system for the entire project.
+- User has file manager at /admin/file-manager that flags images used in /admin/manage-settings as unused, need to be careful about this when managing images.
+- File Manager has similar 'unused file' detection issues across multiple admin sections: cat-courses, post builder content, and partners - indicating need to systematically review all model checks in FileManager.

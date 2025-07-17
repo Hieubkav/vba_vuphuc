@@ -6,12 +6,14 @@
     $primaryButtonUrl = $webDesign->homepage_cta_primary_button_url ?? '/courses';
     $secondaryButtonText = $webDesign->homepage_cta_secondary_button_text ?? 'Đăng ký học';
     $secondaryButtonUrl = $webDesign->homepage_cta_secondary_button_url ?? '/students/register';
+    $isVisible = $webDesign->homepage_cta_enabled ?? true;
 
     // Xử lý URL - nếu bắt đầu bằng / thì dùng route, nếu không thì dùng trực tiếp
     $primaryUrl = str_starts_with($primaryButtonUrl, '/') ? url($primaryButtonUrl) : $primaryButtonUrl;
     $secondaryUrl = str_starts_with($secondaryButtonUrl, '/') ? url($secondaryButtonUrl) : $secondaryButtonUrl;
 @endphp
 
+@if($isVisible)
 <div class="absolute inset-0 opacity-10">
     <div class="absolute inset-0 bg-pattern"></div>
 </div>
@@ -39,3 +41,4 @@
         </div>
     </div>
 </div>
+@endif

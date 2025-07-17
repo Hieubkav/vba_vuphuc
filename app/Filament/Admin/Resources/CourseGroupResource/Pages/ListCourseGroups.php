@@ -13,6 +13,12 @@ class ListCourseGroups extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('view_frontend')
+                ->label('Xem trên website')
+                ->icon('heroicon-o-globe-alt')
+                ->color('info')
+                ->url(fn () => route('course-groups.index'))
+                ->openUrlInNewTab(),
             Actions\CreateAction::make(),
         ];
     }

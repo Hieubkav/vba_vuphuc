@@ -1,7 +1,7 @@
-# Global CTA Implementation
+# Global CTA Implementation - UPDATED
 
 ## Tổng quan
-Đã di chuyển CTA section từ chỉ dành cho storefront sang layout chung để sử dụng cho toàn bộ các giao diện.
+CTA đã được tích hợp hoàn toàn vào WebDesign system. Không còn trang quản lý riêng biệt.
 
 ## Các thay đổi đã thực hiện
 
@@ -19,13 +19,10 @@
   - Responsive design
   - Fallback values
 
-### 3. Global CTA Service
-- **File**: `app/Services/GlobalCtaService.php`
-- **Chức năng**: Quản lý dữ liệu CTA với cache
-- **Methods**:
-  - `getCtaData()`: Lấy dữ liệu CTA với cache
-  - `clearCache()`: Xóa cache CTA
-  - `isEnabled()`: Kiểm tra CTA có được bật không
+### 3. WebDesign Integration
+- **Đã gộp vào**: WebDesign system
+- **Quản lý qua**: `/admin/manage-web-design`
+- **Dữ liệu**: Lấy trực tiếp từ WebDesign model
 
 ### 4. Storefront Section Renderer Update
 - **File**: `resources/views/components/storefront-section-renderer.blade.php`
@@ -42,26 +39,24 @@
 - **Thay đổi**: Thêm styling cho `.global-cta-section`
 - **Features**: Background pattern, responsive design
 
-### 7. Admin Management Page
-- **File**: `app/Filament/Admin/Pages/ManageGlobalCta.php`
-- **Chức năng**: Trang quản lý CTA riêng biệt trong admin
+### 7. WebDesign Management
+- **Đã gộp vào**: `/admin/manage-web-design`
+- **Vị trí**: CTA Toàn cục block trong Builder
 - **Features**:
-  - Form cấu hình CTA
-  - Preview CTA real-time
-  - Bật/tắt hiển thị
-  - Cấu hình nút hành động
-
-- **File**: `resources/views/filament/admin/pages/manage-global-cta.blade.php`
-- **Chức năng**: Giao diện quản lý CTA với preview
+  - Drag & drop để sắp xếp thứ tự
+  - Toggle bật/tắt hiển thị
+  - Form cấu hình đầy đủ
+  - Tích hợp với các section khác
 
 ## Cách sử dụng
 
-### Quản lý CTA trong Admin
+### Quản lý CTA trong WebDesign
 1. Truy cập Admin Panel
-2. Vào "Quản lý nội dung" > "CTA Toàn cục"
-3. Cấu hình nội dung CTA
-4. Bật/tắt hiển thị
-5. Lưu cấu hình
+2. Vào "Quản lý nội dung" > "Giao diện trang chủ"
+3. Tìm block "CTA Toàn cục"
+4. Cấu hình nội dung CTA
+5. Kéo thả để sắp xếp thứ tự
+6. Lưu cấu hình
 
 ### Dữ liệu CTA
 CTA sử dụng các field từ WebDesign model:

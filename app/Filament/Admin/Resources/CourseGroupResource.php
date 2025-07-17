@@ -183,12 +183,6 @@ class CourseGroupResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_frontend')
-                    ->label('Xem trên website')
-                    ->icon('heroicon-o-globe-alt')
-                    ->color('info')
-                    ->url(fn () => route('course-groups.index'))
-                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make()
                     ->label('Sửa'),
                 Tables\Actions\Action::make('view_group')

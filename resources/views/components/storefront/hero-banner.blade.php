@@ -28,7 +28,7 @@
         <div class="md:hidden overflow-hidden relative min-h-[300px]">
             @forelse($activeSliders as $index => $slider)
                 <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out hero-slide" x-bind:class="{ 'opacity-100': activeSlide === {{ $index }}, 'opacity-0': activeSlide !== {{ $index }} }">
-                    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40 z-10"></div>
+                    <div class="absolute inset-0 smart-overlay-mobile z-10"></div>
                     @if($slider->link)<a href="{{ $slider->link }}" class="absolute top-4 right-4 z-30 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors duration-300 shadow-lg" aria-label="Xem chi tiết"><svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>@endif
                     @if($slider->image_link)
                         <div class="w-full h-full flex items-center justify-center">
@@ -47,9 +47,16 @@
                     @if($slider->title || $slider->description)
                         <div class="absolute inset-0 z-20 flex flex-col justify-end p-6 sm:p-8">
                             <div class="transition-opacity duration-500" x-bind:class="{ 'opacity-100': activeSlide === {{ $index }}, 'opacity-0': activeSlide !== {{ $index }} }">
-                                @if($slider->title)<h2 class="text-white text-xl sm:text-2xl font-bold mb-2 drop-shadow-lg">{{ $slider->title }}</h2>@endif
-                                @if($slider->description)<p class="text-white text-sm sm:text-base mb-3 max-w-md drop-shadow-md">{{ $slider->description }}</p>@endif
-                                @if($slider->link)<a href="{{ $slider->link }}" class="inline-flex items-center bg-red-600/90 hover:bg-red-700 text-white px-3 py-1.5 text-sm rounded-md transition-colors duration-300 shadow-lg backdrop-blur-sm border border-red-500/30"><span class="font-medium">Xem chi tiết</span><svg class="h-3.5 w-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>@endif
+                                <!-- Minimal text container - very subtle background -->
+                                <div class="relative">
+                                    <!-- Very light background -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent rounded-lg"></div>
+                                    <div class="relative p-3 sm:p-4">
+                                        @if($slider->title)<h2 class="text-white text-lg sm:text-xl font-bold mb-1 text-shadow-strong">{{ $slider->title }}</h2>@endif
+                                        @if($slider->description)<p class="text-white text-xs sm:text-sm mb-2 max-w-xs text-shadow-medium leading-snug">{{ $slider->description }}</p>@endif
+                                        @if($slider->link)<a href="{{ $slider->link }}" class="inline-flex items-center bg-red-600/90 hover:bg-red-700 text-white px-2 py-1 text-xs rounded transition-all duration-300 shadow-lg border border-red-500/30 hover:shadow-xl hover:scale-105"><span class="font-medium">Xem chi tiết</span><svg class="h-3 w-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>@endif
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -70,7 +77,7 @@
         <div class="hidden md:block overflow-hidden relative bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 transition-all duration-700" id="desktop-slider-container">
             @forelse($activeSliders as $index => $slider)
                 <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out hero-slide" x-bind:class="{ 'opacity-100': activeSlide === {{ $index }}, 'opacity-0': activeSlide !== {{ $index }} }">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent z-10"></div>
+                    <div class="absolute inset-0 smart-overlay-desktop z-10"></div>
                     @if($slider->link)<a href="{{ $slider->link }}" class="absolute top-6 right-6 z-30 p-3 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-colors duration-300 shadow-lg" aria-label="Xem chi tiết"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>@endif
                     @if($slider->image_link)
                         <div class="w-full h-full flex items-center justify-center responsive-padding">
@@ -90,9 +97,16 @@
                         <div class="absolute inset-0 z-20 flex items-center">
                             <div class="container mx-auto px-4 lg:px-6">
                                 <div class="max-w-2xl transition-opacity duration-500" x-bind:class="{ 'opacity-100': activeSlide === {{ $index }}, 'opacity-0': activeSlide !== {{ $index }} }">
-                                    @if($slider->title)<h1 class="text-white text-3xl lg:text-5xl xl:text-6xl font-bold mb-4 drop-shadow-2xl leading-tight">{{ $slider->title }}</h1>@endif
-                                    @if($slider->description)<p class="text-white text-base lg:text-lg xl:text-xl mb-6 max-w-2xl drop-shadow-lg leading-relaxed">{{ $slider->description }}</p>@endif
-                                    @if($slider->link)<a href="{{ $slider->link }}" class="inline-flex items-center bg-red-600/90 hover:bg-red-700 text-white px-5 py-2.5 lg:px-6 lg:py-3 rounded-lg transition-colors duration-300 shadow-xl backdrop-blur-sm border border-red-500/30 text-base lg:text-lg font-medium"><span>Xem chi tiết</span><svg class="h-4 w-4 lg:h-5 lg:w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>@endif
+                                    <!-- Minimal text container - very subtle background -->
+                                    <div class="relative">
+                                        <!-- Very light background -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-black/35 via-black/20 to-transparent rounded-lg"></div>
+                                        <div class="relative p-4 lg:p-6">
+                                            @if($slider->title)<h1 class="text-white text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 text-shadow-strong leading-tight">{{ $slider->title }}</h1>@endif
+                                            @if($slider->description)<p class="text-white text-sm lg:text-base xl:text-lg mb-4 max-w-lg text-shadow-medium leading-relaxed">{{ $slider->description }}</p>@endif
+                                            @if($slider->link)<a href="{{ $slider->link }}" class="inline-flex items-center bg-red-600/90 hover:bg-red-700 text-white px-4 py-2 lg:px-5 lg:py-2.5 rounded-lg transition-all duration-300 shadow-xl border border-red-500/30 text-sm lg:text-base font-medium hover:shadow-2xl hover:scale-105"><span>Xem chi tiết</span><svg class="h-4 w-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></a>@endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -135,6 +149,40 @@
 .hero-slide { overflow: hidden; }
 .hero-slide img { max-width: 100%; object-position: center; }
 
+/* Enhanced text shadows for better readability - no blur needed */
+.text-shadow-strong {
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.9),
+        0 4px 8px rgba(0, 0, 0, 0.7),
+        0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-medium {
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.8),
+        0 2px 6px rgba(0, 0, 0, 0.6),
+        0 3px 9px rgba(0, 0, 0, 0.4);
+}
+
+/* Ultra minimal overlay gradients - barely visible */
+.smart-overlay-mobile {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.1) 50%,
+        transparent 80%
+    );
+}
+
+.smart-overlay-desktop {
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.08) 50%,
+        transparent 70%
+    );
+}
+
 /* Mobile styles */
 @media (max-width: 767px) {
     .hero-slide img {
@@ -163,6 +211,19 @@
 
 .hero-slide img:not([src]) { background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); min-height: 300px; }
 @media (min-width: 768px) { .hero-slide img:not([src]) { min-height: 400px; } }
+
+/* Clean text styling - no blur effects */
+.text-compact {
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25;
+}
+
+@media (min-width: 640px) {
+    .text-compact {
+        font-size: 1rem; /* 16px */
+        line-height: 1.5;
+    }
+}
 </style>
 
 <script>

@@ -78,8 +78,16 @@ class ManageWebDesign extends Page implements HasForms
                 'blog_posts_order' => 9,
                 'blog_posts_title' => 'Bài viết mới nhất',
                 'blog_posts_description' => 'Cập nhật kiến thức và thông tin hữu ích',
+                'homepage_cta_enabled' => true,
+                'homepage_cta_order' => 10,
+                'homepage_cta_title' => 'Bắt đầu hành trình với VBA Vũ Phúc',
+                'homepage_cta_description' => 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.',
+                'homepage_cta_primary_button_text' => 'Xem khóa học',
+                'homepage_cta_primary_button_url' => '/courses',
+                'homepage_cta_secondary_button_text' => 'Đăng ký học',
+                'homepage_cta_secondary_button_url' => '/students/register',
                 'footer_enabled' => true,
-                'footer_order' => 10,
+                'footer_order' => 11,
                 'footer_policy_1_title' => 'Chính sách & Điều khoản',
                 'footer_policy_1_url' => '#',
                 'footer_policy_2_title' => 'Hệ thống đại lý',
@@ -185,6 +193,19 @@ class ManageWebDesign extends Page implements HasForms
                     'order' => $webDesign->blog_posts_order ?? 9,
                     'title' => $webDesign->blog_posts_title ?? 'Bài viết mới nhất',
                     'description' => $webDesign->blog_posts_description ?? 'Cập nhật kiến thức và thông tin hữu ích',
+                ]
+            ],
+            [
+                'type' => 'homepage_cta',
+                'data' => [
+                    'enabled' => $webDesign->homepage_cta_enabled ?? true,
+                    'order' => $webDesign->homepage_cta_order ?? 10,
+                    'title' => $webDesign->homepage_cta_title ?? 'Bắt đầu hành trình với VBA Vũ Phúc',
+                    'description' => $webDesign->homepage_cta_description ?? 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.',
+                    'primary_button_text' => $webDesign->homepage_cta_primary_button_text ?? 'Xem khóa học',
+                    'primary_button_url' => $webDesign->homepage_cta_primary_button_url ?? '/courses',
+                    'secondary_button_text' => $webDesign->homepage_cta_secondary_button_text ?? 'Đăng ký học',
+                    'secondary_button_url' => $webDesign->homepage_cta_secondary_button_url ?? '/students/register',
                 ]
             ],
             [
@@ -450,6 +471,57 @@ class ManageWebDesign extends Page implements HasForms
                                             ->label('Mô tả')
                                             ->default('Cập nhật kiến thức và thông tin hữu ích')
                                             ->rows(2),
+                                    ])
+                                    ->columns(1),
+
+                                // CTA Global Block
+                                Builder\Block::make('homepage_cta')
+                                    ->label('CTA Toàn cục')
+                                    ->schema([
+                                        Grid::make(2)->schema([
+                                            Toggle::make('enabled')
+                                                ->label('Hiển thị')
+                                                ->default(true)
+                                                ->inline(false),
+                                            TextInput::make('order')
+                                                ->label('Thứ tự')
+                                                ->numeric()
+                                                ->default(10)
+                                                ->minValue(1)
+                                                ->maxValue(15),
+                                        ]),
+                                        TextInput::make('title')
+                                            ->label('📝 Tiêu đề chính')
+                                            ->default('Bắt đầu hành trình với VBA Vũ Phúc')
+                                            ->required()
+                                            ->maxLength(255),
+                                        Textarea::make('description')
+                                            ->label('📄 Mô tả')
+                                            ->default('Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.')
+                                            ->required()
+                                            ->rows(3),
+                                        Section::make('Nút hành động')
+                                            ->schema([
+                                                Grid::make(2)->schema([
+                                                    TextInput::make('primary_button_text')
+                                                        ->label('🔘 Text nút chính')
+                                                        ->default('Xem khóa học')
+                                                        ->required(),
+                                                    TextInput::make('primary_button_url')
+                                                        ->label('🔗 Link nút chính')
+                                                        ->default('/courses')
+                                                        ->required(),
+                                                ]),
+                                                Grid::make(2)->schema([
+                                                    TextInput::make('secondary_button_text')
+                                                        ->label('🔘 Text nút phụ')
+                                                        ->default('Đăng ký học'),
+                                                    TextInput::make('secondary_button_url')
+                                                        ->label('🔗 Link nút phụ')
+                                                        ->default('/students/register'),
+                                                ]),
+                                            ])
+                                            ->collapsible(),
                                     ])
                                     ->columns(1),
 
@@ -738,10 +810,25 @@ class ManageWebDesign extends Page implements HasForms
                 ]
             ],
             [
-                'type' => 'footer',
+                'type' => 'homepage_cta',
                 'data' => [
                     'enabled' => true,
                     'order' => 10,
+                    'title' => 'Bắt đầu hành trình với VBA Vũ Phúc',
+                    'description' => 'Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.',
+                    'primary_button_text' => 'Xem khóa học',
+                    'primary_button_url' => '/courses',
+                    'secondary_button_text' => 'Đăng ký học',
+                    'secondary_button_url' => '/students/register',
+                    'bg_color' => 'bg-gradient-to-r from-red-700 via-red-600 to-red-700',
+                    'animation_class' => 'animate-fade-in-optimized',
+                ]
+            ],
+            [
+                'type' => 'footer',
+                'data' => [
+                    'enabled' => true,
+                    'order' => 11,
                     'policy_1_title' => 'Chính sách & Điều khoản',
                     'policy_1_type' => 'custom',
                     'policy_1_url' => '#',
@@ -830,6 +917,7 @@ class ManageWebDesign extends Page implements HasForms
             'faq' => 'Accordion FAQ',
             'partners' => 'Logo đối tác',
             'blog_posts' => 'Grid bài viết',
+            'homepage_cta' => 'CTA với gradient đỏ và 2 nút',
             'footer' => 'Footer với 3 chính sách',
         ];
 
@@ -922,6 +1010,22 @@ class ManageWebDesign extends Page implements HasForms
                 }
                 if (isset($sectionData['company_director_info'])) {
                     $webDesignData['footer_company_director_info'] = $sectionData['company_director_info'];
+                }
+            }
+
+            // Handle CTA specific fields
+            if ($type === 'homepage_cta') {
+                if (isset($sectionData['primary_button_text'])) {
+                    $webDesignData['homepage_cta_primary_button_text'] = $sectionData['primary_button_text'];
+                }
+                if (isset($sectionData['primary_button_url'])) {
+                    $webDesignData['homepage_cta_primary_button_url'] = $sectionData['primary_button_url'];
+                }
+                if (isset($sectionData['secondary_button_text'])) {
+                    $webDesignData['homepage_cta_secondary_button_text'] = $sectionData['secondary_button_text'];
+                }
+                if (isset($sectionData['secondary_button_url'])) {
+                    $webDesignData['homepage_cta_secondary_button_url'] = $sectionData['secondary_button_url'];
                 }
             }
 

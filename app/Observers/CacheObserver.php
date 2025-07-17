@@ -68,8 +68,6 @@ class CacheObserver
                 
             case 'App\Models\WebDesign':
                 ViewServiceProvider::refreshCache('webdesign');
-                // Clear Global CTA cache
-                app(\App\Services\GlobalCtaService::class)->clearCache();
                 break;
                 
             case 'App\Models\Testimonial':

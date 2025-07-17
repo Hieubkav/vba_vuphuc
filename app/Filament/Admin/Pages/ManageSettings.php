@@ -86,9 +86,8 @@ class ManageSettings extends Page implements HasForms
                                 return $webpService->convertToWebP(
                                     $file,
                                     'settings/logos',
-                                    $seoFileName,
-                                    400,   // width
-                                    200    // height
+                                    $seoFileName
+                                    // Không truyền width/height vì Filament đã resize rồi
                                 );
                             })
                             ->columnSpan(1),
@@ -113,9 +112,8 @@ class ManageSettings extends Page implements HasForms
                                 return $webpService->convertToWebP(
                                     $file,
                                     'settings/favicons',
-                                    $seoFileName,
-                                    32,    // width
-                                    32     // height
+                                    $seoFileName
+                                    // Không truyền width/height vì Filament đã resize rồi
                                 );
                             })
                             ->columnSpan(1),
@@ -175,9 +173,8 @@ class ManageSettings extends Page implements HasForms
                                 return $webpService->convertToWebP(
                                     $file,
                                     'settings/og-images',
-                                    $seoFileName,
-                                    1200,  // width
-                                    630    // height
+                                    $seoFileName
+                                    // Không truyền width/height vì Filament đã resize rồi
                                 );
                             }),
                         FileUpload::make('placeholder_image')
@@ -200,9 +197,8 @@ class ManageSettings extends Page implements HasForms
                                 return $webpService->convertToWebP(
                                     $file,
                                     'settings/placeholders',
-                                    $seoFileName,
-                                    400,   // width
-                                    400    // height
+                                    $seoFileName
+                                    // Không truyền width/height vì Filament đã resize rồi
                                 );
                             }),
                         Textarea::make('address')
