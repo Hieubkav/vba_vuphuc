@@ -130,7 +130,7 @@
     </div>
 
     <!-- Top Navigation Bar -->
-    @include('components.public.subnav')
+    {{-- @include('components.public.subnav') --}}
 
     <!-- Main Navigation -->
     @include('components.public.navbar')
