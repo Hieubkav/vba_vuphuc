@@ -47,25 +47,24 @@ class SliderResource extends Resource
                     ->schema([
                         FileUpload::make('image_link')
                             ->label('Hình ảnh Hero Banner')
+                            ->helperText('Ảnh sẽ được tối ưu hóa tự động với chiều rộng tối đa 1920px, giữ nguyên tỷ lệ gốc. Sử dụng nút "Chỉnh ảnh thành 16:9" nếu muốn crop thành tỷ lệ 16:9.')
+                            ->required()
                             ->image()
                             ->directory('sliders/banners')
                             ->visibility('public')
-                            ->maxSize(8192) // 8MB
+                            ->maxSize(8192) // Tăng lên 8MB để cho phép ảnh chất lượng cao
                             ->imageEditor()
-                            ->imageEditorAspectRatios(['16:9'])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Kích thước tối ưu: 1920x1080px (16:9). Ảnh sẽ được tự động chuyển sang WebP với chất lượng 95%')
-                            ->required()
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $title = $get('title') ?? 'slider';
-                                $customName = 'banner-' . $title;
-
-                                return \App\Actions\ConvertImageToWebp::run(
+                                $imageService = app(\App\Services\ImageService::class);
+                                $title = $get('title') ?? 'hero-banner';
+                                return $imageService->saveImageWithAspectRatio(
                                     $file,
                                     'sliders/banners',
-                                    $customName,
-                                    1920,
-                                    1080
+                                    1920,  // maxWidth - tối ưu cho desktop
+                                    1080,  // maxHeight - giới hạn chiều cao
+                                    85,    // quality - cân bằng giữa chất lượng và dung lượng
+                                    "hero-banner-{$title}" // SEO-friendly name
                                 );
                             })
                             ->columnSpanFull(),

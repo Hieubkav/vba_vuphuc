@@ -244,4 +244,76 @@ class ImageService
             return false;
         }
     }
+
+    /**
+     * Lưu ảnh với tỷ lệ khung hình được giữ nguyên (không crop)
+     * Tối ưu cho hero banner - giữ nguyên aspect ratio gốc
+     *
+     * @param UploadedFile $file
+     * @param string $directory
+     * @param int $maxWidth
+     * @param int $maxHeight
+     * @param int $quality
+     * @param string|null $customName
+     * @return string|null
+     */
+    public function saveImageWithAspectRatio(
+        UploadedFile $file,
+        string $directory,
+        int $maxWidth = 1920,
+        int $maxHeight = 1080,
+        int $quality = 85,
+        ?string $customName = null
+    ): ?string {
+        try {
+            // Khởi tạo ImageManager
+            $manager = new ImageManager(new Driver());
+
+            // Đọc ảnh gốc
+            $image = $manager->read($file->getRealPath());
+
+            // Lấy kích thước gốc
+            $originalWidth = $image->width();
+            $originalHeight = $image->height();
+
+            // Tính toán kích thước mới giữ nguyên tỷ lệ
+            $ratio = min($maxWidth / $originalWidth, $maxHeight / $originalHeight);
+
+            // Chỉ resize nếu ảnh lớn hơn kích thước tối đa
+            if ($ratio < 1) {
+                $newWidth = (int) round($originalWidth * $ratio);
+                $newHeight = (int) round($originalHeight * $ratio);
+                $image = $image->resize($newWidth, $newHeight);
+            }
+
+            // Tạo tên file
+            $fileName = $customName ? Str::slug($customName) : Str::random(40);
+            $fileName .= '.webp';
+
+            // Đảm bảo thư mục tồn tại
+            $fullDirectory = 'public/' . trim($directory, '/');
+            if (!Storage::exists($fullDirectory)) {
+                Storage::makeDirectory($fullDirectory);
+            }
+
+            // Đường dẫn đầy đủ
+            $filePath = $fullDirectory . '/' . $fileName;
+
+            // Lưu ảnh với định dạng WebP
+            $webpData = $image->toWebp($quality);
+            Storage::put($filePath, $webpData);
+
+            // Trả về đường dẫn relative (không có 'public/')
+            return trim($directory, '/') . '/' . $fileName;
+
+        } catch (\Exception $e) {
+            Log::error('ImageService saveImageWithAspectRatio error: ' . $e->getMessage(), [
+                'file' => $file->getClientOriginalName(),
+                'directory' => $directory,
+                'maxWidth' => $maxWidth,
+                'maxHeight' => $maxHeight
+            ]);
+            return null;
+        }
+    }
 }
