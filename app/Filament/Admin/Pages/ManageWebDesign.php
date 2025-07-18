@@ -17,6 +17,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Actions\Action;
 use Illuminate\Support\Facades\Cache;
 
 class ManageWebDesign extends Page implements HasForms
@@ -1052,5 +1053,16 @@ class ManageWebDesign extends Page implements HasForms
             ->success()
             ->duration(5000)
             ->send();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('Lưu thay đổi')
+                ->color('danger')
+                ->action('save')
+                ->requiresConfirmation(false)
+        ];
     }
 }
