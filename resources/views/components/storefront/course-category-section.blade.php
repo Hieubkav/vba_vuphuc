@@ -49,7 +49,7 @@
 
         <!-- View All Link - Responsive -->
         <a
-            href="{{ route('courses.cat-category', $category->slug) }}"
+            href="{{ route('courses.index', ['category' => $category->slug]) }}"
             class="inline-flex items-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-red-600 hover:text-white hover:bg-red-600 border border-red-600 rounded-lg transition-all duration-200 group flex-shrink-0"
         >
             <span class="hidden sm:inline">Xem tất cả</span>

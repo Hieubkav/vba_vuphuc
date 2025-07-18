@@ -231,7 +231,7 @@ class CatCourseResource extends Resource
                     ->label('Xem trên website')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn ($record) => route('courses.cat-category', $record->slug))
+                    ->url(fn ($record) => route('courses.index', ['category' => $record->slug]))
                     ->openUrlInNewTab(),
                 Tables\Actions\Action::make('manage_courses')
                     ->label('Quản lý khóa học')

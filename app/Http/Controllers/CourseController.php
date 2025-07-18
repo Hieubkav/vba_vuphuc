@@ -179,26 +179,7 @@ class CourseController extends Controller
         return view('courses.category', compact('category', 'courses'));
     }
 
-    /**
-     * Hiển thị khóa học theo danh mục khóa học (CatCourse)
-     */
-    public function catCategory(string $slug): View
-    {
-        $category = CatCourse::where('slug', $slug)
-            ->where('status', 'active')
-            ->firstOrFail();
 
-        $courses = Course::with(['courseCategory', 'images' => function($q) {
-            $q->where('status', 'active')->orderBy('is_main', 'desc')->orderBy('order');
-        }])
-        ->where('cat_course_id', $category->id)
-        ->where('status', 'active')
-        ->orderBy('is_featured', 'desc')
-        ->orderBy('order')
-        ->paginate(12);
-
-        return view('courses.cat-category', compact('category', 'courses'));
-    }
 
     /**
      * API endpoint cho search suggestions

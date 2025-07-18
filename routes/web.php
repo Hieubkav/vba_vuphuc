@@ -48,10 +48,14 @@ Route::controller(MainController::class)->group(function () {
 Route::controller(CourseController::class)->group(function () {
     Route::get('/khoa-hoc', 'index')->name('courses.index');
     Route::get('/khoa-hoc/danh-muc/{slug}', 'category')->name('courses.category');
-    Route::get('/khoa-hoc/chuyen-muc/{slug}', 'catCategory')->name('courses.cat-category');
     Route::get('/khoa-hoc/{slug}', 'show')->name('courses.show');
     Route::get('/api/courses/search', 'searchSuggestions')->name('courses.search');
 });
+
+// Redirect route cũ về trang filter mới với query parameter
+Route::get('/khoa-hoc/chuyen-muc/{slug}', function($slug) {
+    return redirect()->route('courses.index', ['category' => $slug], 301);
+})->name('courses.cat-category');
 
 /*
 |--------------------------------------------------------------------------

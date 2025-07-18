@@ -106,6 +106,11 @@ Route::get('/khoa-hoc', [CourseController::class, 'index'])->name('courses.index
 Route::get('/khoa-hoc/danh-muc/{slug}', [CourseController::class, 'category'])->name('courses.category');
 Route::get('/khoa-hoc/{slug}', [CourseController::class, 'show'])->name('courses.show');
 Route::get('/api/courses/search', [CourseController::class, 'searchSuggestions']);
+
+// Redirect route cũ về trang filter mới
+Route::get('/khoa-hoc/chuyen-muc/{slug}', function($slug) {
+    return redirect()->route('courses.index', ['category' => $slug], 301);
+})->name('courses.cat-category');
 ```
 
 ### Student Routes

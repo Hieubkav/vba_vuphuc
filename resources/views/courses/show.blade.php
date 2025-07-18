@@ -64,7 +64,7 @@
                 <a href="{{ route('courses.index') }}" class="hover:text-red-600 transition-colors">Khóa học</a>
                 @if($course->category)
                 <i class="fas fa-chevron-right text-xs"></i>
-                <a href="{{ route('courses.cat-category', $course->category->slug) }}" class="hover:text-red-600 transition-colors">{{ $course->category->name }}</a>
+                <a href="{{ route('courses.index', ['category' => $course->category->slug]) }}" class="hover:text-red-600 transition-colors">{{ $course->category->name }}</a>
                 @endif
                 <i class="fas fa-chevron-right text-xs"></i>
                 <span class="text-gray-900 font-medium">{{ $course->title }}</span>

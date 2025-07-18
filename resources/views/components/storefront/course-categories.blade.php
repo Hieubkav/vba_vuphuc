@@ -27,7 +27,7 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
         @foreach($courseCategoriesGrid as $category)
             <div class="group">
-                <a href="{{ route('courses.cat-category', $category->slug) }}"
+                <a href="{{ route('courses.index', ['category' => $category->slug]) }}"
                    class="block bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
                     
                     <!-- Category Image -->

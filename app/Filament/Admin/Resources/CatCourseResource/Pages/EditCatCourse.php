@@ -17,7 +17,7 @@ class EditCatCourse extends EditRecord
                 ->label('Xem trên website')
                 ->icon('heroicon-o-eye')
                 ->color('info')
-                ->url(fn () => route('courses.cat-category', $this->record->slug))
+                ->url(fn () => route('courses.index', ['category' => $this->record->slug]))
                 ->openUrlInNewTab(),
             Actions\Action::make('manage_courses')
                 ->label('Quản lý khóa học')
