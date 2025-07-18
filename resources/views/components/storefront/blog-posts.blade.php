@@ -60,12 +60,12 @@
                 <!-- Title lớn -->
                 @if($mainPost->slug)
                 <a href="{{ route('posts.show', $mainPost->slug) }}">
-                    <h2 class="section-title mb-4 hover:text-red-600 transition-colors line-clamp-3">
+                    <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-4 hover:text-red-600 transition-colors line-clamp-3">
                         {{ $mainPost->title }}
                     </h2>
                 </a>
                 @else
-                <h2 class="section-title mb-4 line-clamp-3">{{ $mainPost->title }}</h2>
+                <h2 class="text-xl lg:text-2xl font-bold text-gray-900 mb-4 line-clamp-3">{{ $mainPost->title }}</h2>
                 @endif
 
                 <!-- Excerpt lớn -->
@@ -127,12 +127,12 @@
                 <!-- Title nhỏ -->
                 @if($post->slug)
                 <a href="{{ route('posts.show', $post->slug) }}">
-                    <h3 class="card-title mb-2 hover:text-red-600 transition-colors line-clamp-2">
+                    <h3 class="text-base font-semibold text-gray-900 mb-2 hover:text-red-600 transition-colors line-clamp-2">
                         {{ $post->title }}
                     </h3>
                 </a>
                 @else
-                <h3 class="card-title mb-2 line-clamp-2">{{ $post->title }}</h3>
+                <h3 class="text-base font-semibold text-gray-900 mb-2 line-clamp-2">{{ $post->title }}</h3>
                 @endif
 
                 <!-- Excerpt nhỏ -->
@@ -178,7 +178,7 @@
     </div>
 
     <!-- Tiêu đề -->
-    <h3 class="card-title mb-3">Chưa có bài viết nào</h3>
+    <h3 class="text-xl font-bold text-gray-900 mb-3">Chưa có bài viết nào</h3>
     <p class="body-text text-gray-600 mb-8 max-w-md mx-auto">
         Hiện tại chưa có bài viết nào được xuất bản. Hãy quay lại sau hoặc khám phá các nội dung khác.
     </p>

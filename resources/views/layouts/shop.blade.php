@@ -145,9 +145,7 @@
 
     <!-- Footer -->
     @if(webDesignVisible('footer'))
-        <footer>
-            @include('components.public.footer')
-        </footer>
+        @include('components.public.footer')
     @endif
 
     <!-- Action Buttons -->
