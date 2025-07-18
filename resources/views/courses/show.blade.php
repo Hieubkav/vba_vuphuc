@@ -116,7 +116,7 @@
                 <!-- Course Info -->
                 <div class="lg:w-3/5">
                     <div class="mb-6">
-                        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">{{ $course->title }}</h1>
+                        <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 leading-tight">{{ $course->title }}</h1>
                     </div>
 
                     <!-- Course Meta Grid -->
@@ -139,14 +139,14 @@
 
                         <div class="text-center p-4 bg-gray-50 rounded-lg border">
                             <i class="fas fa-users text-blue-500 text-2xl mb-2"></i>
-                            <p class="text-sm text-gray-600 mb-1">Học viên</p>
+                            <p class="text-sm text-gray-600 mb-1">Số lượng/khóa</p>
                             <p class="font-semibold text-gray-900">{{ $course->students_count }}</p>
                         </div>
 
                         <div class="text-center p-4 bg-gray-50 rounded-lg border">
                             <i class="fas fa-calendar text-orange-500 text-2xl mb-2"></i>
-                            <p class="text-sm text-gray-600 mb-1">Cập nhật</p>
-                            <p class="font-semibold text-gray-900">{{ $course->updated_at->format('d/m/Y') }}</p>
+                            <p class="text-sm text-gray-600 mb-1">Thời gian bắt đầu</p>
+                            <p class="font-semibold text-gray-900">{{ $course->start_date ? $course->start_date->format('d/m/Y') : $course->updated_at->format('d/m/Y') }}</p>
                         </div>
                     </div>
 
