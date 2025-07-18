@@ -165,10 +165,10 @@
     <!-- Header Section - Minimalist -->
     <div class="text-center mb-12">
         <div class="w-12 h-1 bg-gray-300 mx-auto mb-6"></div>
-        <h2 class="text-2xl md:text-3xl font-light text-gray-900 mb-3 tracking-wide">
+        <h2 class="section-title mb-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
             Timeline
         </h2>
-        <p class="text-gray-500 max-w-md mx-auto font-light text-sm">
+        <p class="subtitle max-w-2xl mx-auto">
             Tài liệu PDF từ các khóa học
         </p>
     </div>

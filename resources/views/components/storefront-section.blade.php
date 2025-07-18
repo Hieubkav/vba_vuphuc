@@ -10,13 +10,13 @@
             <!-- Section Header -->
             <div class="text-center mb-8 md:mb-12">
                 @if($title)
-                    <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 heading">
+                    <h2 class="section-title mb-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
                         {{ $title }}
                     </h2>
                 @endif
-                
+
                 @if($description)
-                    <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    <p class="subtitle max-w-2xl mx-auto">
                         {{ $description }}
                     </p>
                 @endif

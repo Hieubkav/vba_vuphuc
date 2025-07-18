@@ -15,10 +15,10 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header Section -->
     <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <h2 class="section-title mb-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 bg-clip-text text-transparent">
             Danh mục khóa học
         </h2>
-        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+        <p class="subtitle max-w-2xl mx-auto">
             Khám phá các danh mục khóa học đa dạng được thiết kế để phát triển kỹ năng và kiến thức của bạn
         </p>
     </div>
