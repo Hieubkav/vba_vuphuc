@@ -22,18 +22,7 @@
 
 @if($isVisible && $partnerCount > 0)
 <div class="container mx-auto px-4">
-    <!-- Header Section -->
-    <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {{ $partnersWebDesign->title ?? 'Đối tác tin cậy' }}
-        </h2>
-        <div class="w-20 h-1 bg-gradient-to-r from-red-600 to-red-500 mx-auto mb-6"></div>
-        @if($partnersWebDesign->subtitle ?? null)
-        <p class="text-gray-600 text-lg max-w-3xl mx-auto leading-relaxed">
-            {{ $partnersWebDesign->subtitle }}
-        </p>
-        @endif
-    </div>
+    {{-- Header được xử lý bởi x-storefront-section wrapper --}}
 
     <!-- Partners Swiper -->
     <div class="partners-swiper-container relative">
