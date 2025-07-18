@@ -68,7 +68,19 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-document-text')
                     ->collapsible(),
                 NavigationGroup::make()
-                    ->label('Quản lý hệ thống')
+                    ->label('Bán hàng')
+                    ->icon('heroicon-o-shopping-bag')
+                    ->collapsible(),
+                NavigationGroup::make()
+                    ->label('Đối tác & Liên kết')
+                    ->icon('heroicon-o-building-office-2')
+                    ->collapsible(),
+                NavigationGroup::make()
+                    ->label('Nhân sự & Người dùng')
+                    ->icon('heroicon-o-users')
+                    ->collapsible(),
+                NavigationGroup::make()
+                    ->label('Cấu hình hệ thống')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsible(),
             ])

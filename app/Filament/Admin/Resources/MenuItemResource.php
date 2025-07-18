@@ -31,15 +31,15 @@ class MenuItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3';
 
-    protected static ?string $navigationGroup = 'Quản lý nội dung';
+    protected static ?string $navigationGroup = 'Cấu hình hệ thống';
 
-    protected static ?string $navigationLabel = 'Menu';
+    protected static ?string $navigationLabel = 'Menu điều hướng';
 
     protected static ?string $modelLabel = 'Menu';
 
     protected static ?string $pluralModelLabel = 'Menu';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 51;
 
     public static function form(Form $form): Form
     {

@@ -52,7 +52,7 @@ class PostResource extends Resource
 
     protected static ?string $navigationLabel = 'Bài viết';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 11;
 
     public static function form(Form $form): Form
     {

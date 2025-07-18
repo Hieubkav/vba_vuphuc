@@ -26,7 +26,7 @@ class FaqResource extends Resource
 
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 15;
 
     public static function form(Form $form): Form
     {

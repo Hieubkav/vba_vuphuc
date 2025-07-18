@@ -31,13 +31,13 @@ class SliderResource extends Resource
 
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?string $navigationLabel = 'Slider Banner';
+    protected static ?string $navigationLabel = 'Ảnh cuộn';
 
     protected static ?string $modelLabel = 'slider banner';
 
     protected static ?string $pluralModelLabel = 'slider banner';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 13;
 
     public static function form(Form $form): Form
     {

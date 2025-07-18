@@ -37,7 +37,7 @@ class PostCategoryResource extends Resource
 
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 12;
 
     public static function form(Form $form): Form
     {

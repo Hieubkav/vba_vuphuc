@@ -25,7 +25,7 @@ class TestimonialResource extends Resource
 
     protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 14;
 
     public static function form(Form $form): Form
     {
