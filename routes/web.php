@@ -18,6 +18,7 @@ use App\Http\Controllers\FaviconController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
+
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudentController;

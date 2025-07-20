@@ -5,7 +5,6 @@ namespace App\Filament\Admin\Pages;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
-
 /**
  * File Manager Page - Quản lý tất cả file upload trong dự án
  * Hỗ trợ: Images, Documents, Videos, Audio và các file khác
@@ -18,9 +17,9 @@ class FileManager extends Page
 
     protected static ?string $title = 'Quản lý File Upload';
 
-    protected static ?string $navigationGroup = 'Hệ thống';
+    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
 
-    protected static ?int $navigationSort = 99;
+    protected static ?int $navigationSort = 3;
 
     protected static string $view = 'filament.admin.file-manager';
 

@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\SliderResource\Pages;
 use App\Models\Slider;
-use App\Traits\HasImageUpload;
 
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -20,24 +19,22 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
-
 class SliderResource extends Resource
 {
-    use HasImageUpload;
 
     protected static ?string $model = Slider::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationGroup = 'Quản lý nội dung';
+    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
 
-    protected static ?string $navigationLabel = 'Ảnh cuộn';
+    protected static ?string $navigationLabel = 'Slider/Banner';
 
     protected static ?string $modelLabel = 'slider banner';
 
     protected static ?string $pluralModelLabel = 'slider banner';
 
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {

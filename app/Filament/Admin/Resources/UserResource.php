@@ -16,7 +16,6 @@ use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
-
 class UserResource extends Resource
 {
 
@@ -30,9 +29,9 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'người dùng';
 
-    protected static ?string $navigationGroup = 'Nhân sự & Người dùng';
+    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
 
-    protected static ?int $navigationSort = 42;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {

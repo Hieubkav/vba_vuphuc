@@ -19,22 +19,21 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Cache;
-
 class ManageWebDesign extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = null;
+    protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
 
-    protected static ?string $navigationGroup = 'Hệ Thống';
+    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
 
     protected static string $view = 'filament.admin.pages.manage-web-design';
 
-    protected static ?string $title = 'Quản Lý Giao Diện';
+    protected static ?string $title = 'Cấu hình giao diện';
 
-    protected static ?string $navigationLabel = 'Quản Lý Giao Diện';
+    protected static ?string $navigationLabel = 'Cấu hình giao diện';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public ?array $data = [];
 

@@ -83,6 +83,10 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Cấu hình hệ thống')
                     ->icon('heroicon-o-cog-6-tooth')
                     ->collapsible(),
+                NavigationGroup::make()
+                    ->label('CÀI ĐẶT WEBSITE')
+                    ->icon('heroicon-o-wrench-screwdriver')
+                    ->collapsible(),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('16rem')

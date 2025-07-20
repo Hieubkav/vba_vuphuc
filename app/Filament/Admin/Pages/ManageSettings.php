@@ -14,22 +14,21 @@ use Filament\Pages\Page;
 use Filament\Notifications\Notification;
 use Filament\Actions\Action;
 use Illuminate\Support\Facades\Cache;
-
 class ManageSettings extends Page implements HasForms
 {
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationGroup = 'Hệ Thống';
+    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
 
     protected static string $view = 'filament.admin.pages.manage-settings';
 
-    protected static ?string $title = 'Cài Đặt Website';
+    protected static ?string $title = 'Cài đặt chung';
 
-    protected static ?string $navigationLabel = 'Cài Đặt Website';
+    protected static ?string $navigationLabel = 'Cài đặt chung';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 5;
 
     public ?array $data = [];
 
