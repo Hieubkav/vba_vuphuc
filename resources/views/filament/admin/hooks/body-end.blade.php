@@ -205,10 +205,18 @@ function initializeThemeSwitcher() {
         topbar.appendChild(themeToggle);
     }
     
-    // Apply saved theme
+    // Apply saved theme - mặc định dark mode
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
+    if (savedTheme === 'light') {
+        // Chỉ chuyển sang light mode nếu user đã chọn light
+        document.documentElement.classList.remove('dark');
+    } else {
+        // Mặc định là dark mode
         document.documentElement.classList.add('dark');
+        // Lưu dark mode làm mặc định nếu chưa có setting
+        if (!savedTheme) {
+            localStorage.setItem('theme', 'dark');
+        }
     }
 }
 

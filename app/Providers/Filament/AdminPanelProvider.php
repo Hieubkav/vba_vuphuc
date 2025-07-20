@@ -92,6 +92,7 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
+            ->darkMode() // Bật dark mode mặc định
             ->widgets([
                 \App\Filament\Admin\Widgets\StatsOverviewWidget::class,
                 \App\Filament\Admin\Widgets\QuickActionsWidget::class,
@@ -112,6 +113,26 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            ->renderHook(
+                PanelsRenderHook::HEAD_END,
+                fn(): string => Blade::render('
+                    <script>
+                        // Áp dụng dark mode ngay lập tức khi tải trang (trước khi DOM load)
+                        (function() {
+                            const savedTheme = localStorage.getItem("theme");
+                            if (savedTheme === "light") {
+                                document.documentElement.classList.remove("dark");
+                            } else {
+                                // Mặc định dark mode
+                                document.documentElement.classList.add("dark");
+                                if (!savedTheme) {
+                                    localStorage.setItem("theme", "dark");
+                                }
+                            }
+                        })();
+                    </script>
+                ')
+            )
             ->renderHook(
                 PanelsRenderHook::TOPBAR_START,
                 fn (): string => Blade::render('
