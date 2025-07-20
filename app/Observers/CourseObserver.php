@@ -132,27 +132,12 @@ class CourseObserver
     }
 
     /**
-     * Clear cache liên quan đến courses
+     * Clear cache liên quan đến courses using ViewServiceProvider
      */
     private function clearRelatedCache(): void
     {
-        Cache::forget('storefront_courses');
-        Cache::forget('navigation_data');
-
-        // Clear cache theo pattern
-        $cacheKeys = [
-            'courses_featured',
-            'courses_by_category_*',
-            'courses_latest',
-            'courses_popular'
-        ];
-
-        foreach ($cacheKeys as $key) {
-            if (str_contains($key, '*')) {
-                // Xóa cache theo pattern (cần implement cache tagging nếu muốn)
-                continue;
-            }
-            Cache::forget($key);
-        }
+        // Use ViewServiceProvider for consistent cache clearing
+        \App\Providers\ViewServiceProvider::refreshCache('storefront');
+        \App\Providers\ViewServiceProvider::refreshCache('courses');
     }
 }

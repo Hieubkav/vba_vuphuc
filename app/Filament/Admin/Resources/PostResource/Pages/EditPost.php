@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\PostResource\Pages;
 
 use App\Filament\Admin\Resources\PostResource;
+use App\Providers\ViewServiceProvider;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
@@ -21,7 +22,12 @@ class EditPost extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->label('Xóa'),
+                ->label('Xóa')
+                ->after(function () {
+                    // Clear cache after deleting post
+                    ViewServiceProvider::refreshCache('storefront');
+                    ViewServiceProvider::refreshCache('posts');
+                }),
         ];
     }
 
@@ -34,6 +40,8 @@ class EditPost extends EditRecord
     {
         return 'Bài viết đã được cập nhật thành công';
     }
+
+
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
@@ -75,6 +83,10 @@ class EditPost extends EditRecord
         if ($this->categoriesData !== null) {
             $this->getRecord()->categories()->sync($this->categoriesData);
         }
+
+        // Clear cache after saving post
+        ViewServiceProvider::refreshCache('storefront');
+        ViewServiceProvider::refreshCache('posts');
     }
 
     /**

@@ -100,25 +100,12 @@ class PartnerObserver
     }
 
     /**
-     * Clear cache liên quan đến partners
+     * Clear cache liên quan đến partners using ViewServiceProvider
      */
     private function clearRelatedCache(): void
     {
-        // Sử dụng ViewServiceProvider để clear cache đồng bộ
+        // Use ViewServiceProvider for consistent cache clearing
         \App\Providers\ViewServiceProvider::refreshCache('storefront');
-
-        // Clear cache navigation (partners có thể hiển thị ở footer)
-        \App\Providers\ViewServiceProvider::refreshCache('navigation');
-
-        // Clear cache theo pattern cũ (backward compatibility)
-        $cacheKeys = [
-            'partners_active',
-            'partners_ordered',
-            'storefront_data'
-        ];
-
-        foreach ($cacheKeys as $key) {
-            Cache::forget($key);
-        }
+        \App\Providers\ViewServiceProvider::refreshCache('partners');
     }
 }

@@ -483,6 +483,11 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('storefront_course_stats');
                 Cache::forget('storefront_course_categories');
                 Cache::forget('storefront_course_groups');
+                self::clearCoursesCache();
+                break;
+            case 'cat_courses':
+                Cache::forget('storefront_course_categories');
+                self::clearCatCoursesCache();
                 break;
             case 'course_groups':
                 Cache::forget('storefront_course_groups');
@@ -496,6 +501,37 @@ class ViewServiceProvider extends ServiceProvider
                 break;
             case 'sliders':
                 Cache::forget('storefront_sliders');
+                self::clearSlidersCache();
+                break;
+            case 'posts':
+                Cache::forget('storefront_latest_posts');
+                self::clearPostsCache();
+                break;
+            case 'faqs':
+                Cache::forget('storefront_faqs');
+                self::clearFaqsCache();
+                break;
+            case 'partners':
+                Cache::forget('storefront_partners');
+                self::clearPartnersCache();
+                break;
+            case 'instructors':
+                self::clearInstructorsCache();
+                break;
+            case 'course_materials':
+                self::clearCourseMaterialsCache();
+                break;
+            case 'students':
+                self::clearStudentsCache();
+                break;
+            case 'products':
+                self::clearProductsCache();
+                break;
+            case 'employees':
+                self::clearEmployeesCache();
+                break;
+            case 'post_categories':
+                self::clearPostCategoriesCache();
                 break;
             case 'navigation':
                 Cache::forget('navigation_data');
@@ -605,6 +641,320 @@ class ViewServiceProvider extends ServiceProvider
 
         } catch (\Exception $e) {
             // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear sliders cache specifically - Auto trigger method
+     */
+    public static function clearSlidersCache(): void
+    {
+        try {
+            // Clear sliders cache
+            Cache::forget('storefront_sliders');
+
+            // Also clear related caches that might contain slider data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $sliderKeys = Cache::getRedis()->keys('*slider*');
+                    foreach ($sliderKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear posts cache specifically - Auto trigger method
+     */
+    public static function clearPostsCache(): void
+    {
+        try {
+            // Clear posts cache
+            Cache::forget('storefront_latest_posts');
+
+            // Also clear related caches that might contain post data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $postKeys = Cache::getRedis()->keys('*post*');
+                    foreach ($postKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear faqs cache specifically - Auto trigger method
+     */
+    public static function clearFaqsCache(): void
+    {
+        try {
+            // Clear faqs cache
+            Cache::forget('storefront_faqs');
+
+            // Also clear related caches that might contain faq data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $faqKeys = Cache::getRedis()->keys('*faq*');
+                    foreach ($faqKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear partners cache specifically - Auto trigger method
+     */
+    public static function clearPartnersCache(): void
+    {
+        try {
+            // Clear partners cache
+            Cache::forget('storefront_partners');
+
+            // Also clear related caches that might contain partner data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $partnerKeys = Cache::getRedis()->keys('*partner*');
+                    foreach ($partnerKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear courses cache specifically - Auto trigger method
+     */
+    public static function clearCoursesCache(): void
+    {
+        try {
+            // Clear courses cache
+            Cache::forget('storefront_featured_courses');
+            Cache::forget('storefront_latest_courses');
+            Cache::forget('storefront_course_stats');
+
+            // Also clear related caches that might contain course data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $courseKeys = Cache::getRedis()->keys('*course*');
+                    foreach ($courseKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear course categories cache specifically - Auto trigger method
+     */
+    public static function clearCatCoursesCache(): void
+    {
+        try {
+            // Clear course categories cache
+            Cache::forget('storefront_course_categories');
+
+            // Also clear related caches that might contain category data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $catCourseKeys = Cache::getRedis()->keys('*cat_course*');
+                    foreach ($catCourseKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear instructors cache specifically - Auto trigger method
+     */
+    public static function clearInstructorsCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $instructorKeys = Cache::getRedis()->keys('*instructor*');
+                    foreach ($instructorKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear course materials cache specifically - Auto trigger method
+     */
+    public static function clearCourseMaterialsCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $materialKeys = Cache::getRedis()->keys('*material*');
+                    foreach ($materialKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear students cache specifically - Auto trigger method
+     */
+    public static function clearStudentsCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $studentKeys = Cache::getRedis()->keys('*student*');
+                    foreach ($studentKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear products cache specifically - Auto trigger method
+     */
+    public static function clearProductsCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $productKeys = Cache::getRedis()->keys('*product*');
+                    foreach ($productKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear employees cache specifically - Auto trigger method
+     */
+    public static function clearEmployeesCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $employeeKeys = Cache::getRedis()->keys('*employee*');
+                    foreach ($employeeKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear post categories cache specifically - Auto trigger method
+     */
+    public static function clearPostCategoriesCache(): void
+    {
+        try {
+            Cache::forget('navigation_data');
+            if (config('cache.default') === 'redis') {
+                try {
+                    $postCatKeys = Cache::getRedis()->keys('*post_cat*');
+                    foreach ($postCatKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+        } catch (\Exception $e) {
             Cache::flush();
         }
     }

@@ -46,18 +46,50 @@ trait ClearsViewCache
 
             case 'App\Models\Product':
             case 'App\Models\CatProduct':
-            case 'App\Models\Post':
-            case 'App\Models\Partner':
-            case 'App\Models\Slider':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('navigation');
                 break;
 
+            case 'App\Models\Post':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('posts');
+                break;
+
+            case 'App\Models\Partner':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('partners');
+                break;
+
             case 'App\Models\Course':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('courses');
+                ViewServiceProvider::clearCourseDetailCaches();
+                break;
+
             case 'App\Models\CatCourse':
-            case 'App\Models\CourseMaterial':
-            case 'App\Models\CourseImage':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('cat_courses');
+                ViewServiceProvider::clearCourseDetailCaches();
+                break;
+
             case 'App\Models\Instructor':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('instructors');
+                ViewServiceProvider::clearCourseDetailCaches();
+                break;
+
+            case 'App\Models\CourseMaterial':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('course_materials');
+                ViewServiceProvider::clearCourseDetailCaches();
+                break;
+
+            case 'App\Models\CourseImage':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('navigation');
                 ViewServiceProvider::clearCourseDetailCaches();
@@ -78,6 +110,16 @@ trait ClearsViewCache
             case 'App\Models\Testimonial':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('testimonials');
+                break;
+
+            case 'App\Models\Slider':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('sliders');
+                break;
+
+            case 'App\Models\Faq':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('faqs');
                 break;
 
             default:

@@ -43,14 +43,17 @@ class CacheObserver
         
         switch ($modelClass) {
             case 'App\Models\Course':
+                ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('courses');
                 break;
                 
             case 'App\Models\CatCourse':
-                ViewServiceProvider::refreshCache('courses');
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('cat_courses');
                 break;
                 
             case 'App\Models\Post':
+                ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('posts');
                 break;
                 
@@ -59,6 +62,7 @@ class CacheObserver
                 break;
                 
             case 'App\Models\Slider':
+                ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('sliders');
                 break;
                 
@@ -74,7 +78,12 @@ class CacheObserver
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('testimonials');
                 break;
-                
+
+            case 'App\Models\Faq':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('faqs');
+                break;
+
             case 'App\Models\MenuItem':
                 ViewServiceProvider::refreshCache('navigation');
                 break;
@@ -92,11 +101,19 @@ class CacheObserver
                 break;
 
             case 'App\Models\Partner':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('partners');
+                break;
+
+            case 'App\Models\Instructor':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('instructors');
+                break;
+
             case 'App\Models\Association':
             case 'App\Models\Student':
-            case 'App\Models\Instructor':
-            case 'App\Models\Faq':
                 ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('students');
                 break;
                 
             default:

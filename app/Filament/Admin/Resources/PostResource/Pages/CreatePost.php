@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\PostResource\Pages;
 
 use App\Filament\Admin\Resources\PostResource;
+use App\Providers\ViewServiceProvider;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePost extends CreateRecord
@@ -25,6 +26,8 @@ class CreatePost extends CreateRecord
     {
         return 'Bài viết đã được thêm thành công';
     }
+
+
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -66,6 +69,10 @@ class CreatePost extends CreateRecord
         if ($this->categoriesData !== null) {
             $this->getRecord()->categories()->sync($this->categoriesData);
         }
+
+        // Clear cache after creating post
+        ViewServiceProvider::refreshCache('storefront');
+        ViewServiceProvider::refreshCache('posts');
     }
 
     /**
