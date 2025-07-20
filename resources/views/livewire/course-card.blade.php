@@ -93,10 +93,10 @@
             </div>
             @endif
 
-            @if($course->enrolled_students_count)
+            @if($course->max_students)
             <div class="flex items-center">
                 <i class="fas fa-users mr-1"></i>
-                <span>{{ $course->enrolled_students_count }} học viên</span>
+                <span>{{ $course->max_students }} chỗ</span>
             </div>
             @endif
         </div>

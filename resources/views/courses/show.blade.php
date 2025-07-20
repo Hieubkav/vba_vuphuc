@@ -139,8 +139,8 @@
 
                         <div class="text-center p-4 bg-gray-50 rounded-lg border">
                             <i class="fas fa-users text-blue-500 text-2xl mb-2"></i>
-                            <p class="text-sm text-gray-600 mb-1">Số lượng/khóa</p>
-                            <p class="font-semibold text-gray-900">{{ $course->students_count }}</p>
+                            <p class="text-sm text-gray-600 mb-1">Quy mô học viên</p>
+                            <p class="font-semibold text-gray-900">{{ $course->max_students ?? 'Không giới hạn' }}</p>
                         </div>
 
                         <div class="text-center p-4 bg-gray-50 rounded-lg border">
@@ -496,7 +496,7 @@
                                         </p>
                                         <div class="flex items-center mt-2 text-xs text-gray-400">
                                             <i class="fas fa-users mr-1"></i>
-                                            <span>{{ $relatedCourse->students_count }} học viên</span>
+                                            <span>{{ $relatedCourse->max_students ?? 'Không giới hạn' }}</span>
                                         </div>
                                     </div>
                                 </div>
