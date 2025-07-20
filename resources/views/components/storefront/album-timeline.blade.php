@@ -24,7 +24,7 @@
             @endphp
 
             <!-- Timeline Item - Responsive Layout -->
-            <div class="relative grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center timeline-item pl-8 sm:pl-10 lg:pl-0">
+            <div class="relative grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 items-center timeline-item pl-8 sm:pl-10 lg:pl-0" id="album-{{ $album->id }}">
 
                 <!-- Timeline Dot - Desktop -->
                 <div class="absolute left-1/2 transform -translate-x-1/2 w-2.5 h-2.5 bg-red-500 rounded-full z-20 hidden lg:block timeline-dot"></div>
@@ -80,72 +80,94 @@
                     </div>
                 </div>
 
-                <!-- PDF Carousel Side -->
+                <!-- Media Side -->
                 <div class="{{ $isEven ? 'lg:order-2' : 'lg:order-1' }}">
-                    @if($pdfUrl)
-                        <!-- PDF Carousel Container -->
-                        <div class="relative group bg-white border border-red-100 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300" id="pdf-carousel-{{ $album->id }}">
-                            <!-- PDF Pages Container -->
-                            <div class="aspect-[4/3] relative bg-gray-50">
-                                <!-- PDF Page Display -->
-                                <div class="pdf-page-container w-full h-full flex items-center justify-center">
-                                    <canvas id="pdf-canvas-{{ $album->id }}" class="max-w-full max-h-full"></canvas>
-                                </div>
+                    @if(($album->media_type === 'pdf' && $pdfUrl) || ($album->media_type === 'images' && $album->thumbnail))
+                        <!-- Media Container -->
+                        <div class="relative group bg-white border border-red-100 rounded-lg overflow-hidden hover:shadow-md transition-all duration-300">
 
-                                <!-- Loading State -->
-                                <div id="pdf-loading-{{ $album->id }}" class="absolute inset-0 flex items-center justify-center bg-gray-50">
-                                    <div class="text-center">
-                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-2"></div>
-                                        <p class="text-gray-500 text-sm">Đang tải PDF...</p>
-                                    </div>
-                                </div>
-
-                                <!-- Navigation Arrows -->
-                                <button class="pdf-nav-btn pdf-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
-                                        onclick="prevPage({{ $album->id }})" style="display: none;">
-                                    <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
-                                </button>
-                                <button class="pdf-nav-btn pdf-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
-                                        onclick="nextPage({{ $album->id }})" style="display: none;">
-                                    <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
-                                </button>
-
-                                <!-- Page Counter -->
-                                <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
-                                    <span id="current-page-{{ $album->id }}">1</span>/<span id="total-pages-{{ $album->id }}">{{ $album->total_pages ?? '?' }}</span>
-                                </div>
-
-                                <!-- PDF Icon -->
-                                <div class="absolute top-2 left-2 bg-red-500/90 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
+                            <!-- Media Type Badge -->
+                            @if($album->media_type === 'pdf')
+                                <div class="absolute top-2 left-2 bg-red-500/90 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full z-20">
                                     <i class="fas fa-file-pdf mr-1"></i>PDF
                                 </div>
-                            </div>
+                            @else
+                                <div class="absolute top-2 left-2 bg-blue-500/90 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full z-20">
+                                    <i class="fas fa-image mr-1"></i>Hình ảnh
+                                </div>
+                            @endif
 
-                            <!-- PDF Actions -->
-                            <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                                <button onclick="window.open('{{ $pdfUrl }}', '_blank')"
-                                        class="bg-white/90 hover:bg-white backdrop-blur-sm px-2 py-1 text-xs text-gray-700 hover:text-red-600 font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
-                                    <i class="fas fa-external-link-alt mr-1"></i>Mở PDF
-                                </button>
-                                <a href="{{ $pdfUrl }}" download="{{ $album->title }}.pdf"
-                                   class="bg-red-500/90 hover:bg-red-500 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
-                                    <i class="fas fa-download mr-1"></i>Tải về
-                                </a>
-                            </div>
+                            @if($album->media_type === 'pdf' && $pdfUrl)
+                                <!-- PDF Container -->
+                                <div class="aspect-[4/3] relative bg-gray-50">
+                                    <!-- PDF Page Display -->
+                                    <div class="pdf-page-container w-full h-full flex items-center justify-center">
+                                        <canvas id="pdf-canvas-{{ $album->id }}" class="max-w-full max-h-full"></canvas>
+                                    </div>
+
+                                    <!-- Loading State -->
+                                    <div id="pdf-loading-{{ $album->id }}" class="absolute inset-0 flex items-center justify-center bg-gray-50">
+                                        <div class="text-center">
+                                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-2"></div>
+                                            <p class="text-gray-500 text-sm">Đang tải PDF...</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Navigation Arrows -->
+                                    <button class="pdf-nav-btn pdf-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                            onclick="prevPage({{ $album->id }})" style="display: none;">
+                                        <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
+                                    </button>
+                                    <button class="pdf-nav-btn pdf-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                            onclick="nextPage({{ $album->id }})" style="display: none;">
+                                        <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
+                                    </button>
+
+                                    <!-- Page Counter -->
+                                    <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
+                                        <span id="current-page-{{ $album->id }}">1</span>/<span id="total-pages-{{ $album->id }}">{{ $album->total_pages ?? '?' }}</span>
+                                    </div>
+
+                                    <!-- PDF Actions -->
+                                    <div class="absolute bottom-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        <button onclick="window.open('{{ $pdfUrl }}', '_blank')"
+                                                class="bg-white/90 hover:bg-white backdrop-blur-sm px-2 py-1 text-xs text-gray-700 hover:text-red-600 font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
+                                            <i class="fas fa-external-link-alt mr-1"></i>Mở PDF
+                                        </button>
+                                        <a href="{{ $pdfUrl }}" download="{{ $album->title }}.pdf"
+                                           class="bg-red-500/90 hover:bg-red-500 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full transition-all duration-300 shadow-sm hover:shadow-md">
+                                            <i class="fas fa-download mr-1"></i>Tải về
+                                        </a>
+                                    </div>
+                                </div>
+                            @elseif($album->media_type === 'images' && $album->thumbnail)
+                                <!-- Single Image Container -->
+                                <div class="aspect-[4/3] relative bg-gray-50 overflow-hidden">
+                                    <img src="{{ $album->thumbnail_url }}"
+                                         alt="{{ $album->title }}"
+                                         class="w-full h-full object-cover"
+                                         loading="lazy">
+
+                                    <!-- Image Overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Initialize PDF for this album -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                initPDFCarousel({{ $album->id }}, '{{ $pdfUrl }}');
-                            });
-                        </script>
+                        @if($album->media_type === 'pdf' && $pdfUrl)
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    initPDFCarousel({{ $album->id }}, '{{ $pdfUrl }}');
+                                });
+                            </script>
+                        @endif
                     @else
-                        <!-- Fallback when no PDF -->
-                        <div class="aspect-[4/3] bg-red-50 border border-red-100 flex items-center justify-center rounded-lg">
+                        <!-- Fallback when no media -->
+                        <div class="aspect-[4/3] bg-gray-50 border border-gray-100 flex items-center justify-center rounded-lg">
                             <div class="text-center">
-                                <i class="fas fa-file-pdf text-red-300 text-3xl mb-2"></i>
-                                <p class="text-red-400 font-light text-sm">Chưa có tài liệu PDF</p>
+                                <i class="fas fa-folder-open text-gray-300 text-3xl mb-2"></i>
+                                <p class="text-gray-400 font-light text-sm">Chưa có tài liệu hoặc hình ảnh</p>
                             </div>
                         </div>
                     @endif
@@ -340,6 +362,8 @@ function prevPage(albumId) {
     }
 }
 
+// Removed image carousel - now using simple single image display
+
 // Handle window resize
 window.addEventListener('resize', function() {
     Object.keys(pdfStates).forEach(albumId => {
@@ -428,4 +452,6 @@ canvas {
     max-height: 100%;
     border-radius: 0.25rem;
 }
+
+/* Removed image carousel styles - now using simple single image display */
 </style>

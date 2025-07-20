@@ -15,7 +15,7 @@ class AlbumObserver
      */
     public function created(Album $album): void
     {
-        $this->clearRelatedCache();
+        // Cache clearing được handle bởi CacheObserver
     }
 
     /**
@@ -23,6 +23,26 @@ class AlbumObserver
      */
     public function updating(Album $album): void
     {
+        // Validation logic cho media_type
+        if ($album->isDirty('media_type')) {
+            if ($album->media_type === 'pdf' && $album->thumbnail) {
+                // Tự động xóa thumbnail khi chuyển sang PDF
+                if (Storage::disk('public')->exists($album->thumbnail)) {
+                    Storage::disk('public')->delete($album->thumbnail);
+                }
+                $album->thumbnail = null;
+            }
+            if ($album->media_type === 'images' && $album->pdf_file) {
+                // Tự động xóa PDF file khi chuyển sang images
+                if (Storage::disk('public')->exists($album->pdf_file)) {
+                    Storage::disk('public')->delete($album->pdf_file);
+                }
+                $album->pdf_file = null;
+                $album->total_pages = null;
+                $album->file_size = null;
+            }
+        }
+
         // Lưu thumbnail cũ để xóa sau khi update
         if ($album->isDirty('thumbnail')) {
             $this->storeOldFile(
@@ -52,7 +72,8 @@ class AlbumObserver
             }
         }
 
-        $this->clearRelatedCache();
+        // Cache clearing được handle bởi CacheObserver
+        // Không cần clear cache ở đây nữa
     }
 
     /**
@@ -60,12 +81,25 @@ class AlbumObserver
      */
     public function deleted(Album $album): void
     {
-        // Xóa thumbnail khi xóa record
-        if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
-            Storage::disk('public')->delete($album->thumbnail);
+        // Xóa file theo media_type
+        if ($album->media_type === 'pdf') {
+            // Xóa file PDF
+            if ($album->pdf_file && Storage::disk('public')->exists($album->pdf_file)) {
+                Storage::disk('public')->delete($album->pdf_file);
+            }
+        } elseif ($album->media_type === 'images') {
+            // Xóa thumbnail image
+            if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
+                Storage::disk('public')->delete($album->thumbnail);
+            }
         }
 
-        $this->clearRelatedCache();
+        // Xóa OG image nếu có
+        if ($album->og_image_link && Storage::disk('public')->exists($album->og_image_link)) {
+            Storage::disk('public')->delete($album->og_image_link);
+        }
+
+        // Cache clearing được handle bởi CacheObserver
     }
 
     /**
@@ -73,7 +107,7 @@ class AlbumObserver
      */
     public function restored(Album $album): void
     {
-        $this->clearRelatedCache();
+        // Cache clearing được handle bởi CacheObserver
     }
 
     /**
@@ -81,22 +115,24 @@ class AlbumObserver
      */
     public function forceDeleted(Album $album): void
     {
-        // Xóa thumbnail khi force delete
-        if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
-            Storage::disk('public')->delete($album->thumbnail);
+        // Xóa file theo media_type
+        if ($album->media_type === 'pdf') {
+            // Xóa file PDF
+            if ($album->pdf_file && Storage::disk('public')->exists($album->pdf_file)) {
+                Storage::disk('public')->delete($album->pdf_file);
+            }
+        } elseif ($album->media_type === 'images') {
+            // Xóa thumbnail image
+            if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
+                Storage::disk('public')->delete($album->thumbnail);
+            }
         }
 
-        $this->clearRelatedCache();
-    }
-
-    /**
-     * Clear related cache
-     */
-    protected function clearRelatedCache(): void
-    {
-        // Clear cache liên quan đến albums
-        if (method_exists($this, 'clearCache')) {
-            $this->clearCache();
+        // Xóa OG image nếu có
+        if ($album->og_image_link && Storage::disk('public')->exists($album->og_image_link)) {
+            Storage::disk('public')->delete($album->og_image_link);
         }
+
+        // Cache clearing được handle bởi CacheObserver
     }
 }

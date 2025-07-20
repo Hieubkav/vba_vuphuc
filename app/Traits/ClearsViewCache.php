@@ -64,6 +64,12 @@ trait ClearsViewCache
                 ViewServiceProvider::clearCourseDetailCaches();
                 break;
 
+            case 'App\Models\Album':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('albums');
+                ViewServiceProvider::clearAlbumsCache();
+                break;
+
             default:
                 ViewServiceProvider::refreshCache('all');
                 break;

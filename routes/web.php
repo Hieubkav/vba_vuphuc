@@ -124,6 +124,10 @@ Route::controller(AlbumController::class)->group(function () {
     Route::get('/api/albums/{album}/pdf', 'getPdf')->name('albums.pdf');
 });
 
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Routes Bài viết & Tin tức

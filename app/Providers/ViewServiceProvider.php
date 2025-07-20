@@ -248,22 +248,33 @@ class ViewServiceProvider extends ServiceProvider
                 }
             }),
 
-            // Albums - Album timeline với PDF - Cache 2 giờ
+            // Albums - Album timeline với PDF hoặc ảnh đơn - Cache 2 giờ
             'albums' => Cache::remember('storefront_albums', 7200, function () {
                 try {
-                    return \App\Models\Album::where('status', 'active')
+                    $albums = \App\Models\Album::where('status', 'active')
                         ->where('published_date', '<=', now())
-                        ->whereNotNull('pdf_file') // Chỉ lấy album có PDF
+                        ->where('featured', true) // Chỉ lấy album nổi bật
                         ->select([
-                            'id', 'title', 'description', 'slug', 'pdf_file',
+                            'id', 'title', 'description', 'slug', 'pdf_file', 'media_type', 'thumbnail',
                             'published_date', 'featured', 'total_pages', 'file_size',
                             'download_count', 'view_count', 'created_at', 'order'
                         ])
                         ->orderBy('order', 'asc')
-                        ->orderBy('featured', 'desc')
                         ->orderBy('published_date', 'desc')
+                        ->orderBy('id', 'asc') // Fallback để đảm bảo thứ tự nhất quán
                         ->take(10)
-                        ->get();
+                        ->get()
+                        ->filter(function ($album) {
+                            // Chỉ lấy albums có nội dung phù hợp với media_type
+                            if ($album->media_type === 'pdf') {
+                                return !empty($album->pdf_file);
+                            } elseif ($album->media_type === 'images') {
+                                return !empty($album->thumbnail);
+                            }
+                            return false;
+                        });
+
+                    return $albums;
                 } catch (\Exception $e) {
                     // Fallback nếu bảng albums chưa tồn tại
                     return collect();
@@ -485,10 +496,44 @@ class ViewServiceProvider extends ServiceProvider
             case 'testimonials':
                 Cache::forget('storefront_testimonials');
                 break;
+            case 'albums':
+                Cache::forget('storefront_albums');
+                break;
             case 'all':
             default:
                 self::clearCache();
                 break;
+        }
+    }
+
+    /**
+     * Clear albums cache specifically - Auto trigger method
+     */
+    public static function clearAlbumsCache(): void
+    {
+        try {
+            // Clear albums cache
+            Cache::forget('storefront_albums');
+
+            // Also clear related caches that might contain album data
+            Cache::forget('storefront_latest_posts');
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $albumKeys = Cache::getRedis()->keys('*album*');
+                    foreach ($albumKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
         }
     }
 }

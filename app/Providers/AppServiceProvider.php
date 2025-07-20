@@ -12,12 +12,14 @@ use App\Models\CatCourse;
 use App\Models\Partner;
 use App\Models\Post;
 use App\Models\CatPost;
+use App\Models\Album;
 use App\Observers\InstructorObserver;
 use App\Observers\TestimonialObserver;
 use App\Observers\CatCourseObserver;
 use App\Observers\PartnerObserver;
 use App\Observers\PostObserver;
 use App\Observers\CatPostObserver;
+use App\Observers\AlbumObserver;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -45,6 +47,7 @@ class AppServiceProvider extends ServiceProvider
         Partner::observe(PartnerObserver::class);
         Post::observe(PostObserver::class);
         CatPost::observe(CatPostObserver::class);
+        Album::observe(AlbumObserver::class);
 
         // Cache Observer để clear cache ViewServiceProvider
         \App\Models\Course::observe(\App\Observers\CacheObserver::class);

@@ -19,10 +19,12 @@ class Album extends Model
         'og_image_link',
         'slug',
         'pdf_file',
+        'thumbnail',
         'published_date',
         'status',
         'order',
         'featured',
+        'media_type',
         'total_pages',
         'file_size',
         'download_count',
@@ -34,13 +36,14 @@ class Album extends Model
         'status' => 'string',
         'order' => 'integer',
         'featured' => 'boolean',
+        'media_type' => 'string',
         'total_pages' => 'integer',
         'file_size' => 'integer',
         'download_count' => 'integer',
         'view_count' => 'integer',
     ];
 
-    // Relationships - Đã xóa images relationship vì không cần thiết
+    // Relationships - Đã đơn giản hóa, không cần relationship với images
 
     // Scopes
     public function scopeActive($query)
@@ -58,6 +61,16 @@ class Album extends Model
         return $query->where('published_date', '<=', now());
     }
 
+    public function scopePdfType($query)
+    {
+        return $query->where('media_type', 'pdf');
+    }
+
+    public function scopeImagesType($query)
+    {
+        return $query->where('media_type', 'images');
+    }
+
     // Accessors
     public function getPdfUrlAttribute()
     {
@@ -72,16 +85,18 @@ class Album extends Model
     public function getFormattedFileSizeAttribute()
     {
         if (!$this->file_size) return null;
-        
+
         $bytes = $this->file_size;
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
+
         return round($bytes, 2) . ' ' . $units[$i];
     }
+
+
 
     // Methods
     public function incrementViewCount()

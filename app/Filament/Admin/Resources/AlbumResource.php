@@ -81,9 +81,21 @@ class AlbumResource extends Resource
                                     ])
                                     ->columns(2),
 
-                                Forms\Components\Section::make('File PDF')
+                                Forms\Components\Section::make('Loại nội dung Album')
+                                    ->description('Chọn loại nội dung cho album này. Mỗi album chỉ có thể chứa một loại: PDF hoặc hình ảnh.')
                                     ->schema([
+                                        Forms\Components\Radio::make('media_type')
+                                            ->label('Loại nội dung')
+                                            ->options([
+                                                'pdf' => 'Tài liệu PDF',
+                                                'images' => 'Hình ảnh',
+                                            ])
+                                            ->default('pdf')
+                                            ->required()
+                                            ->live()
+                                            ->columnSpanFull(),
 
+                                        // PDF Upload - chỉ hiện khi chọn PDF
                                         Forms\Components\FileUpload::make('pdf_file')
                                             ->label('File PDF')
                                             ->acceptedFileTypes(['application/pdf'])
@@ -91,9 +103,39 @@ class AlbumResource extends Resource
                                             ->maxSize(50000) // 50MB
                                             ->downloadable()
                                             ->previewable(false)
-                                            ->helperText('File PDF tài liệu (tùy chọn). Kích thước tối đa: 50MB'),
-                                    ])
-                                    ->columns(2),
+                                            ->helperText('File PDF tài liệu. Kích thước tối đa: 50MB')
+                                            ->visible(fn (Forms\Get $get): bool => $get('media_type') === 'pdf')
+                                            ->required(fn (Forms\Get $get): bool => $get('media_type') === 'pdf')
+                                            ->rules([
+                                                fn (Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                    if ($get('media_type') === 'images' && $value) {
+                                                        $fail('Không thể upload PDF khi đã chọn loại nội dung là hình ảnh.');
+                                                    }
+                                                },
+                                            ])
+                                            ->columnSpanFull(),
+
+                                        // Image Upload - chỉ hiện khi chọn Images
+                                        Forms\Components\FileUpload::make('thumbnail')
+                                            ->label('Hình ảnh Album')
+                                            ->image()
+                                            ->directory('albums/images')
+                                            ->visibility('public')
+                                            ->maxSize(5120) // 5MB
+                                            ->imageEditor()
+                                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                            ->helperText('Upload 1 hình ảnh đại diện cho album. Kích thước tối đa: 5MB')
+                                            ->visible(fn (Forms\Get $get): bool => $get('media_type') === 'images')
+                                            ->required(fn (Forms\Get $get): bool => $get('media_type') === 'images')
+                                            ->rules([
+                                                fn (Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                    if ($get('media_type') === 'pdf' && $value) {
+                                                        $fail('Không thể upload hình ảnh khi đã chọn loại nội dung là PDF.');
+                                                    }
+                                                },
+                                            ])
+                                            ->columnSpanFull(),
+                                    ]),
 
                                 Forms\Components\Section::make('Cài đặt hiển thị')
                                     ->schema([
@@ -198,13 +240,24 @@ class AlbumResource extends Resource
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\IconColumn::make('pdf_file')
-                    ->label('PDF')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-document')
-                    ->falseIcon('heroicon-o-x-mark')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('media_type')
+                    ->label('Loại nội dung')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pdf' => 'danger',
+                        'images' => 'primary',
+                        default => 'gray',
+                    })
+                    ->icon(fn (string $state): string => match ($state) {
+                        'pdf' => 'heroicon-o-document',
+                        'images' => 'heroicon-o-photo',
+                        default => 'heroicon-o-question-mark-circle',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pdf' => 'PDF',
+                        'images' => 'Hình ảnh',
+                        default => $state,
+                    }),
 
                 Tables\Columns\TextColumn::make('published_date')
                     ->label('Ngày xuất bản')
@@ -299,7 +352,7 @@ class AlbumResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // Đã xóa AlbumImagesRelationManager vì không cần thiết
+            // Đã đơn giản hóa - không cần RelationManager cho images
         ];
     }
 
