@@ -27,9 +27,11 @@ class PartnerResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Đối tác';
 
-    protected static ?string $navigationGroup = 'Đối tác & Liên kết';
+    protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?int $navigationSort = 31;
+    protected static ?string $navigationLabel = 'Đối tác';
+
+    protected static ?int $navigationSort = 16;
 
     public static function form(Form $form): Form
     {

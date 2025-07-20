@@ -26,15 +26,15 @@ class SliderResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
+    protected static ?string $navigationGroup = 'Quản lý nội dung';
 
-    protected static ?string $navigationLabel = 'Slider/Banner';
+    protected static ?string $navigationLabel = 'Ảnh cuộn';
 
-    protected static ?string $modelLabel = 'slider banner';
+    protected static ?string $modelLabel = 'ảnh cuộn';
 
-    protected static ?string $pluralModelLabel = 'slider banner';
+    protected static ?string $pluralModelLabel = 'ảnh cuộn';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 15;
 
     public static function form(Form $form): Form
     {

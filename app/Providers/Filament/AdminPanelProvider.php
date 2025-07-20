@@ -72,10 +72,6 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-shopping-bag')
                     ->collapsible(),
                 NavigationGroup::make()
-                    ->label('Đối tác & Liên kết')
-                    ->icon('heroicon-o-building-office-2')
-                    ->collapsible(),
-                NavigationGroup::make()
                     ->label('Nhân sự & Người dùng')
                     ->icon('heroicon-o-users')
                     ->collapsible(),

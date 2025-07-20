@@ -8,20 +8,30 @@ use Filament\Notifications\Notification;
 /**
  * File Manager Page - Quản lý tất cả file upload trong dự án
  * Hỗ trợ: Images, Documents, Videos, Audio và các file khác
+ * http://127.0.0.1:8000/admin/file-manager
  */
 class FileManager extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?string $navigationLabel = 'Quản lý File';
+    // Hidden from navigation - development/testing feature only
+    // protected static ?string $navigationLabel = 'Quản lý File';
+    // protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
+    // protected static ?int $navigationSort = 3;
+
+    // Completely hide from navigation
+    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $navigationLabel = null;
 
     protected static ?string $title = 'Quản lý File Upload';
 
-    protected static ?string $navigationGroup = 'CÀI ĐẶT WEBSITE';
-
-    protected static ?int $navigationSort = 3;
-
     protected static string $view = 'filament.admin.file-manager';
+
+    // Override method to completely hide from navigation
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
 
     public $files = [];
     public $totalFiles = 0;

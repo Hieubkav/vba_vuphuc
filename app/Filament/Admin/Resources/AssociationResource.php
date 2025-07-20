@@ -28,7 +28,7 @@ class AssociationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationGroup = 'Đối tác & Liên kết';
+    protected static ?string $navigationGroup = 'Quản lý nội dung';
 
     protected static ?string $navigationLabel = 'Hiệp hội';
 
@@ -36,7 +36,7 @@ class AssociationResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Hiệp hội';
 
-    protected static ?int $navigationSort = 32;
+    protected static ?int $navigationSort = 17;
 
     public static function form(Form $form): Form
     {
