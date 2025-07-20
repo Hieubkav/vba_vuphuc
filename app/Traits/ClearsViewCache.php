@@ -55,13 +55,18 @@ trait ClearsViewCache
 
             case 'App\Models\Course':
             case 'App\Models\CatCourse':
-            case 'App\Models\CourseGroup':
             case 'App\Models\CourseMaterial':
             case 'App\Models\CourseImage':
             case 'App\Models\Instructor':
                 ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('navigation');
                 ViewServiceProvider::clearCourseDetailCaches();
+                break;
+
+            case 'App\Models\CourseGroup':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('navigation');
+                ViewServiceProvider::refreshCache('course_groups');
                 break;
 
             case 'App\Models\Album':

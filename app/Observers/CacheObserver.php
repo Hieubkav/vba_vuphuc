@@ -79,7 +79,9 @@ class CacheObserver
                 break;
                 
             case 'App\Models\CourseGroup':
+                // Clear course groups cache specifically and storefront cache
                 ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('course_groups');
                 break;
 
             case 'App\Models\Album':

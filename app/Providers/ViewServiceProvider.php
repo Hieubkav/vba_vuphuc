@@ -484,6 +484,12 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('storefront_course_categories');
                 Cache::forget('storefront_course_groups');
                 break;
+            case 'course_groups':
+                Cache::forget('storefront_course_groups');
+                Cache::forget('course_group_types');
+                Cache::forget('course_group_stats');
+                self::clearCourseGroupsCache();
+                break;
             case 'sliders':
                 Cache::forget('storefront_sliders');
                 break;
@@ -524,6 +530,38 @@ class ViewServiceProvider extends ServiceProvider
                 try {
                     $albumKeys = Cache::getRedis()->keys('*album*');
                     foreach ($albumKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear course groups cache specifically - Auto trigger method
+     */
+    public static function clearCourseGroupsCache(): void
+    {
+        try {
+            // Clear course groups cache
+            Cache::forget('storefront_course_groups');
+
+            // Also clear related caches that might contain course group data
+            Cache::forget('course_group_types');
+            Cache::forget('course_group_stats');
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $courseGroupKeys = Cache::getRedis()->keys('*course_group*');
+                    foreach ($courseGroupKeys as $key) {
                         Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
                     }
                 } catch (\Exception $redisException) {
