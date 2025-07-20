@@ -12,6 +12,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
+use Filament\Actions\Action;
 use Illuminate\Support\Facades\Cache;
 
 class ManageSettings extends Page implements HasForms
@@ -234,5 +235,16 @@ class ManageSettings extends Page implements HasForms
             ->title('Cài đặt đã được lưu')
             ->success()
             ->send();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('Lưu cài đặt')
+                ->color('primary')
+                ->action('save')
+                ->requiresConfirmation(false)
+        ];
     }
 }
