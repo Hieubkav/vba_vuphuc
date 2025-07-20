@@ -75,6 +75,11 @@ trait ClearsViewCache
                 ViewServiceProvider::clearAlbumsCache();
                 break;
 
+            case 'App\Models\Testimonial':
+                ViewServiceProvider::refreshCache('storefront');
+                ViewServiceProvider::refreshCache('testimonials');
+                break;
+
             default:
                 ViewServiceProvider::refreshCache('all');
                 break;

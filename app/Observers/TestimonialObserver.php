@@ -91,15 +91,12 @@ class TestimonialObserver
     }
 
     /**
-     * Clear testimonials cache
+     * Clear testimonials cache using ViewServiceProvider
      */
     protected function clearTestimonialsCache(): void
     {
-        Cache::forget('storefront_testimonials');
-
-        // Clear view cache nếu có
-        if (function_exists('cache_clear')) {
-            cache_clear('testimonials');
-        }
+        // Use ViewServiceProvider for consistent cache clearing
+        \App\Providers\ViewServiceProvider::refreshCache('storefront');
+        \App\Providers\ViewServiceProvider::refreshCache('testimonials');
     }
 }

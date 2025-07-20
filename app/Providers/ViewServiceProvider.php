@@ -490,6 +490,10 @@ class ViewServiceProvider extends ServiceProvider
                 Cache::forget('course_group_stats');
                 self::clearCourseGroupsCache();
                 break;
+            case 'testimonials':
+                Cache::forget('storefront_testimonials');
+                self::clearTestimonialsCache();
+                break;
             case 'sliders':
                 Cache::forget('storefront_sliders');
                 break;
@@ -562,6 +566,36 @@ class ViewServiceProvider extends ServiceProvider
                 try {
                     $courseGroupKeys = Cache::getRedis()->keys('*course_group*');
                     foreach ($courseGroupKeys as $key) {
+                        Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
+                    }
+                } catch (\Exception $redisException) {
+                    // Continue if Redis operations fail
+                }
+            }
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if specific clearing fails
+            Cache::flush();
+        }
+    }
+
+    /**
+     * Clear testimonials cache specifically - Auto trigger method
+     */
+    public static function clearTestimonialsCache(): void
+    {
+        try {
+            // Clear testimonials cache
+            Cache::forget('storefront_testimonials');
+
+            // Also clear related caches that might contain testimonial data
+            Cache::forget('navigation_data');
+
+            // Clear any pattern-based caches if using Redis
+            if (config('cache.default') === 'redis') {
+                try {
+                    $testimonialKeys = Cache::getRedis()->keys('*testimonial*');
+                    foreach ($testimonialKeys as $key) {
                         Cache::forget(str_replace(config('cache.prefix') . ':', '', $key));
                     }
                 } catch (\Exception $redisException) {

@@ -71,6 +71,7 @@ class CacheObserver
                 break;
                 
             case 'App\Models\Testimonial':
+                ViewServiceProvider::refreshCache('storefront');
                 ViewServiceProvider::refreshCache('testimonials');
                 break;
                 
