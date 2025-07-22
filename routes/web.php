@@ -15,6 +15,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseGroupController;
 use App\Http\Controllers\FaviconController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\PostController;
@@ -98,6 +99,18 @@ Route::controller(StudentController::class)->group(function () {
 */
 Route::controller(InstructorController::class)->group(function () {
     Route::get('/giang-vien/{slug}', 'show')->name('instructors.show');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Routes Đóng góp ý kiến
+|--------------------------------------------------------------------------
+| Quản lý form đóng góp ý kiến từ khách hàng
+*/
+Route::controller(FeedbackController::class)->group(function () {
+    Route::get('/dong-gop-y-kien', 'show')->name('feedback.show');
+    Route::post('/dong-gop-y-kien', 'store')->name('feedback.store');
+    Route::get('/cam-on-dong-gop', 'success')->name('feedback.success');
 });
 
 /*

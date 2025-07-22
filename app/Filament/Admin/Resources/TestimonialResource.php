@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\TestimonialResource\Pages;
+use App\Helpers\AvatarHelper;
 use App\Models\Testimonial;
 use App\Traits\HasImageUpload;
 use Filament\Forms;
@@ -38,6 +39,12 @@ class TestimonialResource extends Resource
                             ->required()
                             ->maxLength(255),
 
+                        Forms\Components\TextInput::make('email')
+                            ->label('Email')
+                            ->email()
+                            ->maxLength(255)
+                            ->helperText('Email khách hàng (dành cho feedback từ website)'),
+
                         Forms\Components\TextInput::make('position')
                             ->label('Chức vụ')
                             ->maxLength(255),
@@ -57,7 +64,7 @@ class TestimonialResource extends Resource
                             ->visibility('public')
                             ->maxSize(5120)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Ảnh sẽ được tự động tối ưu thành WebP với tên SEO-friendly')
+                            ->helperText('Ảnh sẽ được tự động tối ưu thành WebP với tên SEO-friendly. Feedback từ khách hàng sẽ có avatar chữ cái tự động.')
                             ->saveUploadedFileUsing(function ($file, $get) {
                                 $customerName = $get('name') ?: 'khach-hang';
                                 $customName = 'avatar-' . $customerName;
@@ -69,7 +76,8 @@ class TestimonialResource extends Resource
                                     400,
                                     400
                                 );
-                            }),
+                            })
+                            ->dehydrated(fn ($state) => filled($state)), // Chỉ save khi có file upload
                     ])
                     ->columns(2),
 
@@ -107,9 +115,11 @@ class TestimonialResource extends Resource
                             ->options([
                                 'active' => 'Hiển thị',
                                 'inactive' => 'Ẩn',
+                                'pending' => 'Chờ duyệt',
                             ])
-                            ->default('active')
-                            ->required(),
+                            ->default('pending')
+                            ->required()
+                            ->helperText('Feedback từ website sẽ có trạng thái "Chờ duyệt" ban đầu'),
                     ])
                     ->columns(2),
             ]);
@@ -119,15 +129,29 @@ class TestimonialResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('avatar')
-                    ->label('Ảnh')
-                    ->circular()
-                    ->disk('public'),
+                Tables\Columns\ViewColumn::make('avatar')
+                    ->label('Avatar')
+                    ->view('filament.tables.columns.testimonial-avatar'),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Tên khách hàng')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
+                    ->searchable()
+                    ->toggleable()
+                    ->copyable()
+                    ->placeholder('Không có'),
+
+                Tables\Columns\TextColumn::make('type')
+                    ->label('Loại')
+                    ->getStateUsing(function ($record) {
+                        return $record->email ? 'Feedback KH' : 'Testimonial';
+                    })
+                    ->badge()
+                    ->color(fn($state) => $state === 'Feedback KH' ? 'info' : 'success'),
 
                 Tables\Columns\TextColumn::make('position')
                     ->label('Chức vụ')
@@ -151,8 +175,18 @@ class TestimonialResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Trạng thái')
                     ->badge()
-                    ->color(fn($state) => $state === 'active' ? 'success' : 'danger')
-                    ->formatStateUsing(fn($state) => $state === 'active' ? 'Hiển thị' : 'Ẩn'),
+                    ->color(fn($state) => match($state) {
+                        'active' => 'success',
+                        'pending' => 'warning',
+                        'inactive' => 'danger',
+                        default => 'gray'
+                    })
+                    ->formatStateUsing(fn($state) => match($state) {
+                        'active' => 'Hiển thị',
+                        'pending' => 'Chờ duyệt',
+                        'inactive' => 'Ẩn',
+                        default => $state
+                    }),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Ngày tạo')
@@ -165,6 +199,7 @@ class TestimonialResource extends Resource
                     ->label('Trạng thái')
                     ->options([
                         'active' => 'Hiển thị',
+                        'pending' => 'Chờ duyệt',
                         'inactive' => 'Ẩn',
                     ]),
 
@@ -210,7 +245,14 @@ class TestimonialResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('status', 'active')->count();
+        $pendingCount = static::getModel()::where('status', 'pending')->count();
+        return $pendingCount > 0 ? (string) $pendingCount : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $pendingCount = static::getModel()::where('status', 'pending')->count();
+        return $pendingCount > 0 ? 'warning' : null;
     }
 
 

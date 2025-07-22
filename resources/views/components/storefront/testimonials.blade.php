@@ -37,8 +37,33 @@
 
                         <!-- Customer Info -->
                         <div class="flex items-center mt-auto pt-3 border-t border-gray-100">
-                            <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0">
-                                @if($testimonial->avatar)
+                            <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-200 mr-3 flex-shrink-0 testimonial-avatar">
+                                @php
+                                    $isInitialsAvatar = \App\Helpers\AvatarHelper::isInitialsAvatar($testimonial->avatar);
+                                @endphp
+
+                                @if($isInitialsAvatar)
+                                    @php
+                                        $avatarData = \App\Helpers\AvatarHelper::parseAvatarString($testimonial->avatar);
+                                    @endphp
+
+                                    @if($avatarData)
+                                        <!-- Avatar chữ cái -->
+                                        <div
+                                            class="w-full h-full avatar-initials avatar-initials--shadow flex items-center justify-center text-sm font-semibold"
+                                            style="background-color: {{ $avatarData['background_color'] }}; color: {{ $avatarData['text_color'] }}"
+                                            title="Feedback từ {{ $testimonial->name }}"
+                                        >
+                                            {{ $avatarData['initials'] }}
+                                        </div>
+                                    @else
+                                        <!-- Fallback nếu parse lỗi -->
+                                        <div class="w-full h-full bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                            <i class="fas fa-user text-red-500 text-sm"></i>
+                                        </div>
+                                    @endif
+                                @elseif($testimonial->avatar)
+                                    <!-- Ảnh thật từ testimonial -->
                                     <img src="{{ asset('storage/' . $testimonial->avatar) }}"
                                          alt="{{ \App\Services\SeoImageService::createSeoAltText($testimonial->name, 'Ảnh đại diện') }}"
                                          title="{{ \App\Services\SeoImageService::createSeoTitle($testimonial->name, 'Ảnh đại diện') }}"
@@ -117,6 +142,7 @@
 @if(isset($testimonials) && $testimonials->count() > 0)
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/testimonials.css') }}">
+<link rel="stylesheet" href="{{ asset('css/avatar-initials.css') }}">
 @endpush
 
 @push('scripts')

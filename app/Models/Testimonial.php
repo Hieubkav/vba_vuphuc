@@ -12,6 +12,7 @@ class Testimonial extends Model
 
     protected $fillable = [
         'name',
+        'email',
         'position',
         'company',
         'location',
@@ -34,6 +35,14 @@ class Testimonial extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope for pending testimonials (feedback chưa được duyệt)
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
     }
 
     /**
