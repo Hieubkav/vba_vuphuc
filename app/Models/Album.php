@@ -41,6 +41,7 @@ class Album extends Model
         'file_size' => 'integer',
         'download_count' => 'integer',
         'view_count' => 'integer',
+        'thumbnail' => 'array', // JSON cast để hỗ trợ multiple images
     ];
 
     // Relationships - Đã đơn giản hóa, không cần relationship với images
@@ -79,8 +80,51 @@ class Album extends Model
 
     public function getThumbnailUrlAttribute()
     {
-        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
+        if (!$this->thumbnail) return null;
+
+        // Nếu là array (multiple files), trả về URL của file đầu tiên
+        if (is_array($this->thumbnail)) {
+            return !empty($this->thumbnail) ? asset('storage/' . $this->thumbnail[0]) : null;
+        }
+
+        // Tương thích ngược với string
+        return asset('storage/' . $this->thumbnail);
     }
+
+
+
+    // Accessor cho multiple thumbnail URLs
+    public function getThumbnailUrlsAttribute()
+    {
+        if (!$this->thumbnail) return [];
+
+        if (is_array($this->thumbnail)) {
+            return array_map(fn($file) => asset('storage/' . $file), $this->thumbnail);
+        }
+
+        // Tương thích ngược với string
+        return [asset('storage/' . $this->thumbnail)];
+    }
+
+    // Helper method để kiểm tra có multiple files không
+    public function hasMultipleImages()
+    {
+        return is_array($this->thumbnail) && count($this->thumbnail) > 1;
+    }
+
+    // Helper method để lấy số lượng images
+    public function getImageCount()
+    {
+        if (!$this->thumbnail) return 0;
+
+        if (is_array($this->thumbnail)) {
+            return count($this->thumbnail);
+        }
+
+        return 1; // Single image
+    }
+
+
 
     public function getFormattedFileSizeAttribute()
     {
@@ -127,7 +171,12 @@ class Album extends Model
 
             // Auto-generate OG image from thumbnail if empty
             if (empty($album->og_image_link) && !empty($album->thumbnail)) {
-                $album->og_image_link = $album->thumbnail;
+                // Nếu thumbnail là array, lấy phần tử đầu tiên
+                if (is_array($album->thumbnail)) {
+                    $album->og_image_link = !empty($album->thumbnail) ? $album->thumbnail[0] : null;
+                } else {
+                    $album->og_image_link = $album->thumbnail;
+                }
             }
 
             // Auto-generate slug if empty

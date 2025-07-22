@@ -115,16 +115,19 @@ class AlbumResource extends Resource
                                             ])
                                             ->columnSpanFull(),
 
-                                        // Image Upload - chỉ hiện khi chọn Images
+                                        // Image Upload - chỉ hiện khi chọn Images (hỗ trợ multiple files)
                                         Forms\Components\FileUpload::make('thumbnail')
                                             ->label('Hình ảnh Album')
                                             ->image()
                                             ->directory('albums/images')
                                             ->visibility('public')
-                                            ->maxSize(5120) // 5MB
+                                            ->maxSize(5120) // 5MB per file
                                             ->imageEditor()
                                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                            ->helperText('Upload 1 hình ảnh đại diện cho album. Kích thước tối đa: 5MB')
+                                            ->multiple() // Cho phép upload nhiều file
+                                            ->maxFiles(10) // Tối đa 10 ảnh
+                                            ->reorderable() // Cho phép sắp xếp lại thứ tự
+                                            ->helperText('Upload nhiều hình ảnh cho album (tối đa 10 ảnh). Kích thước tối đa mỗi ảnh: 5MB. Ảnh đầu tiên sẽ là ảnh đại diện.')
                                             ->visible(fn (Forms\Get $get): bool => $get('media_type') === 'images')
                                             ->required(fn (Forms\Get $get): bool => $get('media_type') === 'images')
                                             ->rules([

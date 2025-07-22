@@ -114,11 +114,11 @@
                                     </div>
 
                                     <!-- Navigation Arrows -->
-                                    <button class="pdf-nav-btn pdf-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                    <button id="pdf-prev-{{ $album->id }}" class="pdf-nav-btn pdf-prev absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
                                             onclick="prevPage({{ $album->id }})" style="display: none;">
                                         <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
                                     </button>
-                                    <button class="pdf-nav-btn pdf-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
+                                    <button id="pdf-next-{{ $album->id }}" class="pdf-nav-btn pdf-next absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-md z-10"
                                             onclick="nextPage({{ $album->id }})" style="display: none;">
                                         <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
                                     </button>
@@ -126,6 +126,11 @@
                                     <!-- Page Counter -->
                                     <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full">
                                         <span id="current-page-{{ $album->id }}">1</span>/<span id="total-pages-{{ $album->id }}">{{ $album->total_pages ?? '?' }}</span>
+                                    </div>
+
+                                    <!-- Progress Bar -->
+                                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+                                        <div id="pdf-progress-{{ $album->id }}" class="h-full bg-red-500 transition-all duration-300" style="width: 0%"></div>
                                     </div>
 
                                     <!-- PDF Actions -->
@@ -139,14 +144,77 @@
                                             <i class="fas fa-download mr-1"></i>Tải về
                                         </a>
                                     </div>
+
+                                    <!-- Navigation Hint -->
+                                    <div class="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden lg:block">
+                                        <div class="bg-black/70 backdrop-blur-sm px-2 py-1 text-xs text-white rounded-full">
+                                            <i class="fas fa-info-circle mr-1"></i>Cuộn hoặc dùng mũi tên để xem trang
+                                        </div>
+                                    </div>
+
+                                    <!-- Mobile Navigation Hint -->
+                                    <div class="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-300 lg:hidden">
+                                        <div class="bg-black/70 backdrop-blur-sm px-2 py-1 text-xs text-white rounded-full">
+                                            <i class="fas fa-hand-pointer mr-1"></i>Vuốt để xem trang
+                                        </div>
+                                    </div>
                                 </div>
                             @elseif($album->media_type === 'images' && $album->thumbnail)
-                                <!-- Single Image Container -->
+                                <!-- Image Display with Carousel Support -->
                                 <div class="aspect-[4/3] relative bg-gray-50 overflow-hidden">
-                                    <img src="{{ $album->thumbnail_url }}"
-                                         alt="{{ $album->title }}"
-                                         class="w-full h-full object-cover"
-                                         loading="lazy">
+                                    @if($album->hasMultipleImages())
+                                        <!-- Multiple Images Carousel -->
+                                        <div id="image-carousel-{{ $album->id }}" class="relative w-full h-full">
+                                            @foreach($album->thumbnail_urls as $index => $imageUrl)
+                                                <div class="carousel-slide {{ $index === 0 ? 'active' : '' }} absolute inset-0 transition-opacity duration-300 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}">
+                                                    <img
+                                                        src="{{ $imageUrl }}"
+                                                        alt="{{ $album->title }} - Ảnh {{ $index + 1 }}"
+                                                        class="w-full h-full object-cover"
+                                                        loading="lazy"
+                                                    >
+                                                </div>
+                                            @endforeach
+
+                                            <!-- Navigation Buttons -->
+                                            @if(count($album->thumbnail_urls) > 1)
+                                                <button
+                                                    onclick="prevImage({{ $album->id }})"
+                                                    class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
+                                                >
+                                                    <i class="fas fa-chevron-left text-sm"></i>
+                                                </button>
+                                                <button
+                                                    onclick="nextImage({{ $album->id }})"
+                                                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
+                                                >
+                                                    <i class="fas fa-chevron-right text-sm"></i>
+                                                </button>
+
+                                                <!-- Dots Indicator -->
+                                                <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
+                                                    @foreach($album->thumbnail_urls as $index => $imageUrl)
+                                                        <button
+                                                            onclick="goToImage({{ $album->id }}, {{ $index }})"
+                                                            class="w-2 h-2 rounded-full transition-all duration-200 {{ $index === 0 ? 'bg-white' : 'bg-white/50' }}"
+                                                            data-slide="{{ $index }}"
+                                                        ></button>
+                                                    @endforeach
+                                                </div>
+
+                                                <!-- Image Counter -->
+                                                <div class="absolute top-2 right-2 bg-black/50 backdrop-blur-sm px-2 py-1 text-xs text-white font-medium rounded-full z-20">
+                                                    <span id="current-image-{{ $album->id }}">1</span>/<span>{{ count($album->thumbnail_urls) }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <!-- Single Image -->
+                                        <img src="{{ $album->thumbnail_url }}"
+                                             alt="{{ $album->title }}"
+                                             class="w-full h-full object-cover"
+                                             loading="lazy">
+                                    @endif
 
                                     <!-- Image Overlay -->
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
@@ -285,8 +353,10 @@ async function initPDFCarousel(albumId, pdfUrl) {
 
         // Show navigation if more than 1 page
         if (pdf.numPages > 1) {
-            const navBtns = document.querySelectorAll(`#pdf-carousel-${albumId} .pdf-nav-btn`);
-            navBtns.forEach(btn => btn.style.display = 'flex');
+            const prevBtn = document.getElementById(`pdf-prev-${albumId}`);
+            const nextBtn = document.getElementById(`pdf-next-${albumId}`);
+            if (prevBtn) prevBtn.style.display = 'flex';
+            if (nextBtn) nextBtn.style.display = 'flex';
         }
 
         // Render first page
@@ -294,6 +364,96 @@ async function initPDFCarousel(albumId, pdfUrl) {
 
         // Hide loading
         document.getElementById(`pdf-loading-${albumId}`).style.display = 'none';
+
+        // Add scroll wheel support for PDF navigation
+        const canvas = document.getElementById(`pdf-canvas-${albumId}`);
+        if (canvas && pdf.numPages > 1) {
+            canvas.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                if (e.deltaY > 0) {
+                    nextPage(albumId);
+                } else {
+                    prevPage(albumId);
+                }
+            });
+
+            // Add keyboard navigation (when canvas is focused)
+            canvas.setAttribute('tabindex', '0');
+            canvas.addEventListener('keydown', function(e) {
+                switch(e.key) {
+                    case 'ArrowRight':
+                    case 'ArrowDown':
+                    case ' ': // Space key
+                        e.preventDefault();
+                        nextPage(albumId);
+                        break;
+                    case 'ArrowLeft':
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        prevPage(albumId);
+                        break;
+                    case 'Home':
+                        e.preventDefault();
+                        renderPage(albumId, 1);
+                        break;
+                    case 'End':
+                        e.preventDefault();
+                        renderPage(albumId, state.totalPages);
+                        break;
+                }
+            });
+
+            // Add focus styles
+            canvas.style.outline = 'none';
+            canvas.addEventListener('focus', function() {
+                this.style.boxShadow = '0 0 0 2px rgba(239, 68, 68, 0.5)';
+            });
+            canvas.addEventListener('blur', function() {
+                this.style.boxShadow = '';
+            });
+
+            // Add touch gestures for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            canvas.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            canvas.addEventListener('touchend', function(e) {
+                if (!e.changedTouches[0]) return;
+
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+
+                // Minimum swipe distance
+                const minSwipeDistance = 50;
+
+                // Horizontal swipe (left/right)
+                if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                    if (deltaX > 0) {
+                        // Swipe right - previous page
+                        prevPage(albumId);
+                    } else {
+                        // Swipe left - next page
+                        nextPage(albumId);
+                    }
+                }
+                // Vertical swipe (up/down)
+                else if (Math.abs(deltaY) > minSwipeDistance) {
+                    if (deltaY < 0) {
+                        // Swipe up - next page
+                        nextPage(albumId);
+                    } else {
+                        // Swipe down - previous page
+                        prevPage(albumId);
+                    }
+                }
+            }, { passive: true });
+        }
 
     } catch (error) {
         console.error('Error loading PDF:', error);
@@ -338,8 +498,37 @@ async function renderPage(albumId, pageNum) {
         document.getElementById(`current-page-${albumId}`).textContent = pageNum;
         state.currentPage = pageNum;
 
+        // Update progress bar
+        const progressBar = document.getElementById(`pdf-progress-${albumId}`);
+        if (progressBar) {
+            const progress = (pageNum / state.totalPages) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Update navigation button states
+        updateNavigationButtons(albumId);
+
     } catch (error) {
         console.error('Error rendering page:', error);
+    }
+}
+
+// Update navigation button states
+function updateNavigationButtons(albumId) {
+    const state = pdfStates[albumId];
+    if (!state) return;
+
+    const prevBtn = document.getElementById(`pdf-prev-${albumId}`);
+    const nextBtn = document.getElementById(`pdf-next-${albumId}`);
+
+    if (prevBtn) {
+        prevBtn.disabled = state.currentPage <= 1;
+        prevBtn.style.opacity = state.currentPage <= 1 ? '0.5' : '';
+    }
+
+    if (nextBtn) {
+        nextBtn.disabled = state.currentPage >= state.totalPages;
+        nextBtn.style.opacity = state.currentPage >= state.totalPages ? '0.5' : '';
     }
 }
 
@@ -362,7 +551,83 @@ function prevPage(albumId) {
     }
 }
 
-// Removed image carousel - now using simple single image display
+// Image Carousel Functions
+const imageStates = {};
+
+function initImageCarousel(albumId, imageCount) {
+    imageStates[albumId] = {
+        currentImage: 0,
+        totalImages: imageCount
+    };
+}
+
+function nextImage(albumId) {
+    const state = imageStates[albumId];
+    if (!state) return;
+
+    const nextIndex = (state.currentImage + 1) % state.totalImages;
+    goToImage(albumId, nextIndex);
+}
+
+function prevImage(albumId) {
+    const state = imageStates[albumId];
+    if (!state) return;
+
+    const prevIndex = (state.currentImage - 1 + state.totalImages) % state.totalImages;
+    goToImage(albumId, prevIndex);
+}
+
+function goToImage(albumId, index) {
+    const state = imageStates[albumId];
+    if (!state || index < 0 || index >= state.totalImages) return;
+
+    const carousel = document.getElementById(`image-carousel-${albumId}`);
+    if (!carousel) return;
+
+    // Hide all slides
+    const slides = carousel.querySelectorAll('.carousel-slide');
+    slides.forEach((slide, i) => {
+        if (i === index) {
+            slide.classList.add('opacity-100');
+            slide.classList.remove('opacity-0');
+        } else {
+            slide.classList.add('opacity-0');
+            slide.classList.remove('opacity-100');
+        }
+    });
+
+    // Update dots
+    const dots = carousel.querySelectorAll('[data-slide]');
+    dots.forEach((dot, i) => {
+        if (i === index) {
+            dot.classList.add('bg-white');
+            dot.classList.remove('bg-white/50');
+        } else {
+            dot.classList.add('bg-white/50');
+            dot.classList.remove('bg-white');
+        }
+    });
+
+    // Update counter
+    const counter = document.getElementById(`current-image-${albumId}`);
+    if (counter) {
+        counter.textContent = index + 1;
+    }
+
+    state.currentImage = index;
+}
+
+// Initialize image carousels on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-initialize image carousels
+    document.querySelectorAll('[id^="image-carousel-"]').forEach(carousel => {
+        const albumId = carousel.id.replace('image-carousel-', '');
+        const imageCount = carousel.querySelectorAll('.carousel-slide').length;
+        if (imageCount > 1) {
+            initImageCarousel(parseInt(albumId), imageCount);
+        }
+    });
+});
 
 // Handle window resize
 window.addEventListener('resize', function() {
@@ -387,12 +652,14 @@ window.addEventListener('resize', function() {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .pdf-nav-btn {
     border: none;
     outline: none;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .pdf-nav-btn:focus {
@@ -401,8 +668,61 @@ window.addEventListener('resize', function() {
 }
 
 .pdf-nav-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.3 !important;
     cursor: not-allowed;
+    pointer-events: none;
+}
+
+.pdf-nav-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* PDF Canvas styling */
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+canvas:focus {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Progress bar animation */
+#pdf-progress-[id] {
+    transition: width 0.3s ease;
+}
+
+/* Mobile optimizations for PDF viewer */
+@media (max-width: 768px) {
+    .pdf-nav-btn {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .pdf-nav-btn i {
+        font-size: 0.75rem;
+    }
+
+    /* Make navigation hint smaller on mobile */
+    .absolute.bottom-2.left-2 {
+        display: none;
+    }
+}
+
+/* Touch-friendly navigation on mobile */
+@media (max-width: 640px) {
+    .pdf-nav-btn {
+        opacity: 0.8 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+    }
+
+    .group:hover .pdf-nav-btn {
+        opacity: 0.8 !important;
+    }
 }
 
 /* Responsive spacing optimizations */
@@ -446,12 +766,39 @@ window.addEventListener('resize', function() {
     scroll-behavior: smooth;
 }
 
-/* PDF Canvas styling */
-canvas {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 0.25rem;
+/* Loading animation improvements */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
-/* Removed image carousel styles - now using simple single image display */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Accessibility improvements */
+.pdf-nav-btn:focus-visible {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .pdf-nav-btn {
+        border: 1px solid #000;
+    }
+
+    canvas {
+        border: 1px solid #000;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .pdf-nav-btn,
+    canvas,
+    .timeline-item {
+        transition: none;
+    }
+}
 </style>

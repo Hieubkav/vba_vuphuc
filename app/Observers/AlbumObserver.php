@@ -26,9 +26,13 @@ class AlbumObserver
         // Validation logic cho media_type
         if ($album->isDirty('media_type')) {
             if ($album->media_type === 'pdf' && $album->thumbnail) {
-                // Tự động xóa thumbnail khi chuyển sang PDF
-                if (Storage::disk('public')->exists($album->thumbnail)) {
-                    Storage::disk('public')->delete($album->thumbnail);
+                // Tự động xóa thumbnail khi chuyển sang PDF (hỗ trợ multiple files)
+                $filesToDelete = is_array($album->thumbnail) ? $album->thumbnail : [$album->thumbnail];
+
+                foreach ($filesToDelete as $file) {
+                    if ($file && Storage::disk('public')->exists($file)) {
+                        Storage::disk('public')->delete($file);
+                    }
                 }
                 $album->thumbnail = null;
             }
@@ -43,13 +47,20 @@ class AlbumObserver
             }
         }
 
-        // Lưu thumbnail cũ để xóa sau khi update
+        // Lưu thumbnail cũ để xóa sau khi update (hỗ trợ multiple files)
         if ($album->isDirty('thumbnail')) {
+            $originalThumbnail = $album->getOriginal('thumbnail');
+
+            // Chuyển array thành JSON string để lưu vào cache
+            if (is_array($originalThumbnail)) {
+                $originalThumbnail = json_encode($originalThumbnail);
+            }
+
             $this->storeOldFile(
                 get_class($album),
                 $album->id,
                 'thumbnail',
-                $album->getOriginal('thumbnail')
+                $originalThumbnail
             );
         }
     }
@@ -59,16 +70,28 @@ class AlbumObserver
      */
     public function updated(Album $album): void
     {
-        // Xóa thumbnail cũ nếu có
+        // Xóa thumbnail cũ nếu có (hỗ trợ multiple files)
         if ($album->wasChanged('thumbnail')) {
-            $oldFile = $this->getAndDeleteOldFile(
+            $oldFiles = $this->getAndDeleteOldFile(
                 get_class($album),
                 $album->id,
                 'thumbnail'
             );
 
-            if ($oldFile && Storage::disk('public')->exists($oldFile)) {
-                Storage::disk('public')->delete($oldFile);
+            if ($oldFiles) {
+                // Nếu là JSON string, decode về array
+                if (is_string($oldFiles) && str_starts_with($oldFiles, '[')) {
+                    $oldFiles = json_decode($oldFiles, true) ?? [$oldFiles];
+                }
+
+                // Xử lý cả single file (string) và multiple files (array)
+                $filesToDelete = is_array($oldFiles) ? $oldFiles : [$oldFiles];
+
+                foreach ($filesToDelete as $oldFile) {
+                    if ($oldFile && Storage::disk('public')->exists($oldFile)) {
+                        Storage::disk('public')->delete($oldFile);
+                    }
+                }
             }
         }
 
@@ -88,9 +111,15 @@ class AlbumObserver
                 Storage::disk('public')->delete($album->pdf_file);
             }
         } elseif ($album->media_type === 'images') {
-            // Xóa thumbnail image
-            if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
-                Storage::disk('public')->delete($album->thumbnail);
+            // Xóa thumbnail images (hỗ trợ multiple files)
+            if ($album->thumbnail) {
+                $filesToDelete = is_array($album->thumbnail) ? $album->thumbnail : [$album->thumbnail];
+
+                foreach ($filesToDelete as $file) {
+                    if ($file && Storage::disk('public')->exists($file)) {
+                        Storage::disk('public')->delete($file);
+                    }
+                }
             }
         }
 
@@ -122,9 +151,15 @@ class AlbumObserver
                 Storage::disk('public')->delete($album->pdf_file);
             }
         } elseif ($album->media_type === 'images') {
-            // Xóa thumbnail image
-            if ($album->thumbnail && Storage::disk('public')->exists($album->thumbnail)) {
-                Storage::disk('public')->delete($album->thumbnail);
+            // Xóa thumbnail images (hỗ trợ multiple files)
+            if ($album->thumbnail) {
+                $filesToDelete = is_array($album->thumbnail) ? $album->thumbnail : [$album->thumbnail];
+
+                foreach ($filesToDelete as $file) {
+                    if ($file && Storage::disk('public')->exists($file)) {
+                        Storage::disk('public')->delete($file);
+                    }
+                }
             }
         }
 
