@@ -478,6 +478,10 @@ class ManageWebDesign extends Page implements HasForms
                                 Builder\Block::make('homepage_cta')
                                     ->label('CTA Toàn cục')
                                     ->schema([
+                                        Placeholder::make('cta_helper')
+                                            ->label('')
+                                            ->content('💡 Gợi ý: Có thể link đến trang đóng góp ý kiến tại /dong-gop-y-kien để thu thập feedback từ khách hàng')
+                                            ->columnSpanFull(),
                                         Grid::make(2)->schema([
                                             Toggle::make('enabled')
                                                 ->label('Hiển thị')
@@ -499,7 +503,8 @@ class ManageWebDesign extends Page implements HasForms
                                             ->label('📄 Mô tả')
                                             ->default('Khám phá các khóa học VBA chất lượng cao và chuyên sâu. Học tập hiệu quả, hỗ trợ tận tâm từ giảng viên.')
                                             ->required()
-                                            ->rows(3),
+                                            ->rows(3)
+                                            ->helperText('💡 Có thể khuyến khích khách hàng đóng góp ý kiến tại /dong-gop-y-kien'),
                                         Section::make('Nút hành động')
                                             ->schema([
                                                 Grid::make(2)->schema([
@@ -510,7 +515,8 @@ class ManageWebDesign extends Page implements HasForms
                                                     TextInput::make('primary_button_url')
                                                         ->label('🔗 Link nút chính')
                                                         ->default('/courses')
-                                                        ->required(),
+                                                        ->required()
+                                                        ->helperText('Gợi ý: /courses, /khoa-hoc, /dong-gop-y-kien'),
                                                 ]),
                                                 Grid::make(2)->schema([
                                                     TextInput::make('secondary_button_text')
@@ -518,7 +524,8 @@ class ManageWebDesign extends Page implements HasForms
                                                         ->default('Đăng ký học'),
                                                     TextInput::make('secondary_button_url')
                                                         ->label('🔗 Link nút phụ')
-                                                        ->default('/students/register'),
+                                                        ->default('/students/register')
+                                                        ->helperText('Gợi ý: /dang-ky-hoc-vien, /dong-gop-y-kien, /lien-he'),
                                                 ]),
                                             ])
                                             ->collapsible(),
