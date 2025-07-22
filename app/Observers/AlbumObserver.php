@@ -44,6 +44,9 @@ class AlbumObserver
                 $album->pdf_file = null;
                 $album->total_pages = null;
                 $album->file_size = null;
+
+                // Reset thumbnail array để tránh accumulation khi upload images mới
+                $album->thumbnail = null;
             }
         }
 
@@ -61,6 +64,40 @@ class AlbumObserver
                 $album->id,
                 'thumbnail',
                 $originalThumbnail
+            );
+        }
+
+        // Xử lý khi media_type thay đổi - clear old files ngay lập tức
+        if ($album->isDirty('media_type')) {
+            $originalMediaType = $album->getOriginal('media_type');
+
+            // Nếu chuyển từ images sang PDF, xóa thumbnail cũ
+            if ($originalMediaType === 'images' && $album->media_type === 'pdf') {
+                $originalThumbnail = $album->getOriginal('thumbnail');
+                if ($originalThumbnail) {
+                    $filesToDelete = is_array($originalThumbnail) ? $originalThumbnail : [$originalThumbnail];
+                    foreach ($filesToDelete as $file) {
+                        if ($file && Storage::disk('public')->exists($file)) {
+                            Storage::disk('public')->delete($file);
+                        }
+                    }
+                }
+            }
+
+            // Nếu chuyển từ PDF sang images, xóa PDF cũ
+            if ($originalMediaType === 'pdf' && $album->media_type === 'images') {
+                $originalPdfFile = $album->getOriginal('pdf_file');
+                if ($originalPdfFile && Storage::disk('public')->exists($originalPdfFile)) {
+                    Storage::disk('public')->delete($originalPdfFile);
+                }
+            }
+
+            // Store flag để biết có media_type change để xử lý trong updated()
+            $this->storeOldFile(
+                get_class($album),
+                $album->id,
+                'media_type_changed',
+                $originalMediaType . '->' . $album->media_type
             );
         }
     }
@@ -93,6 +130,18 @@ class AlbumObserver
                     }
                 }
             }
+        }
+
+        // Xử lý media_type changes - force cache rebuild
+        $mediaTypeChange = $this->getAndDeleteOldFile(
+            get_class($album),
+            $album->id,
+            'media_type_changed'
+        );
+
+        if ($mediaTypeChange) {
+            // Force immediate cache rebuild for media type transitions
+            \App\Providers\ViewServiceProvider::forceRebuildAlbumsCache();
         }
 
         // Cache clearing được handle bởi CacheObserver

@@ -22,6 +22,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudentController;
+use App\Providers\ViewServiceProvider;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -289,4 +290,22 @@ Route::get('/api/realtime-stats', function () {
         ], 500);
     }
 })->middleware('auth')->name('api.realtime-stats');
+
+// Force refresh albums cache - for debugging media type transitions
+Route::post('/api/force-refresh-albums-cache', function () {
+    try {
+        ViewServiceProvider::forceRebuildAlbumsCache();
+        return response()->json([
+            'success' => true,
+            'message' => 'Albums cache refreshed successfully',
+            'timestamp' => now()->toISOString()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => 'Failed to refresh cache: ' . $e->getMessage(),
+            'timestamp' => now()->toISOString()
+        ], 500);
+    }
+})->middleware('auth')->name('api.force-refresh-albums-cache');
 

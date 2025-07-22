@@ -37,6 +37,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        \Illuminate\Database\Events\TransactionCommitted::class => [
+            \App\Listeners\AlbumCacheRefreshListener::class,
+        ],
     ];
 
     /**

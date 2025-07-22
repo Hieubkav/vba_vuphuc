@@ -93,6 +93,23 @@ class AlbumResource extends Resource
                                             ->default('pdf')
                                             ->required()
                                             ->live()
+                                            ->afterStateUpdated(function (Forms\Set $set, $state) {
+                                                // Clear files khi chuyển media_type để tránh accumulation
+                                                if ($state === 'pdf') {
+                                                    $set('thumbnail', null); // Clear images
+                                                } elseif ($state === 'images') {
+                                                    $set('pdf_file', null); // Clear PDF
+                                                    $set('total_pages', null);
+                                                    $set('file_size', null);
+                                                }
+
+                                                // Force cache clear when media type changes
+                                                try {
+                                                    \App\Providers\ViewServiceProvider::forceRebuildAlbumsCache();
+                                                } catch (\Exception $e) {
+                                                    // Silent fail - cache will be cleared later
+                                                }
+                                            })
                                             ->columnSpanFull(),
 
                                         // PDF Upload - chỉ hiện khi chọn PDF
@@ -137,6 +154,16 @@ class AlbumResource extends Resource
                                                     }
                                                 },
                                             ])
+                                            ->afterStateUpdated(function ($state) {
+                                                // Force cache refresh after image upload
+                                                if (!empty($state)) {
+                                                    try {
+                                                        \App\Providers\ViewServiceProvider::forceRebuildAlbumsCache();
+                                                    } catch (\Exception $e) {
+                                                        // Silent fail
+                                                    }
+                                                }
+                                            })
                                             ->columnSpanFull(),
                                     ]),
 

@@ -584,6 +584,57 @@ class ViewServiceProvider extends ServiceProvider
     }
 
     /**
+     * Force rebuild albums cache immediately - For media type transitions
+     */
+    public static function forceRebuildAlbumsCache(): void
+    {
+        try {
+            // Clear existing cache first
+            self::clearAlbumsCache();
+
+            // Force immediate rebuild with fresh database data
+            Cache::forget('storefront_albums');
+
+            // Rebuild cache with fresh data
+            Cache::remember('storefront_albums', 7200, function () {
+                try {
+                    $albums = \App\Models\Album::where('status', 'active')
+                        ->where('published_date', '<=', now())
+                        ->where('featured', true) // Chỉ lấy album nổi bật
+                        ->select([
+                            'id', 'title', 'description', 'slug', 'pdf_file', 'media_type', 'thumbnail',
+                            'published_date', 'featured', 'total_pages', 'file_size',
+                            'download_count', 'view_count', 'created_at', 'order'
+                        ])
+                        ->orderBy('order', 'asc')
+                        ->orderBy('published_date', 'desc')
+                        ->orderBy('id', 'asc') // Fallback để đảm bảo thứ tự nhất quán
+                        ->take(10)
+                        ->get()
+                        ->filter(function ($album) {
+                            // Chỉ lấy albums có nội dung phù hợp với media_type
+                            if ($album->media_type === 'pdf') {
+                                return !empty($album->pdf_file);
+                            } elseif ($album->media_type === 'images') {
+                                return !empty($album->thumbnail);
+                            }
+                            return false;
+                        });
+
+                    return $albums;
+                } catch (\Exception $e) {
+                    // Fallback nếu bảng albums chưa tồn tại
+                    return collect();
+                }
+            });
+
+        } catch (\Exception $e) {
+            // Fallback: Clear all cache if rebuild fails
+            Cache::flush();
+        }
+    }
+
+    /**
      * Clear course groups cache specifically - Auto trigger method
      */
     public static function clearCourseGroupsCache(): void

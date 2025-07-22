@@ -12,7 +12,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Clean up orphaned album file references weekly
+        $schedule->command('album:cleanup-orphaned-files')
+                 ->weekly()
+                 ->sundays()
+                 ->at('02:00')
+                 ->description('Clean up orphaned album file references');
     }
 
     /**
