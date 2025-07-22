@@ -19,6 +19,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Str;
 class SliderResource extends Resource
 {
 
@@ -44,25 +45,34 @@ class SliderResource extends Resource
                     ->schema([
                         FileUpload::make('image_link')
                             ->label('Hình ảnh Hero Banner')
-                            ->helperText('Ảnh sẽ được tối ưu hóa tự động với chiều rộng tối đa 1920px, giữ nguyên tỷ lệ gốc. Sử dụng nút "Chỉnh ảnh thành 16:9" nếu muốn crop thành tỷ lệ 16:9.')
+                            ->helperText('Ảnh sẽ được tối ưu hóa thành WebP tự động. Kích thước tối đa: 8MB.')
                             ->required()
                             ->image()
                             ->directory('sliders/banners')
                             ->visibility('public')
-                            ->maxSize(8192) // Tăng lên 8MB để cho phép ảnh chất lượng cao
-                            ->imageEditor()
+                            ->maxSize(8192)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->saveUploadedFileUsing(function ($file, $get) {
-                                $imageService = app(\App\Services\ImageService::class);
-                                $title = $get('title') ?? 'hero-banner';
-                                return $imageService->saveImageWithAspectRatio(
-                                    $file,
-                                    'sliders/banners',
-                                    1920,  // maxWidth - tối ưu cho desktop
-                                    1080,  // maxHeight - giới hạn chiều cao
-                                    85,    // quality - cân bằng giữa chất lượng và dung lượng
-                                    "hero-banner-{$title}" // SEO-friendly name
-                                );
+                                // Fallback an toàn: nếu có lỗi thì dùng Laravel default
+                                try {
+                                    $title = $get('title') ?? 'hero-banner';
+                                    $customName = 'hero-banner-' . Str::slug($title);
+
+                                    // Sử dụng ConvertImageToWebp action
+                                    $result = \App\Actions\ConvertImageToWebp::run(
+                                        $file,
+                                        'sliders/banners',
+                                        $customName,
+                                        1920, // width
+                                        1080  // height
+                                    );
+
+                                    // Nếu convert thành công thì return, không thì fallback
+                                    return $result ?: $file->store('sliders/banners', 'public');
+                                } catch (\Exception $e) {
+                                    // Fallback: lưu file gốc nếu có lỗi
+                                    return $file->store('sliders/banners', 'public');
+                                }
                             })
                             ->columnSpanFull(),
 
