@@ -317,15 +317,148 @@
                             </div>
                         </div>
                         @endif
+
+                        <!-- Course Materials Section (Desktop Only) -->
+                        @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
+                        <div class="mb-8 hidden lg:block">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-4">Tài liệu khóa học</h2>
+
+                            <!-- Auth Status Alert -->
+                            @if(!auth('student')->check())
+                                <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <div class="flex items-start">
+                                        <svg class="h-4 w-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-blue-800 font-medium text-sm">Đăng nhập để xem tài liệu</p>
+                                            <p class="text-blue-700 text-xs mt-1">
+                                                <a href="{{ route('auth.login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="underline hover:no-underline">Đăng nhập</a>
+                                                để truy cập tài liệu.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @elseif(auth('student')->check() && $isLoggedIn)
+                                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                    <div class="flex items-start">
+                                        <svg class="h-4 w-4 text-green-400 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                        <div>
+                                            <p class="text-green-800 font-medium text-sm">Đã đăng nhập</p>
+                                            <p class="text-green-700 text-xs mt-1">
+                                                Bạn có thể truy cập tất cả tài liệu học viên.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Open Materials -->
+                            @if($openMaterials && $openMaterials->count() > 0)
+                            <div class="mb-6">
+                                <div class="flex items-center mb-3">
+                                    <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                    <h3 class="text-lg font-semibold text-green-700">Tài liệu mở</h3>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    @foreach($openMaterials as $material)
+                                    <div class="p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="{{ $material->file_icon }} text-xl text-green-600"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-medium text-gray-900 text-sm truncate">{{ $material->title }}</h4>
+                                                <div class="flex items-center space-x-2 mt-1 text-xs text-gray-500">
+                                                    <span>{{ $material->file_size_formatted }}</span>
+                                                    <span class="px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs">Miễn phí</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2 mt-2">
+                                                    @if($material->canPreview())
+                                                        <a href="{{ route('course-materials.view', $material) }}"
+                                                           target="_blank"
+                                                           class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                                                            Xem
+                                                        </a>
+                                                    @endif
+                                                    <a href="{{ route('course.material.download', $material->id) }}"
+                                                       class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                                                        Tải về
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+
+                            <!-- Enrolled Materials -->
+                            @if($enrolledMaterials && $enrolledMaterials->count() > 0)
+                            <div class="mb-4">
+                                <div class="flex items-center mb-3">
+                                    <svg class="w-4 h-4 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
+                                    </svg>
+                                    <h3 class="text-lg font-semibold text-blue-700">Tài liệu học viên</h3>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    @foreach($enrolledMaterials as $material)
+                                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg {{ $isLoggedIn ? 'hover:bg-blue-100' : 'opacity-60' }} transition-colors">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <i class="{{ $material->file_icon }} text-xl {{ $isLoggedIn ? 'text-blue-600' : 'text-gray-400' }}"></i>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-medium text-gray-900 text-sm truncate">{{ $material->title }}</h4>
+                                                <div class="flex items-center space-x-2 mt-1 text-xs text-gray-500">
+                                                    <span>{{ $material->file_size_formatted }}</span>
+                                                    <span class="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">Học viên</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2 mt-2">
+                                                    @if($isLoggedIn)
+                                                        <a href="{{ route('course-materials.view', $material) }}"
+                                                           target="_blank"
+                                                           class="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors">
+                                                            Xem
+                                                        </a>
+                                                        <a href="{{ route('course.material.download', $material->id) }}"
+                                                           class="px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors">
+                                                            Tải về
+                                                        </a>
+                                                    @else
+                                                        <div class="px-2 py-1 text-xs bg-gray-100 text-gray-500 rounded cursor-not-allowed">
+                                                            <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 616 0z" clip-rule="evenodd" />
+                                                            </svg>
+                                                            Khóa
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- Sidebar -->
             <div class="lg:col-span-1">
-                <!-- Course Materials Section -->
+                <!-- Course Materials Section (Mobile Only) -->
                 @if(($openMaterials && $openMaterials->count() > 0) || ($enrolledMaterials && $enrolledMaterials->count() > 0))
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 lg:hidden">
                     <div class="p-6">
                         <h3 class="text-xl font-bold text-gray-900 mb-4">Tài liệu khóa học</h3>
 
