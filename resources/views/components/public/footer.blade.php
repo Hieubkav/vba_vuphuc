@@ -3,21 +3,40 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             <!-- Cột 1: Giới thiệu & Liên hệ -->
             <div class="flex flex-col justify-start">
-                <h3 class="text-lg font-semibold text-red-700 mb-4">CÔNG TY TNHH SX TM DV VŨ PHÚC</h3>
+                @php
+                    $companyBrandName = webDesignContent('footer', 'company_brand_name', 'CÔNG TY TNHH SX TM DV VŨ PHÚC');
+                    $businessLicense = webDesignContent('footer', 'company_business_license', 'Giấy phép kinh doanh số 1800935879, cấp ngày 29/4/2009');
+                    $directorInfo = webDesignContent('footer', 'company_director_info', 'Chịu trách nhiệm: Trần Uy Vũ – Tổng Giám đốc');
+                @endphp
+                <h3 class="text-lg font-semibold text-red-700 mb-4">{{ $companyBrandName }}</h3>
                 <div class="space-y-2 text-gray-600 text-sm">
-                    <p>Giấy phép kinh doanh số 1800935879, cấp ngày 29/4/2009</p>
-                    <p>Chịu trách nhiệm: Trần Uy Vũ – Tổng Giám đốc</p>
+                    <p>{{ $businessLicense }}</p>
+                    <p>{{ $directorInfo }}</p>
+                    @php
+                        // Lấy thông tin liên hệ từ Setting model
+                        $contactSettings = $globalSettings ?? $settings ?? null;
+                        if (!$contactSettings) {
+                            try {
+                                $contactSettings = \App\Models\Setting::where('status', 'active')->first();
+                            } catch (\Exception $e) {
+                                $contactSettings = null;
+                            }
+                        }
+                        $hotline = $contactSettings ? ($contactSettings->hotline ?? '1900 6363 40') : '1900 6363 40';
+                        $email = $contactSettings ? ($contactSettings->email ?? 'contact@vuphucbaking.com') : 'contact@vuphucbaking.com';
+                        $workingHours = $contactSettings ? ($contactSettings->working_hours ?? '7:30 - 17:00 (Thứ 2 - Thứ 6) & 7:30 - 12:00 (Thứ 7)') : '7:30 - 17:00 (Thứ 2 - Thứ 6) & 7:30 - 12:00 (Thứ 7)';
+                    @endphp
                     <p class="flex items-center">
                         <span class="mr-2">☎</span>
-                        <span>1900 6363 40</span>
+                        <span>{{ $hotline }}</span>
                     </p>
                     <p class="flex items-center">
                         <span class="mr-2">📧</span>
-                        <span>contact@vuphucbaking.com</span>
+                        <span>{{ $email }}</span>
                     </p>
                     <p class="flex items-center">
                         <span class="mr-2">🕒</span>
-                        <span>7:30 - 17:00 (Thứ 2 - Thứ 6) & 7:30 - 12:00 (Thứ 7)</span>
+                        <span>{{ $workingHours }}</span>
                     </p>
                 </div>
             </div>
