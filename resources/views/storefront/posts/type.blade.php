@@ -30,7 +30,7 @@
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-    <!-- Hero Section -->
+    {{-- Hero Section đã được loại bỏ để đơn giản hóa giao diện
     <div class="relative bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white overflow-hidden">
         <div class="absolute inset-0 hero-pattern"></div>
         <div class="relative py-24 md:py-32">
@@ -102,6 +102,7 @@
             </svg>
         </div>
     </div>
+    --}}
 
     <!-- Breadcrumb -->
     <div class="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-40">

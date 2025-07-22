@@ -70,7 +70,7 @@
 @endpush
 
 @section('content')
-<!-- Hero Section -->
+{{-- Hero Section đã được loại bỏ để đơn giản hóa giao diện
 <section class="bg-gradient-to-r from-red-600 to-red-700">
     <div class="container mx-auto px-4 py-4">
         <nav class="mb-1">
@@ -85,6 +85,7 @@
         </h1>
     </div>
 </section>
+--}}
 
 <!-- Main Content -->
 <section class="py-16 bg-gray-50">

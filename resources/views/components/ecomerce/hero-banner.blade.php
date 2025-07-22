@@ -1,3 +1,4 @@
+{{-- Hero Section đã được loại bỏ để đơn giản hóa giao diện
 <section class="relative bg-gradient-to-r from-red-700 to-red-800 text-white py-16 md:py-20 overflow-hidden">
     <div class="absolute inset-0 opacity-10">
         <div class="absolute inset-0 bg-pattern"></div>
@@ -38,3 +39,4 @@
         </div>
     </div>
 </section>
+--}}
