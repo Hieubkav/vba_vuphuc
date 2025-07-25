@@ -13,6 +13,7 @@ use Lorisleiva\Actions\Concerns\AsAction;
  * Convert Image To WebP Action - KISS Principle
  *
  * Chỉ làm 1 việc: Chuyển ảnh sang WebP với 95% chất lượng
+ * Giữ nguyên tỷ lệ khung hình khi resize
  * Không có cache, không có optimization phức tạp
  */
 class ConvertImageToWebp
@@ -27,13 +28,13 @@ class ConvertImageToWebp
     }
 
     /**
-     * Chuyển ảnh sang WebP với 95% chất lượng
+     * Chuyển ảnh sang WebP với 95% chất lượng và giữ nguyên tỷ lệ
      *
      * @param UploadedFile $file File upload
      * @param string $directory Thư mục lưu (vd: 'courses', 'posts')
      * @param string|null $customName Tên file tùy chỉnh
-     * @param int $width Chiều rộng (0 = không resize)
-     * @param int $height Chiều cao (0 = không resize)
+     * @param int $width Chiều rộng tối đa (0 = không resize)
+     * @param int $height Chiều cao tối đa (0 = không resize)
      * @return string|null Đường dẫn file đã lưu
      */
     public function handle(UploadedFile $file, string $directory, ?string $customName = null, int $width = 0, int $height = 0): ?string
@@ -61,13 +62,16 @@ class ConvertImageToWebp
             // Đọc và convert sang WebP
             $image = $this->manager->read($filePath);
 
-            // Resize nếu có kích thước
+            // Resize nếu có kích thước - giữ nguyên tỷ lệ (Intervention Image v3)
             if ($width > 0 && $height > 0) {
-                $image->resize($width, $height);
+                // Scale để fit trong khung mà không cắt ảnh
+                $image->scale($width, $height);
             } elseif ($width > 0) {
-                $image->resize(width: $width);
+                // Scale theo chiều rộng, giữ tỷ lệ
+                $image->scaleDown($width);
             } elseif ($height > 0) {
-                $image->resize(height: $height);
+                // Scale theo chiều cao, giữ tỷ lệ
+                $image->scaleDown(height: $height);
             }
 
             $webpData = $image->toWebp(95); // 95% chất lượng

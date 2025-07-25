@@ -45,12 +45,19 @@ class SliderResource extends Resource
                     ->schema([
                         FileUpload::make('image_link')
                             ->label('Hình ảnh Hero Banner')
-                            ->helperText('Ảnh sẽ được tối ưu hóa thành WebP tự động. Kích thước tối đa: 8MB.')
+                            ->helperText('Ảnh sẽ được giữ nguyên kích thước gốc và tối ưu hóa thành WebP. Kích thước tối đa: 8MB. Nhấn nút "Edit" để chỉnh sửa ảnh.')
                             ->required()
                             ->image()
                             ->directory('sliders/banners')
                             ->visibility('public')
                             ->maxSize(8192)
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '21:9',
+                                '4:3',
+                                '1:1',
+                            ])
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->saveUploadedFileUsing(function ($file, $get) {
                                 // Fallback an toàn: nếu có lỗi thì dùng Laravel default
@@ -58,13 +65,13 @@ class SliderResource extends Resource
                                     $title = $get('title') ?? 'hero-banner';
                                     $customName = 'hero-banner-' . Str::slug($title);
 
-                                    // Sử dụng ConvertImageToWebp action
+                                    // Sử dụng ConvertImageToWebp action - giữ nguyên kích thước gốc
                                     $result = \App\Actions\ConvertImageToWebp::run(
                                         $file,
                                         'sliders/banners',
                                         $customName,
-                                        1920, // width
-                                        1080  // height
+                                        0, // width = 0 nghĩa là không resize
+                                        0  // height = 0 nghĩa là không resize
                                     );
 
                                     // Nếu convert thành công thì return, không thì fallback
