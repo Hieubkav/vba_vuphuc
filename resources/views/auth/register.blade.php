@@ -113,6 +113,11 @@
                     </div>
                 </div>
 
+                <!-- CAPTCHA -->
+                <div class="md:col-span-2">
+                    @include('components.captcha', ['question' => $captcha['question']])
+                </div>
+
                 <!-- Submit Button -->
                 <button type="submit" 
                         class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg font-medium hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]">

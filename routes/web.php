@@ -12,6 +12,7 @@
 
 use App\Http\Controllers\AlbumController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseGroupController;
 use App\Http\Controllers\FaviconController;
@@ -111,6 +112,16 @@ Route::controller(FeedbackController::class)->group(function () {
     Route::get('/dong-gop-y-kien', 'show')->name('feedback.show');
     Route::post('/dong-gop-y-kien', 'store')->name('feedback.store');
     Route::get('/cam-on-dong-gop', 'success')->name('feedback.success');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Routes CAPTCHA
+|--------------------------------------------------------------------------
+| API endpoints cho CAPTCHA bảo mật
+*/
+Route::controller(CaptchaController::class)->group(function () {
+    Route::get('/api/captcha/refresh', 'refresh')->name('captcha.refresh');
 });
 
 /*

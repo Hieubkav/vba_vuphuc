@@ -33,7 +33,7 @@
                         </div>
 
                         <!-- Testimonial Content -->
-                        <p class="text-gray-600 italic text-base mb-4 flex-grow leading-relaxed">"{{ $testimonial->content }}"</p>
+                        <p class="text-gray-600 italic text-base mb-4 flex-grow leading-relaxed">"{{ $testimonial->display_content }}"</p>
 
                         <!-- Customer Info -->
                         <div class="flex items-center mt-auto pt-3 border-t border-gray-100">
@@ -80,15 +80,10 @@
                             <div class="min-w-0 flex-1">
                                 <h4 class="font-semibold text-gray-900 text-sm truncate">{{ $testimonial->name }}</h4>
                                 <p class="text-xs text-gray-500 truncate">
-                                    @if($testimonial->position && $testimonial->company)
-                                        {{ $testimonial->position }}, {{ $testimonial->company }}
-                                    @elseif($testimonial->position)
-                                        {{ $testimonial->position }}
-                                    @elseif($testimonial->company)
-                                        {{ $testimonial->company }}
-                                    @endif
                                     @if($testimonial->location)
-                                        @if($testimonial->position || $testimonial->company), @endif{{ $testimonial->location }}
+                                        {{ $testimonial->location }}
+                                    @else
+                                        Khách hàng VBA Vũ Phúc
                                     @endif
                                 </p>
                             </div>

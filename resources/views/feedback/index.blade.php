@@ -40,7 +40,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" novalidate>
+                <form action="{{ route('feedback.store') }}" method="POST" id="feedbackForm" enctype="multipart/form-data" novalidate>
                     @csrf
                     
                     <!-- Name Field -->
@@ -67,10 +67,10 @@
                         <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                             Email <span class="text-red-500">*</span>
                         </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
                             value="{{ old('email') }}"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors @error('email') border-red-500 @enderror"
                             placeholder="Nhập email của bạn"
@@ -79,6 +79,34 @@
                         @error('email')
                             <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                         @enderror
+                    </div>
+
+                    <!-- Avatar Upload Field -->
+                    <div class="mb-6">
+                        <label for="avatar" class="block text-sm font-medium text-gray-700 mb-2">
+                            Ảnh đại diện <span class="text-gray-500">(tùy chọn)</span>
+                        </label>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-1">
+                                <input
+                                    type="file"
+                                    id="avatar"
+                                    name="avatar"
+                                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors @error('avatar') border-red-500 @enderror"
+                                    onchange="previewAvatar(this)"
+                                >
+                                @error('avatar')
+                                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                                <p class="mt-2 text-xs text-gray-500">
+                                    Chấp nhận: JPG, PNG, WebP. Tối đa 2MB. Nếu không upload, hệ thống sẽ tự tạo avatar từ tên của bạn.
+                                </p>
+                            </div>
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden" id="avatarPreview">
+                                <i class="fas fa-user text-gray-400 text-xl"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Rating Field -->
@@ -131,6 +159,11 @@
                                 <span id="charCount">{{ strlen(old('content', '')) }}</span>/1000
                             </p>
                         </div>
+                    </div>
+
+                    <!-- CAPTCHA -->
+                    <div class="mb-6">
+                        @include('components.captcha', ['question' => $captcha['question']])
                     </div>
 
                     <!-- Submit Button -->
@@ -218,6 +251,23 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang gửi...';
     });
 });
+
+// Preview avatar function
+function previewAvatar(input) {
+    const preview = document.getElementById('avatarPreview');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Avatar preview" class="w-full h-full object-cover rounded-full">`;
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.innerHTML = '<i class="fas fa-user text-gray-400 text-xl"></i>';
+    }
+}
 </script>
 @endpush
 @endsection

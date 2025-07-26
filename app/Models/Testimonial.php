@@ -13,10 +13,9 @@ class Testimonial extends Model
     protected $fillable = [
         'name',
         'email',
-        'position',
-        'company',
         'location',
         'content',
+        'edited_content',
         'rating',
         'avatar',
         'order',
@@ -51,6 +50,22 @@ class Testimonial extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('order')->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Lấy nội dung hiển thị (ưu tiên edited_content nếu có)
+     */
+    public function getDisplayContentAttribute(): string
+    {
+        return $this->edited_content ?: $this->content;
+    }
+
+    /**
+     * Kiểm tra xem testimonial có nội dung đã được biên tập không
+     */
+    public function hasEditedContent(): bool
+    {
+        return !empty($this->edited_content);
     }
 
 

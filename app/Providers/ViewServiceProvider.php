@@ -193,7 +193,7 @@ class ViewServiceProvider extends ServiceProvider
             'testimonials' => Cache::remember('storefront_testimonials', 7200, function () {
                 return Testimonial::where('status', 'active')
                     ->select([
-                        'id', 'name', 'position', 'company', 'location', 'content',
+                        'id', 'name', 'location', 'content', 'edited_content',
                         'rating', 'avatar', 'order'
                     ])
                     ->orderBy('order')

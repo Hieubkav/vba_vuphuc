@@ -45,13 +45,7 @@ class TestimonialResource extends Resource
                             ->maxLength(255)
                             ->helperText('Email khách hàng (dành cho feedback từ website)'),
 
-                        Forms\Components\TextInput::make('position')
-                            ->label('Chức vụ')
-                            ->maxLength(255),
 
-                        Forms\Components\TextInput::make('company')
-                            ->label('Công ty')
-                            ->maxLength(255),
 
                         Forms\Components\TextInput::make('location')
                             ->label('Địa điểm')
@@ -84,10 +78,20 @@ class TestimonialResource extends Resource
                 Forms\Components\Section::make('Nội dung đánh giá')
                     ->schema([
                         Forms\Components\Textarea::make('content')
-                            ->label('Nội dung lời khen')
+                            ->label('Nội dung gốc từ khách hàng')
                             ->required()
                             ->rows(4)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->helperText('Nội dung gốc từ khách hàng (không chỉnh sửa)')
+                            ->disabled(fn ($record) => $record && $record->email) // Chỉ readonly nếu là feedback từ khách hàng
+                            ->dehydrated(),
+
+                        Forms\Components\Textarea::make('edited_content')
+                            ->label('Nội dung hiển thị (đã biên tập)')
+                            ->rows(4)
+                            ->columnSpanFull()
+                            ->helperText('Nội dung đã được biên tập để hiển thị trên website. Để trống nếu muốn hiển thị nội dung gốc.')
+                            ->placeholder('Nhập nội dung đã biên tập hoặc để trống để sử dụng nội dung gốc'),
 
                         Forms\Components\Select::make('rating')
                             ->label('Đánh giá (sao)')
@@ -153,15 +157,14 @@ class TestimonialResource extends Resource
                     ->badge()
                     ->color(fn($state) => $state === 'Feedback KH' ? 'info' : 'success'),
 
-                Tables\Columns\TextColumn::make('position')
-                    ->label('Chức vụ')
-                    ->searchable()
-                    ->toggleable(),
-
-                Tables\Columns\TextColumn::make('company')
-                    ->label('Công ty')
-                    ->searchable()
-                    ->toggleable(),
+                Tables\Columns\IconColumn::make('has_edited_content')
+                    ->label('Đã biên tập')
+                    ->getStateUsing(fn($record) => !empty($record->edited_content))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
 
                 Tables\Columns\TextColumn::make('rating')
                     ->label('Đánh giá')

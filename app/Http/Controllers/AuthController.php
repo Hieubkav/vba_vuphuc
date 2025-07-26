@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Rules\CaptchaRule;
+use App\Services\CaptchaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -81,7 +83,12 @@ class AuthController extends Controller
             session(['url.intended' => $request->get('redirect')]);
         }
 
-        return view('auth.register');
+        // Tạo CAPTCHA mới cho form đăng ký
+        $captcha = CaptchaService::generate();
+
+        return view('auth.register', [
+            'captcha' => $captcha
+        ]);
     }
 
     /**
@@ -101,6 +108,7 @@ class AuthController extends Controller
             'education_level' => 'nullable|in:high_school,college,university,master,phd,other',
             'learning_goals' => 'nullable|string|max:1000',
             'interests' => 'nullable|array',
+            'captcha' => ['required', new CaptchaRule()],
         ], [
             'name.required' => 'Vui lòng nhập họ và tên',
             'email.required' => 'Vui lòng nhập email',
@@ -110,6 +118,7 @@ class AuthController extends Controller
             'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp',
             'birth_date.before' => 'Bạn phải từ 16 tuổi trở lên',
+            'captcha.required' => 'Vui lòng nhập kết quả xác thực bảo mật',
         ]);
 
         if ($validator->fails()) {

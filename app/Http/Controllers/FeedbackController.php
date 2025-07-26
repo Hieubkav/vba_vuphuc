@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Helpers\AvatarHelper;
 use App\Models\Testimonial;
 use App\Providers\ViewServiceProvider;
+use App\Rules\CaptchaRule;
+use App\Services\CaptchaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +19,12 @@ class FeedbackController extends Controller
      */
     public function show(): View
     {
-        return view('feedback.index');
+        // Tạo CAPTCHA mới cho form
+        $captcha = CaptchaService::generate();
+
+        return view('feedback.index', [
+            'captcha' => $captcha
+        ]);
     }
 
     /**
@@ -30,6 +37,8 @@ class FeedbackController extends Controller
             'email' => 'required|email|max:255',
             'content' => 'required|string|min:10|max:1000',
             'rating' => 'nullable|integer|min:1|max:5',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'captcha' => ['required', new CaptchaRule()],
         ], [
             'name.required' => 'Vui lòng nhập họ và tên',
             'name.max' => 'Họ và tên không được vượt quá 255 ký tự',
@@ -42,6 +51,10 @@ class FeedbackController extends Controller
             'rating.integer' => 'Đánh giá phải là số nguyên',
             'rating.min' => 'Đánh giá tối thiểu là 1 sao',
             'rating.max' => 'Đánh giá tối đa là 5 sao',
+            'avatar.image' => 'File avatar phải là hình ảnh',
+            'avatar.mimes' => 'Avatar chỉ chấp nhận định dạng: jpeg, png, jpg, webp',
+            'avatar.max' => 'Kích thước avatar không được vượt quá 2MB',
+            'captcha.required' => 'Vui lòng nhập kết quả xác thực bảo mật',
         ]);
 
         if ($validator->fails()) {
@@ -52,8 +65,24 @@ class FeedbackController extends Controller
         }
 
         try {
-            // Tạo avatar chữ cái tự động cho feedback
-            $avatarString = AvatarHelper::generateAvatarString($request->name);
+            // Xử lý upload avatar nếu có
+            $avatarPath = null;
+            if ($request->hasFile('avatar')) {
+                $avatarFile = $request->file('avatar');
+                $customName = 'feedback-avatar-' . $request->name;
+
+                // Sử dụng ConvertImageToWebp action để tối ưu ảnh
+                $avatarPath = \App\Actions\ConvertImageToWebp::run(
+                    $avatarFile,
+                    'testimonials/avatars',
+                    $customName,
+                    400,
+                    400
+                );
+            } else {
+                // Tạo avatar chữ cái tự động nếu không upload ảnh
+                $avatarPath = AvatarHelper::generateAvatarString($request->name);
+            }
 
             // Tạo testimonial mới với trạng thái pending
             Testimonial::create([
@@ -63,11 +92,8 @@ class FeedbackController extends Controller
                 'rating' => $request->rating ?? 5,
                 'status' => 'pending', // Trạng thái chưa được duyệt
                 'order' => 0,
-                'avatar' => $avatarString, // Avatar chữ cái tự động
-                // Các trường khác để null vì đây là feedback từ khách hàng
-                'position' => null,
-                'company' => null,
-                'location' => null,
+                'avatar' => $avatarPath,
+                'location' => null, // Giữ lại trường location
             ]);
 
             // Clear cache để cập nhật dữ liệu testimonials trong CMS
