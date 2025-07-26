@@ -4,6 +4,9 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\SliderResource\Pages;
 use App\Models\Slider;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
@@ -121,7 +124,9 @@ class SliderResource extends Resource
                             ->default(true)
                             ->onColor('success')
                             ->offColor('danger')
-                            ->columnSpan(1),
+                            ->columnSpan(1)
+                            ->dehydrateStateUsing(fn ($state) => $state ? 'active' : 'inactive')
+                            ->formatStateUsing(fn ($state) => $state === 'active'),
                     ])->columns(2),
             ]);
     }
@@ -159,7 +164,27 @@ class SliderResource extends Resource
 
                 ToggleColumn::make('status')
                     ->label('Hiển thị')
-                    ->sortable(),
+                    ->sortable()
+                    ->getStateUsing(fn ($record) => $record->status === 'active')
+                    ->updateStateUsing(function ($record, $state) {
+                        try {
+                            $newStatus = $state ? 'active' : 'inactive';
+                            DB::table('sliders')
+                                ->where('id', $record->id)
+                                ->update([
+                                    'status' => $newStatus,
+                                    'updated_at' => now()
+                                ]);
+
+                            // Clear cache
+                            Cache::forget('storefront_sliders');
+
+                            return $state;
+                        } catch (\Exception $e) {
+                            Log::error('Slider toggle error: ' . $e->getMessage());
+                            throw $e;
+                        }
+                    }),
 
                 TextColumn::make('created_at')
                     ->label('Ngày tạo')

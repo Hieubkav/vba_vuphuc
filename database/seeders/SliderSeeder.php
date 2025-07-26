@@ -21,7 +21,7 @@ class SliderSeeder extends Seeder
                 'image_link' => 'sliders/baking-course-professional.webp',
                 'link' => '/khoa-hoc',
                 'alt_text' => 'Khóa học làm bánh chuyên nghiệp',
-                'status' => 'active',
+                'status' => true,
                 'order' => 1,
             ],
             [
@@ -30,7 +30,7 @@ class SliderSeeder extends Seeder
                 'image_link' => 'sliders/french-pastry-classic.webp',
                 'link' => '/khoa-hoc/banh-phap-co-dien',
                 'alt_text' => 'Học làm bánh Pháp cổ điển',
-                'status' => 'active',
+                'status' => true,
                 'order' => 2,
             ],
             [
@@ -39,7 +39,7 @@ class SliderSeeder extends Seeder
                 'image_link' => 'sliders/professional-baking-instructor.webp',
                 'link' => '/giang-vien',
                 'alt_text' => 'Đội ngũ giảng viên làm bánh chuyên nghiệp',
-                'status' => 'active',
+                'status' => true,
                 'order' => 3,
             ],
             [
@@ -48,7 +48,7 @@ class SliderSeeder extends Seeder
                 'image_link' => 'sliders/real-baking-recipes.webp',
                 'link' => '/cong-thuc-banh',
                 'alt_text' => 'Công thức làm bánh thực tế',
-                'status' => 'active',
+                'status' => true,
                 'order' => 4,
             ],
             [
@@ -57,7 +57,7 @@ class SliderSeeder extends Seeder
                 'image_link' => 'sliders/baking-support-247.webp',
                 'link' => '/lien-he',
                 'alt_text' => 'Hỗ trợ học viên làm bánh 24/7',
-                'status' => 'active',
+                'status' => true,
                 'order' => 5,
             ],
         ];

@@ -270,7 +270,7 @@ class FirstSeed extends Seeder
             'link' => '/san-pham',
             'alt_text' => 'Bánh tươi ngon tại Vũ Phúc Bakery',
             'order' => 1,
-            'status' => 'active',
+            'status' => true,
         ]);
 
         Slider::create([
@@ -280,7 +280,7 @@ class FirstSeed extends Seeder
             'link' => '/banh-kem',
             'alt_text' => 'Bánh kem sinh nhật đẹp mắt',
             'order' => 2,
-            'status' => 'active',
+            'status' => true,
         ]);
     }
 

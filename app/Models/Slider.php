@@ -21,7 +21,6 @@ class Slider extends Model
     ];
 
     protected $casts = [
-        'status' => 'string',
         'order' => 'integer',
     ];
 }
