@@ -161,7 +161,8 @@
                                 </div>
                             @elseif($album->media_type === 'images' && $album->thumbnail)
                                 <!-- Image Display with Carousel Support -->
-                                <div class="aspect-[4/3] relative bg-gray-50 overflow-hidden">
+                                <div class="aspect-[4/3] relative bg-gray-50 overflow-hidden cursor-pointer group"
+                                     onclick="openAlbumModal({{ $album->id }}, '{{ $album->title }}', {{ json_encode($album->thumbnail_urls) }})">
                                     @if($album->hasMultipleImages())
                                         <!-- Multiple Images Carousel -->
                                         <div id="image-carousel-{{ $album->id }}" class="relative w-full h-full">
@@ -170,7 +171,7 @@
                                                     <img
                                                         src="{{ $imageUrl }}"
                                                         alt="{{ $album->title }} - Ảnh {{ $index + 1 }}"
-                                                        class="w-full h-full object-cover"
+                                                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                                         loading="lazy"
                                                     >
                                                 </div>
@@ -179,13 +180,13 @@
                                             <!-- Navigation Buttons -->
                                             @if(count($album->thumbnail_urls) > 1)
                                                 <button
-                                                    onclick="prevImage({{ $album->id }})"
+                                                    onclick="event.stopPropagation(); prevImage({{ $album->id }})"
                                                     class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
                                                 >
                                                     <i class="fas fa-chevron-left text-sm"></i>
                                                 </button>
                                                 <button
-                                                    onclick="nextImage({{ $album->id }})"
+                                                    onclick="event.stopPropagation(); nextImage({{ $album->id }})"
                                                     class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200 z-10"
                                                 >
                                                     <i class="fas fa-chevron-right text-sm"></i>
@@ -195,7 +196,7 @@
                                                 <div class="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
                                                     @foreach($album->thumbnail_urls as $index => $imageUrl)
                                                         <button
-                                                            onclick="goToImage({{ $album->id }}, {{ $index }})"
+                                                            onclick="event.stopPropagation(); goToImage({{ $album->id }}, {{ $index }})"
                                                             class="w-2 h-2 rounded-full transition-all duration-200 {{ $index === 0 ? 'bg-white' : 'bg-white/50' }}"
                                                             data-slide="{{ $index }}"
                                                         ></button>
@@ -212,12 +213,16 @@
                                         <!-- Single Image -->
                                         <img src="{{ $album->thumbnail_url }}"
                                              alt="{{ $album->title }}"
-                                             class="w-full h-full object-cover"
+                                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                              loading="lazy">
                                     @endif
 
-                                    <!-- Image Overlay -->
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                                    <!-- Image Overlay with Click Hint -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                        <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-gray-800 font-medium text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                            <i class="fas fa-expand-alt mr-2"></i>Xem album
+                                        </div>
+                                    </div>
                                 </div>
                             @endif
                         </div>
@@ -325,6 +330,57 @@
     </div>
 </div>
 @endif
+
+{{-- Album Modal --}}
+<div id="album-modal" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden items-center justify-center p-4">
+    <div class="relative max-w-7xl max-h-full w-full">
+        {{-- Close button --}}
+        <button class="absolute top-4 right-4 text-white text-3xl z-20 hover:text-gray-300 transition-colors bg-black/30 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center"
+                onclick="closeAlbumModal()">
+            <i class="fas fa-times"></i>
+        </button>
+
+        {{-- Navigation buttons --}}
+        <button class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-20 hover:text-gray-300 transition-colors bg-black/30 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center"
+                onclick="previousAlbumImage()" id="album-prev-btn">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-20 hover:text-gray-300 transition-colors bg-black/30 backdrop-blur-sm rounded-full w-12 h-12 flex items-center justify-center"
+                onclick="nextAlbumImage()" id="album-next-btn">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        {{-- Main image container --}}
+        <div class="flex items-center justify-center h-full">
+            <img id="album-modal-image" class="max-w-full max-h-full object-contain" src="" alt="">
+        </div>
+
+        {{-- Image counter - Desktop only --}}
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-center hidden md:block">
+            <div class="bg-black/50 backdrop-blur-sm px-4 py-2 rounded-lg text-white">
+                <h3 id="album-modal-title" class="font-semibold text-lg mb-1"></h3>
+                <div class="text-sm opacity-90">
+                    <span id="album-current-image">1</span> / <span id="album-total-images">1</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Simple counter for mobile --}}
+        <div class="absolute top-4 left-1/2 transform -translate-x-1/2 md:hidden">
+            <div class="bg-black/50 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm">
+                <span id="album-current-image-mobile">1</span> / <span id="album-total-images-mobile">1</span>
+            </div>
+        </div>
+
+        {{-- Thumbnail strip for multiple images - Desktop only --}}
+        <div id="album-thumbnail-strip" class="absolute bottom-20 left-1/2 transform -translate-x-1/2 hidden md:block">
+            <div class="flex space-x-2 bg-black/30 backdrop-blur-sm p-2 rounded-lg max-w-md overflow-x-auto">
+                <!-- Thumbnails will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
 
 {{-- PDF Timeline with Carousel Navigation --}}
 
@@ -617,6 +673,131 @@ function goToImage(albumId, index) {
     state.currentImage = index;
 }
 
+// Album Modal Functionality
+let currentAlbumImages = [];
+let currentAlbumIndex = 0;
+let currentAlbumTitle = '';
+
+function openAlbumModal(albumId, title, images) {
+    currentAlbumImages = images;
+    currentAlbumIndex = 0;
+    currentAlbumTitle = title;
+
+    const modal = document.getElementById('album-modal');
+    const modalImage = document.getElementById('album-modal-image');
+    const modalTitle = document.getElementById('album-modal-title');
+    const currentCounter = document.getElementById('album-current-image');
+    const totalCounter = document.getElementById('album-total-images');
+    const currentCounterMobile = document.getElementById('album-current-image-mobile');
+    const totalCounterMobile = document.getElementById('album-total-images-mobile');
+    const thumbnailStrip = document.getElementById('album-thumbnail-strip');
+    const prevBtn = document.getElementById('album-prev-btn');
+    const nextBtn = document.getElementById('album-next-btn');
+
+    // Set initial image and info
+    modalImage.src = images[0];
+    modalImage.alt = title + ' - Ảnh 1';
+    if (modalTitle) modalTitle.textContent = title;
+    if (currentCounter) currentCounter.textContent = '1';
+    if (totalCounter) totalCounter.textContent = images.length.toString();
+    if (currentCounterMobile) currentCounterMobile.textContent = '1';
+    if (totalCounterMobile) totalCounterMobile.textContent = images.length.toString();
+
+    // Show/hide navigation buttons
+    if (images.length > 1) {
+        prevBtn.style.display = 'flex';
+        nextBtn.style.display = 'flex';
+        // Only create thumbnail strip on desktop
+        if (window.innerWidth >= 768) {
+            createThumbnailStrip(images);
+            thumbnailStrip.classList.remove('hidden');
+        }
+    } else {
+        prevBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        thumbnailStrip.classList.add('hidden');
+    }
+
+    // Show modal
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAlbumModal() {
+    const modal = document.getElementById('album-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = 'auto';
+}
+
+function previousAlbumImage() {
+    if (currentAlbumImages.length <= 1) return;
+
+    currentAlbumIndex = (currentAlbumIndex - 1 + currentAlbumImages.length) % currentAlbumImages.length;
+    updateAlbumModalImage();
+}
+
+function nextAlbumImage() {
+    if (currentAlbumImages.length <= 1) return;
+
+    currentAlbumIndex = (currentAlbumIndex + 1) % currentAlbumImages.length;
+    updateAlbumModalImage();
+}
+
+function goToAlbumImage(index) {
+    currentAlbumIndex = index;
+    updateAlbumModalImage();
+}
+
+function updateAlbumModalImage() {
+    const modalImage = document.getElementById('album-modal-image');
+    const currentCounter = document.getElementById('album-current-image');
+    const currentCounterMobile = document.getElementById('album-current-image-mobile');
+
+    modalImage.src = currentAlbumImages[currentAlbumIndex];
+    modalImage.alt = currentAlbumTitle + ' - Ảnh ' + (currentAlbumIndex + 1);
+    if (currentCounter) currentCounter.textContent = (currentAlbumIndex + 1).toString();
+    if (currentCounterMobile) currentCounterMobile.textContent = (currentAlbumIndex + 1).toString();
+
+    // Update thumbnail strip active state (desktop only)
+    if (window.innerWidth >= 768) {
+        updateThumbnailStrip();
+    }
+}
+
+function createThumbnailStrip(images) {
+    const thumbnailStrip = document.getElementById('album-thumbnail-strip');
+    const container = thumbnailStrip.querySelector('div');
+
+    container.innerHTML = '';
+
+    images.forEach((imageUrl, index) => {
+        const thumb = document.createElement('button');
+        thumb.className = `w-12 h-12 rounded overflow-hidden border-2 transition-all duration-200 ${index === 0 ? 'border-white' : 'border-transparent opacity-70 hover:opacity-100'}`;
+        thumb.onclick = () => goToAlbumImage(index);
+
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = `Thumbnail ${index + 1}`;
+        img.className = 'w-full h-full object-cover';
+
+        thumb.appendChild(img);
+        container.appendChild(thumb);
+    });
+}
+
+function updateThumbnailStrip() {
+    const thumbnails = document.querySelectorAll('#album-thumbnail-strip button');
+    thumbnails.forEach((thumb, index) => {
+        if (index === currentAlbumIndex) {
+            thumb.className = thumb.className.replace('border-transparent opacity-70', 'border-white');
+        } else {
+            thumb.className = thumb.className.replace('border-white', 'border-transparent opacity-70');
+        }
+    });
+}
+
 // Initialize image carousels on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Auto-initialize image carousels
@@ -627,6 +808,34 @@ document.addEventListener('DOMContentLoaded', function() {
             initImageCarousel(parseInt(albumId), imageCount);
         }
     });
+
+    // Album modal keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('album-modal');
+        if (modal && !modal.classList.contains('hidden')) {
+            switch(e.key) {
+                case 'Escape':
+                    closeAlbumModal();
+                    break;
+                case 'ArrowLeft':
+                    previousAlbumImage();
+                    break;
+                case 'ArrowRight':
+                    nextAlbumImage();
+                    break;
+            }
+        }
+    });
+
+    // Close modal on background click
+    const modal = document.getElementById('album-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAlbumModal();
+            }
+        });
+    }
 });
 
 // Handle window resize
@@ -645,6 +854,111 @@ window.addEventListener('resize', function() {
 /* Timeline Optimizations */
 .timeline-item {
     transition: all 0.3s ease;
+}
+
+/* Album Modal Styles */
+#album-modal {
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+#album-modal.hidden {
+    animation: fadeOut 0.3s ease-out;
+}
+
+#album-modal img {
+    max-height: 85vh;
+    max-width: 90vw;
+    transition: opacity 0.3s ease;
+}
+
+#album-modal button {
+    transition: all 0.2s ease;
+}
+
+#album-modal button:hover {
+    transform: scale(1.05);
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+#album-thumbnail-strip {
+    max-width: 90vw;
+}
+
+#album-thumbnail-strip > div {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+#album-thumbnail-strip > div::-webkit-scrollbar {
+    height: 4px;
+}
+
+#album-thumbnail-strip > div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#album-thumbnail-strip > div::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #album-modal .absolute.left-4,
+    #album-modal .absolute.right-4 {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+
+    #album-modal .absolute.top-4.right-4 {
+        top: 1rem;
+        right: 1rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1.25rem;
+    }
+
+    #album-modal img {
+        max-height: 90vh;
+        max-width: 100vw;
+        width: 100%;
+        height: auto;
+    }
+
+    /* Hide desktop elements on mobile */
+    #album-modal .hidden.md\\:block {
+        display: none !important;
+    }
+
+    /* Ensure mobile counter is visible */
+    #album-modal .md\\:hidden {
+        display: block !important;
+    }
+}
+
+/* Animation Keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
 }
 
 /* PDF Carousel Styles */
